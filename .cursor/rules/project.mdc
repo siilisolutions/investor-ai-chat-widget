@@ -1,0 +1,36 @@
+---
+description: Project conventions for the Siili Investor Chatbot Widget
+globs: src/**/*
+---
+
+# Siili Chatbot Widget — Project Rules
+
+Read `AGENTS.md` at the repo root for full project context, file map, design tokens, and common tasks.
+
+## Styling
+
+- ALWAYS use CSS custom properties from `src/styles/variables.css`. Never hardcode colors, spacing, or font families.
+- Use CSS Modules (`.module.css`) for component styles. One module per component.
+- Class names in CSS Modules should be camelCase.
+- Border radius is `var(--radius)` (20px) on all interactive elements.
+
+## Components
+
+- All component files are PascalCase `.tsx` in `src/components/`.
+- Each component file starts with a JSDoc block explaining what it renders, its props, and which widget mode it belongs to.
+- Props interfaces are defined in the same file, not exported separately (types shared across components go in `src/types/index.ts`).
+
+## Chat Service
+
+- The mock service is in `src/services/chatService.ts`. It implements the `ChatService` interface from `src/types/index.ts`.
+- When swapping for a real API, create a new file and update the import in `App.tsx`. Do not modify the interface.
+
+## TypeScript
+
+- Strict mode. No `any` types.
+- Use `.ts` extension imports explicitly (e.g., `import type { ChatMessage } from '../types/index.ts'`).
+
+## Design Reference
+
+- Figma: https://www.figma.com/design/vxWJbloNkZ8Muf5qi14MOy/IR-site
+- Font: Everett (Regular, Bold, Light). Assumed to be loaded by the host page.
