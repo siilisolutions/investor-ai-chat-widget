@@ -1,11 +1,13 @@
 /**
  * `ChatMessage` — a single Q+A pair rendered in the expanded chat
- * view. Maps to Figma nodes `147:1129` ("Question + Answer") and
- * `201:2280` (loading state with "Haetaan tietoa...").
+ * view. Maps to Figma nodes `147:1129` ("Question + Answer"),
+ * `178:482` (loading blob animation) and `201:2273` (loading state
+ * with "Haetaan tietoa...").
  *
  * Renders:
  * - The user's question as a right-aligned gray bubble
- * - Either the assistant's answer, the loading indicator, or an
+ * - Either the assistant's answer, the loading indicator (a
+ *   pulsating gray blob per AC-23 — not a spinner ring), or an
  *   error message
  * - An optional list of source badges under the "Lähteet:" label
  *
@@ -31,7 +33,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
       <div className={styles.answerContainer}>
         {loading ? (
           <div className={styles.loading} role="status" aria-live="polite">
-            <div className={styles.spinner} aria-hidden="true" />
+            <div className={styles.loadingBlob} aria-hidden="true" />
             <p className={styles.loadingText}>Haetaan tietoa...</p>
           </div>
         ) : error ? (
