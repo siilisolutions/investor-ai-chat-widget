@@ -6,6 +6,114 @@
 > (visual ground truth). When criteria here conflict with Figma on visual
 > details, Figma wins and this document must be updated.
 
+## AC Catalog
+
+Flat index of every `AC-xx` in this document. Use it to locate an AC by
+ID without scrolling the full spec. The AC body remains the source of
+truth — this table only summarises and links. Keep one row per ID; when
+a new AC is minted or an existing one is renamed, update the row here
+in the same PR.
+
+Status values:
+
+- `active` — AC is in force.
+- `deprecated` — AC has been retired in place (tombstoned); see the AC
+  body for the replacement ID.
+- `superseded` — AC has been replaced by a newer ID that subsumes its
+  behaviour; see the AC body for the successor.
+
+### Stability markers
+
+Every AC also carries exactly one stability marker, both inline on the
+AC heading (e.g. trailing `· **@stable**`) and in the `Stability`
+column of the catalog below. Stability tells reviewers (human or AI)
+how hard to push back on a change that touches the AC:
+
+- `@stable` — behaviour is shipped and known to work; regressions are
+  bugs. Default tag for ACs whose implementation is observable today
+  and has not been flagged as churning.
+- `@evolving` — actively being refined; spec and code may drift by
+  design. Use when the AC is partially implemented, being iterated on,
+  or awaiting a measurement / audit step before it can be called
+  stable. Prefer this over `@stable` when unsure.
+- `@aspirational` — target state, not yet implemented or verified.
+  Typical for ACs that depend on a system we do not yet have (real
+  backend, localisation, analytics pipeline) or for features that are
+  planned but unbuilt.
+
+Stability is orthogonal to Status: an `active` AC can be
+`@aspirational` (we mean to ship it but haven't), and a `deprecated`
+AC keeps whatever marker it carried when it was retired.
+
+| ID | One-line summary | Section | Status | Stability |
+|----|------------------|---------|--------|-----------|
+| AC-01 | Host-site embedding | [§3.1](#31-embedding--initialisation) | active | @stable |
+| AC-02 | Zero host dependencies | [§3.1](#31-embedding--initialisation) | active | @stable |
+| AC-03 | Idempotent init | [§3.1](#31-embedding--initialisation) | active | @evolving |
+| AC-10 | Initial state | [§3.2](#32-compact-hero-mode) | active | @stable |
+| AC-10a | Continue-conversation pill | [§3.2](#32-compact-hero-mode) | active | @aspirational |
+| AC-10b | Suggestion-chip de-duplication | [§3.2](#32-compact-hero-mode) | active | @aspirational |
+| AC-11 | Placeholder copy | [§3.2](#32-compact-hero-mode) | active | @stable |
+| AC-12 | Suggestion chip content | [§3.2](#32-compact-hero-mode) | active | @stable |
+| AC-13 | Sending from the textarea | [§3.2](#32-compact-hero-mode) | active | @stable |
+| AC-14 | Sending from a chip | [§3.2](#32-compact-hero-mode) | active | @stable |
+| AC-15 | Empty-submit guard | [§3.2](#32-compact-hero-mode) | active | @stable |
+| AC-16 | Send-button enablement | [§3.2](#32-compact-hero-mode) | active | @stable |
+| AC-20 | Transition | [§3.3](#33-expanded-chat-mode) | active | @stable |
+| AC-20a | Fill the viewport | [§3.3](#33-expanded-chat-mode) | active | @evolving |
+| AC-20b | Hero image hidden | [§3.3](#33-expanded-chat-mode) | active | @evolving |
+| AC-20c | Back navigation dismisses expanded mode | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
+| AC-20d | Close button | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
+| AC-21 | Header | [§3.3](#33-expanded-chat-mode) | active | @stable |
+| AC-22 | Question bubble | [§3.3](#33-expanded-chat-mode) | active | @stable |
+| AC-23 | Loading indicator | [§3.3](#33-expanded-chat-mode) | active | @evolving |
+| AC-24 | Answer rendering | [§3.3](#33-expanded-chat-mode) | active | @stable |
+| AC-25 | Source references | [§3.3](#33-expanded-chat-mode) | active | @stable |
+| AC-26 | No-sources case | [§3.3](#33-expanded-chat-mode) | active | @stable |
+| AC-27 | Auto-scroll to newest | [§3.3](#33-expanded-chat-mode) | active | @stable |
+| AC-28 | Input positioned below the latest reply | [§3.3](#33-expanded-chat-mode) | active | @evolving |
+| AC-29 | Follow-up questions | [§3.3](#33-expanded-chat-mode) | active | @stable |
+| AC-30 | Input disabled during load | [§3.3](#33-expanded-chat-mode) | active | @stable |
+| AC-31 | Mode transitions & history retention | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
+| AC-40 | Service rejection | [§3.4](#34-error-handling) | active | @stable |
+| AC-41 | No crash on error | [§3.4](#34-error-handling) | active | @stable |
+| AC-42 | No developer leakage | [§3.4](#34-error-handling) | active | @evolving |
+| AC-50 | Interface stability | [§3.5](#35-chat-service-contract) | active | @stable |
+| AC-51 | Mock fidelity | [§3.5](#35-chat-service-contract) | active | @stable |
+| AC-60 | Every factual claim is sourced | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational |
+| AC-61 | No forward-looking statements or advice | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational |
+| AC-62 | No insider or unpublished information | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational |
+| AC-63 | Language parity | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational |
+| AC-64 | Timestamp / freshness cue (recommended) | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational |
+| AC-65 | Clear AI labelling | [§4](#4-content-legal--trust-investor-critical) | active | @stable |
+| AC-70 | Figma parity | [§5](#5-visual-design--brand-award-critical) | active | @evolving |
+| AC-71 | Token-only styling | [§5](#5-visual-design--brand-award-critical) | active | @stable |
+| AC-72 | Send-button states | [§5](#5-visual-design--brand-award-critical) | active | @stable |
+| AC-73 | Typography | [§5](#5-visual-design--brand-award-critical) | active | @stable |
+| AC-74 | Motion polish | [§5](#5-visual-design--brand-award-critical) | active | @evolving |
+| AC-75 | No generic AI aesthetic | [§5](#5-visual-design--brand-award-critical) | active | @evolving |
+| AC-76 | Dark hero compatibility | [§5](#5-visual-design--brand-award-critical) | active | @evolving |
+| AC-80 | Keyboard-only operation | [§6](#6-accessibility) | active | @evolving |
+| AC-81 | Screen-reader labelling | [§6](#6-accessibility) | active | @evolving |
+| AC-82 | WCAG 2.1 AA contrast | [§6](#6-accessibility) | active | @evolving |
+| AC-83 | Reduced motion | [§6](#6-accessibility) | active | @aspirational |
+| AC-84 | Zoom and reflow | [§6](#6-accessibility) | active | @evolving |
+| AC-90 | Desktop (≥1024px) | [§7](#7-responsiveness) | active | @stable |
+| AC-91 | Tablet (640–1023px) | [§7](#7-responsiveness) | active | @evolving |
+| AC-92 | Mobile (<640px) | [§7](#7-responsiveness) | active | @evolving |
+| AC-93 | Textarea auto-grow | [§7](#7-responsiveness) | active | @stable |
+| AC-100 | Bundle budget | [§8](#8-performance) | active | @stable |
+| AC-101 | Cold-start render | [§8](#8-performance) | active | @evolving |
+| AC-102 | No host-page regression | [§8](#8-performance) | active | @aspirational |
+| AC-103 | No layout thrash | [§8](#8-performance) | active | @evolving |
+| AC-110 | Browser matrix | [§9](#9-cross-browser--environment) | active | @evolving |
+| AC-111 | No console errors | [§9](#9-cross-browser--environment) | active | @stable |
+| AC-112 | Graceful CSS isolation | [§9](#9-cross-browser--environment) | active | @stable |
+| AC-120 | Event emission | [§10](#10-observability-light-touch-frontend-only) | active | @aspirational |
+| AC-121 | No uncontrolled network calls | [§10](#10-observability-light-touch-frontend-only) | active | @stable |
+
+---
+
 ## 1. Personas & Primary Jobs-to-Be-Done
 
 ### P1 — The Investor (primary end user)
@@ -130,7 +238,7 @@ that tests and PR descriptions can reference.
 
 ### 3.1 Embedding & Initialisation
 
-- **AC-01** — *Host-site embedding*
+- **AC-01** — *Host-site embedding* · **@stable**
   - **Given** the host page includes `<div id="siili-chatbot"></div>`,
     `siili-chatbot.css`, and `siili-chatbot.iife.js`,
   - **When** the host calls `SiiliChatbot.init({ container: '#siili-chatbot' })`,
@@ -138,7 +246,7 @@ that tests and PR descriptions can reference.
     without polluting `window` beyond the `SiiliChatbot` global, and
     without leaking CSS into the host page.
 
-- **AC-02** — *Zero host dependencies*
+- **AC-02** — *Zero host dependencies* · **@stable**
   - **Given** a host page that loads only `siili-chatbot.css` and
     `siili-chatbot.iife.js` and exposes `<div id="siili-chatbot"></div>`
     (no other scripts, no shared runtime, no global libraries),
@@ -147,7 +255,7 @@ that tests and PR descriptions can reference.
     must not reach for any global beyond the `SiiliChatbot` namespace
     it exports itself.
 
-- **AC-03** — *Idempotent init*
+- **AC-03** — *Idempotent init* · **@evolving**
   - **Given** `SiiliChatbot.init()` has already run,
   - **When** it is called a second time on the same container,
   - **Then** the widget is remounted cleanly (no duplicate UI, no
@@ -157,14 +265,14 @@ that tests and PR descriptions can reference.
 
 Maps to Figma node `113:203`.
 
-- **AC-10** — *Initial state*
+- **AC-10** — *Initial state* · **@stable**
   - **Given** the page has just loaded and `messages.length === 0`,
   - **When** the widget renders for the first time,
   - **Then** it shows the compact mode: one textarea and exactly three
     suggestion chips, overlaid on the hero section in the layout
     defined in Figma.
 
-- **AC-10a** — *Continue-conversation pill*
+- **AC-10a** — *Continue-conversation pill* · **@aspirational**
   - **Given** the user has previously been in expanded mode within the
     current page session and `messages.length > 0`, and the widget is
     now rendering compact mode,
@@ -178,7 +286,7 @@ Maps to Figma node `113:203`.
   - **Given** `messages.length === 0`,
   - **Then** the pill is not rendered.
 
-- **AC-10b** — *Suggestion-chip de-duplication*
+- **AC-10b** — *Suggestion-chip de-duplication* · **@aspirational**
   - **Given** the user has previously asked one of the three predefined
     questions,
   - **When** compact mode is rendered again in the same session,
@@ -188,13 +296,13 @@ Maps to Figma node `113:203`.
   - **Then** no chips are rendered (only the textarea and, per AC-10a,
     the continue pill).
 
-- **AC-11** — *Placeholder copy*
+- **AC-11** — *Placeholder copy* · **@stable**
   - **Given** compact mode is shown,
   - **Then** the textarea displays the placeholder
     *"Kysy minulta mitä vaan Siilistä sijoituskohteena tai
     taloustiedoistamme."* in the `--gray-900` token colour.
 
-- **AC-12** — *Suggestion chip content*
+- **AC-12** — *Suggestion chip content* · **@stable**
   - **Given** compact mode is shown,
   - **Then** the three chips display the three predefined investor
     questions in Finnish (segments, dividend policy, revenue growth)
@@ -206,24 +314,24 @@ Maps to Figma node `113:203`.
     wrap on tablet, horizontal scroll or wrap on mobile), not by
     breaking chip labels.
 
-- **AC-13** — *Sending from the textarea*
+- **AC-13** — *Sending from the textarea* · **@stable**
   - **Given** the user has typed a non-empty, non-whitespace question,
   - **When** they press `Enter` (without `Shift`) or click the send button,
   - **Then** the widget transitions to expanded mode, the question is
     sent to the chat service, and the textarea is cleared.
 
-- **AC-14** — *Sending from a chip*
+- **AC-14** — *Sending from a chip* · **@stable**
   - **Given** a suggestion chip is rendered,
   - **When** the user clicks (or keyboard-activates) it,
   - **Then** the chip's label is sent as the question and the widget
     transitions to expanded mode.
 
-- **AC-15** — *Empty-submit guard*
+- **AC-15** — *Empty-submit guard* · **@stable**
   - **Given** the textarea is empty or whitespace-only,
   - **When** the user presses `Enter` or clicks send,
   - **Then** nothing happens and the widget stays in compact mode.
 
-- **AC-16** — *Send-button enablement*
+- **AC-16** — *Send-button enablement* · **@stable**
   - **Given** the textarea is empty,
   - **Then** the send button is visibly and functionally disabled.
   - **When** at least one non-whitespace character is entered,
@@ -234,7 +342,7 @@ Maps to Figma node `113:203`.
 
 Maps to Figma node `143:753`.
 
-- **AC-20** — *Transition*
+- **AC-20** — *Transition* · **@stable**
   - **Given** the widget is in compact mode and a valid message is
     submitted,
   - **When** the transition occurs,
@@ -242,7 +350,7 @@ Maps to Figma node `143:753`.
     pair is visible immediately with the question filled in and the
     assistant answer in loading state.
 
-- **AC-20a** — *Fill the viewport*
+- **AC-20a** — *Fill the viewport* · **@evolving**
   - **Given** the widget has entered expanded mode,
   - **Then** the chat surface fills the entire browser viewport
     (100vw × 100vh from the widget's root container), with a solid
@@ -250,7 +358,7 @@ Maps to Figma node `143:753`.
   - **Then** no host-page content behind the widget is visible through
     it (no translucency, no gaps at the edges).
 
-- **AC-20b** — *Hero image hidden*
+- **AC-20b** — *Hero image hidden* · **@evolving**
   - **Given** the widget is in expanded mode,
   - **Then** the hero image / hero section that was visible behind the
     compact view is no longer visible to the user — either because
@@ -259,7 +367,7 @@ Maps to Figma node `143:753`.
   - **Then** switching to expanded mode does not cause the page
     underneath to scroll or reflow visibly.
 
-- **AC-20c** — *Back navigation dismisses expanded mode*
+- **AC-20c** — *Back navigation dismisses expanded mode* · **@aspirational**
   - **Given** `SiiliChatbot.init({ interceptBackNavigation: true })`
     (default `true`) and the widget is about to enter expanded mode,
   - **When** the compact → expanded transition begins,
@@ -277,7 +385,7 @@ Maps to Figma node `143:753`.
   - **Then** no history entry is pushed and `popstate` is not
     intercepted.
 
-- **AC-20d** — *Close button*
+- **AC-20d** — *Close button* · **@aspirational**
   - **Given** the widget is in expanded mode,
   - **Then** a close (`×`) button is rendered in the top-right of the
     expanded view, styled per Siili tokens (not a generic Material
@@ -291,17 +399,17 @@ Maps to Figma node `143:753`.
   - **Given** `prefers-reduced-motion: reduce`,
   - **Then** the dismiss transition is instant (no fade / slide).
 
-- **AC-21** — *Header*
+- **AC-21** — *Header* · **@stable**
   - **Given** expanded mode is shown,
   - **Then** the header reads *"Siili AI-avustaja"* styled per Figma
     `143:753` (Everett, weight/size per tokens).
 
-- **AC-22** — *Question bubble*
+- **AC-22** — *Question bubble* · **@stable**
   - **Given** any Q+A pair,
   - **Then** the question appears right-aligned in a `--gray-500`
     bubble with `--radius` corners (Figma `147:1129`).
 
-- **AC-23** — *Loading indicator*
+- **AC-23** — *Loading indicator* · **@evolving**
   - **Given** an in-flight assistant answer,
   - **Then** a pulsating gray blob (Figma `178:482` / loading state
     `201:2273`) and the text *"Haetaan tietoa..."* appear in place
@@ -311,12 +419,12 @@ Maps to Figma node `143:753`.
     pulse at the tempo defined in Figma `178:482` — not a spinning
     ring, not a bar, not a stepped dot sequence.
 
-- **AC-24** — *Answer rendering*
+- **AC-24** — *Answer rendering* · **@stable**
   - **Given** the chat service resolves with an answer,
   - **Then** the pulsating blob is replaced by the answer text,
     preserving paragraph breaks from the backend response.
 
-- **AC-25** — *Source references*
+- **AC-25** — *Source references* · **@stable**
   - **Given** an answer includes one or more `sources`,
   - **Then** the section labelled *"Lähteet:"* is rendered below the
     answer with one `SourceBadge` (Figma `178:441`) per source.
@@ -327,17 +435,17 @@ Maps to Figma node `143:753`.
   - **Then** the badge is rendered as static, non-interactive text
     (no underline, no hover affordance).
 
-- **AC-26** — *No-sources case*
+- **AC-26** — *No-sources case* · **@stable**
   - **Given** an answer has zero sources,
   - **Then** the "Lähteet:" section is not rendered at all (no empty
     label, no empty container).
 
-- **AC-27** — *Auto-scroll to newest*
+- **AC-27** — *Auto-scroll to newest* · **@stable**
   - **Given** expanded mode is shown and a new Q+A pair is appended,
   - **Then** the messages container smoothly scrolls the newest pair
     into view.
 
-- **AC-28** — *Input positioned below the latest reply*
+- **AC-28** — *Input positioned below the latest reply* · **@evolving**
   - **Given** expanded mode is shown,
   - **Then** the `ChatInput` is rendered immediately underneath the
     most recent assistant reply (or its loading blob), in document
@@ -353,18 +461,18 @@ Maps to Figma node `143:753`.
     input beneath it are both visible together, with the input at or
     near the bottom of the viewport.
 
-- **AC-29** — *Follow-up questions*
+- **AC-29** — *Follow-up questions* · **@stable**
   - **Given** the user is in expanded mode and sends another message,
   - **Then** a new Q+A pair is appended below the previous ones
     (existing pairs are never mutated) and the input is cleared.
 
-- **AC-30** — *Input disabled during load*
+- **AC-30** — *Input disabled during load* · **@stable**
   - **Given** an assistant answer is in flight,
   - **Then** the textarea and send button are disabled (visually
     greyed per Figma and functionally non-interactive) until the
     response resolves.
 
-- **AC-31** — *Mode transitions & history retention*
+- **AC-31** — *Mode transitions & history retention* · **@aspirational**
   - **Given** the widget is in expanded mode,
   - **When** the user dismisses it via the close button (AC-20d),
     `Esc`, or browser back (AC-20c),
@@ -386,19 +494,19 @@ Maps to Figma node `143:753`.
 
 ### 3.4 Error Handling
 
-- **AC-40** — *Service rejection*
+- **AC-40** — *Service rejection* · **@stable**
   - **Given** `sendMessage` rejects,
   - **Then** the corresponding Q+A pair shows a human-readable error
     message (Finnish by default, e.g. *"Pahoittelut, jokin meni pieleen."*)
     with `role="alert"`, no loading blob, and no source list.
 
-- **AC-41** — *No crash on error*
+- **AC-41** — *No crash on error* · **@stable**
   - **Given** any error path is taken,
   - **Then** the widget remains fully functional: the user can still
     type and send new messages; the error state is scoped to the one
     failed pair.
 
-- **AC-42** — *No developer leakage*
+- **AC-42** — *No developer leakage* · **@evolving**
   - **Given** an error occurs,
   - **Then** stack traces, internal identifiers, or raw error payloads
     are never rendered in the UI (they may be logged to the console in
@@ -406,13 +514,13 @@ Maps to Figma node `143:753`.
 
 ### 3.5 Chat Service Contract
 
-- **AC-50** — *Interface stability*
+- **AC-50** — *Interface stability* · **@stable**
   - **Given** the `ChatService` interface in `src/types/index.ts`,
   - **Then** swapping `src/services/chatService.ts` for a real API
     client requires **no** changes to `App.tsx`, `ExpandedView.tsx`, or
     the `ChatMessage` component.
 
-- **AC-51** — *Mock fidelity*
+- **AC-51** — *Mock fidelity* · **@stable**
   - **Given** the default mock service is used,
   - **Then** it resolves after ~800ms with a canned Finnish answer and
     two source references (enough to demo the full UI without a
@@ -426,14 +534,14 @@ These criteria exist because the primary user is making regulated
 financial decisions. They apply primarily to the backend, but the
 **widget must not undermine them** through UX.
 
-- **AC-60** — *Every factual claim is sourced*
+- **AC-60** — *Every factual claim is sourced* · **@aspirational**
   - **Given** any answer that states a fact about Siili (revenue,
     dividend, governance, strategy, etc.),
   - **Then** the answer includes at least one source reference linking
     to a published disclosure (annual report, stock exchange release,
     IR PDF, articles of association, etc.).
 
-- **AC-61** — *No forward-looking statements or advice*
+- **AC-61** — *No forward-looking statements or advice* · **@aspirational**
   - **Given** an investor asks for a price prediction, buy/sell advice,
     or a forecast,
   - **Then** the answer politely declines and redirects to published
@@ -441,25 +549,25 @@ financial decisions. They apply primarily to the backend, but the
     widget must render the polite-decline response without decoration
     that makes it look like advice).
 
-- **AC-62** — *No insider or unpublished information*
+- **AC-62** — *No insider or unpublished information* · **@aspirational**
   - **Then** answers must only reference materials already publicly
     disclosed. The widget should never hide or truncate a source link
     in a way that obscures provenance.
 
-- **AC-63** — *Language parity*
+- **AC-63** — *Language parity* · **@aspirational**
   - **Given** the host site toggles `FI ↔ EN`,
   - **Then** the widget UI strings (placeholder, header, chips,
     *"Lähteet:"*, *"Haetaan tietoa..."*, error copy) and the backend
     prompt locale are both switched. A Finnish UI answering in English
     (or vice-versa) is a bug.
 
-- **AC-64** — *Timestamp / freshness cue (recommended)*
+- **AC-64** — *Timestamp / freshness cue (recommended)* · **@aspirational**
   - **Given** an answer cites a dated document,
   - **Then** the reference badge includes the document's date (e.g.
     "Vuosikertomus 2025") so the investor can judge freshness without
     opening the PDF.
 
-- **AC-65** — *Clear AI labelling*
+- **AC-65** — *Clear AI labelling* · **@stable**
   - **Given** the expanded view,
   - **Then** it is unambiguous that the user is talking to an AI
     assistant (the "Siili AI-avustaja" header, plus any disclaimer
@@ -471,13 +579,13 @@ financial decisions. They apply primarily to the backend, but the
 
 These criteria exist to satisfy P2's competition-entry ambition.
 
-- **AC-70** — *Figma parity*
+- **AC-70** — *Figma parity* · **@evolving**
   - **Given** any component referenced in `AGENTS.md §Figma`,
   - **Then** its rendered output matches the Figma frame for layout,
     spacing, border-radius, typography, and colour within a ±1px
     tolerance. Deltas are tracked as defects, not as acceptable drift.
 
-- **AC-71** — *Token-only styling*
+- **AC-71** — *Token-only styling* · **@stable**
   - **Given** any `.module.css` file in `src/styles/`,
   - **Then** it references colours, font families, radii, and shadows
     only via `var(--token)` from `variables.css`. A grep for
@@ -485,7 +593,7 @@ These criteria exist to satisfy P2's competition-entry ambition.
     should return zero matches (with the exception of `variables.css`
     itself).
 
-- **AC-72** — *Send-button states*
+- **AC-72** — *Send-button states* · **@stable**
   - **Given** the send button in either mode,
   - **Then** the Active, Hover, and Pressed visuals match Figma
     `149:1410 / 149:1441 / 150:396` respectively, built from
@@ -493,7 +601,7 @@ These criteria exist to satisfy P2's competition-entry ambition.
     [`src/styles/variables.css`](src/styles/variables.css), with
     smooth CSS transitions between states.
 
-- **AC-73** — *Typography*
+- **AC-73** — *Typography* · **@stable**
   - **Given** the widget is rendered on a page that has loaded the
     Everett font,
   - **Then** all text uses the `--font-family*` tokens in
@@ -505,21 +613,21 @@ These criteria exist to satisfy P2's competition-entry ambition.
   - **Then** the widget falls back to `sans-serif` gracefully without
     layout shift larger than one line-height.
 
-- **AC-74** — *Motion polish*
+- **AC-74** — *Motion polish* · **@evolving**
   - **Given** any interactive element (chip, send button, textarea
     focus, compact → expanded transition),
   - **Then** transitions are tastefully animated (no abrupt flicker,
     no overshoot) with durations in the 120–300ms range and an
     easing that matches the rest of the IR site.
 
-- **AC-75** — *No generic AI aesthetic*
+- **AC-75** — *No generic AI aesthetic* · **@evolving**
   - **Given** a juror inspects the widget,
   - **Then** there are no generic "ChatGPT-looking" artifacts: no
     speech bubbles with default tails, no Material-style FAB, no
     default-looking spinners. Every interactive surface uses Siili's
     gradient, tokens, and `--radius`.
 
-- **AC-76** — *Dark hero compatibility*
+- **AC-76** — *Dark hero compatibility* · **@evolving**
   - **Given** the compact mode is overlaid on the hero image,
   - **Then** the translucent textarea and chips maintain WCAG AA
     contrast against the busiest region of the hero image (tested
@@ -529,33 +637,33 @@ These criteria exist to satisfy P2's competition-entry ambition.
 
 ## 6. Accessibility
 
-- **AC-80** — *Keyboard-only operation*
+- **AC-80** — *Keyboard-only operation* · **@evolving**
   - **Given** a keyboard-only user,
   - **When** they Tab into the widget,
   - **Then** focus order is: textarea → send button → each suggestion
     chip (compact) / each source badge (expanded), with a visible
     focus ring that contrasts against the background.
 
-- **AC-81** — *Screen-reader labelling*
+- **AC-81** — *Screen-reader labelling* · **@evolving**
   - **Given** a screen reader,
   - **Then** the textarea announces its aria-label, the send button
     announces "Send message", the loading state announces *"Haetaan
     tietoa..."* (`aria-live="polite"`), and errors announce via
     `role="alert"`.
 
-- **AC-82** — *WCAG 2.1 AA contrast*
+- **AC-82** — *WCAG 2.1 AA contrast* · **@evolving**
   - **Given** every text/background pair defined by the tokens,
   - **Then** contrast is at least 4.5:1 for body text and 3:1 for
     large text and non-text UI.
 
-- **AC-83** — *Reduced motion*
+- **AC-83** — *Reduced motion* · **@aspirational**
   - **Given** `prefers-reduced-motion: reduce`,
   - **Then** the compact → expanded transition, auto-scroll, and the
     loading blob's pulse animation are reduced or disabled (the blob
     is rendered as a static gray shape alongside the "Haetaan
     tietoa..." text, with no scale/opacity animation).
 
-- **AC-84** — *Zoom and reflow*
+- **AC-84** — *Zoom and reflow* · **@evolving**
   - **Given** a 200% browser zoom,
   - **Then** no content is clipped or requires horizontal scrolling
     within the widget's container.
@@ -564,23 +672,23 @@ These criteria exist to satisfy P2's competition-entry ambition.
 
 ## 7. Responsiveness
 
-- **AC-90** — *Desktop (≥1024px)*
+- **AC-90** — *Desktop (≥1024px)* · **@stable**
   - The compact input and chips sit within the hero per Figma
     `113:203`; expanded view has comfortable horizontal padding
     matching Figma `143:753`.
 
-- **AC-91** — *Tablet (640–1023px)*
+- **AC-91** — *Tablet (640–1023px)* · **@evolving**
   - Chips wrap to two rows if needed; the textarea grows to full
     container width; the send button stays inside the input shell.
 
-- **AC-92** — *Mobile (<640px)*
+- **AC-92** — *Mobile (<640px)* · **@evolving**
   - Compact view stacks the input above the chips; chips are
     horizontally scrollable or wrap without overflowing the viewport;
     expanded view uses `100%` container width with padding per Figma
     mobile guidance (or tasteful scale-down if mobile frames are not
     yet designed).
 
-- **AC-93** — *Textarea auto-grow*
+- **AC-93** — *Textarea auto-grow* · **@stable**
   - **Given** the user types multi-line content,
   - **Then** the textarea grows up to 240px of content height, then
     scrolls internally (never pushes the send button out of view).
@@ -589,24 +697,24 @@ These criteria exist to satisfy P2's competition-entry ambition.
 
 ## 8. Performance
 
-- **AC-100** — *Bundle budget*
+- **AC-100** — *Bundle budget* · **@stable**
   - **Given** the production build,
   - **Then** `dist/siili-chatbot.iife.js` + `dist/siili-chatbot.css`
     combined gzip size is ≤ 60 KB. Any increase is justified in PR
     description.
 
-- **AC-101** — *Cold-start render*
+- **AC-101** — *Cold-start render* · **@evolving**
   - **Given** a cold cache on a simulated mid-range laptop
     (4× CPU throttling in Chrome DevTools),
   - **Then** the compact view is interactive within 150ms of script
     load completing.
 
-- **AC-102** — *No host-page regression*
+- **AC-102** — *No host-page regression* · **@aspirational**
   - **Given** the widget is embedded on the IR site,
   - **Then** Lighthouse performance score for the host page drops by
     no more than 2 points versus the same page without the widget.
 
-- **AC-103** — *No layout thrash*
+- **AC-103** — *No layout thrash* · **@evolving**
   - **Given** messages are streaming in,
   - **Then** CLS (Cumulative Layout Shift) contributed by the widget
     is ≤ 0.05 during a full conversation session.
@@ -615,17 +723,17 @@ These criteria exist to satisfy P2's competition-entry ambition.
 
 ## 9. Cross-Browser & Environment
 
-- **AC-110** — *Browser matrix*
+- **AC-110** — *Browser matrix* · **@evolving**
   - The widget works on the latest two versions of Chrome, Edge,
     Firefox, and Safari (desktop and iOS Safari / Android Chrome).
 
-- **AC-111** — *No console errors*
+- **AC-111** — *No console errors* · **@stable**
   - **Given** a happy-path session (load → compact → send → expanded
     → follow-up → success),
   - **Then** there are zero errors and zero warnings in the browser
     console in production builds.
 
-- **AC-112** — *Graceful CSS isolation*
+- **AC-112** — *Graceful CSS isolation* · **@stable**
   - **Given** the host page has its own aggressive global styles,
   - **Then** the widget's layout is not visibly affected because all
     styling is scoped through CSS Modules and a `siiliChatbot` root
@@ -635,7 +743,7 @@ These criteria exist to satisfy P2's competition-entry ambition.
 
 ## 10. Observability (Light-Touch, Frontend Only)
 
-- **AC-120** — *Event emission*
+- **AC-120** — *Event emission* · **@aspirational**
   - **Given** these user actions — widget mounted, chip clicked,
     message sent, response received, response errored, chat closed
     (via `×` / `Esc` / back), chat reopened (via continue pill),
@@ -646,11 +754,55 @@ These criteria exist to satisfy P2's competition-entry ambition.
     method (`"close_button" | "escape_key" | "back_navigation"`) and
     the message count at dismiss time.
 
-- **AC-121** — *No uncontrolled network calls*
+- **AC-121** — *No uncontrolled network calls* · **@stable**
   - **Given** the widget is mounted,
   - **Then** it makes no network requests beyond the configured
     `ChatService` endpoint and any fonts/stylesheets declared by the
     host page. No third-party trackers embedded in the widget.
+
+---
+
+## 10.5 Amending ACs
+
+The criteria in this document are meant to evolve — but only through
+the patterns below, so AC-IDs stay stable and traceable. Agents
+working under [`.cursor/rules/sdd.mdc`](.cursor/rules/sdd.mdc) must
+propose amendments here *before* coding against behaviour that is
+not covered.
+
+- **Add a new AC** when a task introduces behaviour no existing
+  criterion covers. Pick the next free `AC-xx` in the relevant band
+  (3.1 embedding, 3.2 compact, 3.3 expanded, 3.4 errors, 3.5
+  service, 4 content/legal, 5 visual, 6 a11y, 7 responsiveness, 8
+  performance, 9 browser, 10 observability) and write it as
+  Given/When/Then with a short title. Do not reuse a retired ID.
+- **Edit an existing AC** when the required behaviour has changed.
+  Keep the ID; rewrite the Given/When/Then in the same PR as the
+  code change, and note the edit in the PR description (e.g.
+  `AC-23 loading copy updated to match Figma 178:482`).
+- **Deprecate** instead of deleting. Prefix the AC title with
+  `(deprecated)`, add a one-line reason, and link to the
+  replacement AC-ID if one exists. Retired IDs are never reused so
+  historical PRs keep resolving to something.
+- **Visual ACs** must either cite a Figma node in §2.5 Figma
+  Manifest or mark the row `— (code-authored)` with a short
+  justification. A new visual AC without a manifest row is
+  incomplete.
+- **Non-goals** (§12) are amended the same way but require
+  explicit human approval per
+  [`.cursor/rules/change-boundary.mdc`](.cursor/rules/change-boundary.mdc)
+  — relaxing a non-goal expands scope and must not be done silently
+  by an agent.
+- **Traceability**: when a PR adds, edits, or deprecates an AC,
+  list the affected AC-IDs in the commit / PR body the same way
+  code PRs do. If the AC is visual, bump `Last checked` /
+  `Checked by` in §2.5 for the bound row.
+- **§13 Traceability roll-up** is derived from §2.5 — re-derive it
+  only when persona mapping changes, not for every AC edit.
+
+When in doubt, propose the amendment in chat as a diff against this
+section and the affected `AC-xx`, and let the human confirm before
+the implementation PR lands.
 
 ---
 

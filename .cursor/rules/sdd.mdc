@@ -1,0 +1,47 @@
+---
+description: Spec-driven development — bind every change to an AC-ID
+globs: src/**/*, ACCEPTANCE_CRITERIA.md
+alwaysApply: true
+---
+
+# Spec-driven development
+
+[`ACCEPTANCE_CRITERIA.md`](../../ACCEPTANCE_CRITERIA.md) is the contract for "done". Every non-trivial change binds to at least one `AC-xx` ID there.
+
+## Before you code
+
+- **Identify the ACs.** List the `AC-xx` IDs the change satisfies, modifies, or would newly introduce. Skim §12 Non-Goals to confirm the task is in scope.
+- **If no AC covers it**, propose an AC amendment first (see [`ACCEPTANCE_CRITERIA.md`](../../ACCEPTANCE_CRITERIA.md) §Amending ACs). Do not code silently against an unwritten spec.
+- **If the task conflicts with §12 Non-Goals**, stop and ask — non-goals can only be relaxed with explicit human approval per [`change-boundary.mdc`](change-boundary.mdc).
+
+## Ambiguity protocol
+
+If an AC is silent, self-contradictory, or disagrees with Figma:
+
+1. Do **not** pick arbitrarily.
+2. Either (a) propose a one-paragraph AC patch (add / edit / deprecate per §Amending ACs), or (b) ask the user for the intended behaviour.
+3. For visual conflicts, Figma wins — follow [`project.mdc`](project.mdc) §Figma-first workflow and update the AC + token, not the design.
+
+## Traceability
+
+- Commit messages and PR descriptions list every `AC-xx` touched (e.g. `AC-20d, AC-31`).
+- If a new component or behaviour does not map to an existing AC, the same PR must add the new AC and, when visual, the matching row in §2.5 Figma Manifest.
+- Tests, when added, reference the AC-ID in the test name / description (e.g. `AC-15: empty submit is a no-op`).
+
+## Self-review before finishing
+
+For non-trivial changes, end the turn with a short AC checklist:
+
+- For each touched `AC-xx`, state how it was verified — build / lint / test signal from [`verification.mdc`](verification.mdc), manual dev-harness steps from [`ACCEPTANCE_CRITERIA.md`](../../ACCEPTANCE_CRITERIA.md) §11 Definition of Done, or Figma node checked per [`project.mdc`](project.mdc).
+- If an AC in scope could not be verified this turn, say so explicitly rather than implying coverage.
+- For larger changes, consider running [`scripts/prompts/ac-review.md`](../../scripts/prompts/ac-review.md) in a separate turn for an adversarial second pass.
+
+## Deference
+
+This rule only governs the spec↔code binding. It does **not** restate:
+
+- Build / lint / smoke commands — see [`verification.mdc`](verification.mdc).
+- Approval gates for deps, `vite.config.ts`, public API, CI — see [`change-boundary.mdc`](change-boundary.mdc).
+- Stack conventions, typing, input handlers — see [`code-governance.mdc`](code-governance.mdc).
+- Figma-first visual workflow and node manifest — see [`project.mdc`](project.mdc) and §2.5 of `ACCEPTANCE_CRITERIA.md`.
+- Host-page safety for the embedded bundle — see [`embed-safety.mdc`](embed-safety.mdc).

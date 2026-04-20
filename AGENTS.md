@@ -102,12 +102,25 @@ All tokens live in `src/styles/variables.css` as CSS custom properties. These va
 
 ## Key Decisions & Constraints
 
+> **AC-100 — Bundle budget (load-bearing invariant):** Combined gzipped size of `dist/siili-chatbot.iife.js` + `dist/siili-chatbot.css` **must be ≤ 60 KB**. Any increase must be justified in the PR description. This is the single hardest constraint on the project — it dictates the framework choice (Preact over React), the absence of UI libraries, and the CSS-Modules-not-Tailwind decision. Check `gzip:` output from `npm run build` before merging any change under `src/`, `vite.config.ts`, or dependencies. Source of truth: [`ACCEPTANCE_CRITERIA.md` §8 Performance, AC-100](ACCEPTANCE_CRITERIA.md#8-performance).
+
 1. **Library mode (IIFE)**: The widget bundles its UI framework internally so the host page doesn't need anything pre-loaded. Output is a single `siili-chatbot.iife.js` + `siili-chatbot.css`.
 2. **Preact with React compatibility**: The runtime framework is Preact, aliased in `vite.config.ts` and `tsconfig.app.json` so `import { useState } from 'react'` (etc.) resolves to `preact/compat`. Source code reads like React and uses React-shaped type imports (`KeyboardEvent` from `'react'`, JSX `className`, etc.); the bundle only ships Preact. The choice is driven by AC-100: React 19 + ReactDOM gzipped to ~179 KB (≈3× over budget), Preact gzips to ~10 KB.
 3. **CSS Modules**: Scoped styles that won't leak into the host page. No Tailwind — keeps the bundle small and avoids config conflicts.
 4. **No external UI library**: Zero runtime dependencies beyond Preact (bundled). The `react` and `react-dom` npm packages are intentionally **not** installed — adding them back would silently defeat the alias and blow AC-100.
 5. **Mocked backend**: `src/services/chatService.ts` returns fake responses after a delay. The `ChatService` interface in `src/types/index.ts` is the contract to implement.
 6. **Font**: Figma specifies `Everett`. The host site is expected to load this font. The widget falls back to `sans-serif`.
+
+## Spec-driven workflow
+
+[`ACCEPTANCE_CRITERIA.md`](ACCEPTANCE_CRITERIA.md) is the contract for "done". Every non-trivial change binds to at least one `AC-xx` ID there. The rules and prompts that enforce this:
+
+- [`.cursor/rules/sdd.mdc`](.cursor/rules/sdd.mdc) — always-on rule. Cite AC-IDs, respect §12 Non-Goals, stop-and-ask on ambiguity, end non-trivial turns with an AC-anchored self-review.
+- [`ACCEPTANCE_CRITERIA.md` §Amending ACs](ACCEPTANCE_CRITERIA.md#105-amending-acs) — how to add, edit, or deprecate an `AC-xx` when the spec is silent or out of date. Do this *before* coding the new behaviour.
+- [`scripts/prompts/ac-review.md`](scripts/prompts/ac-review.md) — reusable read-only reviewer prompt (scoped / full-sweep). Run in a separate turn on non-trivial PRs for an adversarial AC-coverage pass; apply accepted fixes in a third turn.
+- [`scripts/prompts/figma-sync.md`](scripts/prompts/figma-sync.md) — the visual counterpart. Pair with `ac-review.md` full-sweep on release gates.
+
+Minimal flow for a new task: identify AC-IDs → (amend if missing) → implement → self-review against the ACs → optionally run `ac-review.md` before merge.
 
 ## Common Tasks
 
