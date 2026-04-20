@@ -136,6 +136,8 @@ AC keeps whatever marker it carried when it was retired.
 | AC-120b | Event emission — no PII in payloads | [§10](#10-observability-light-touch-frontend-only) | active | @aspirational |
 | AC-120c | Event emission — `chat_closed` payload | [§10](#10-observability-light-touch-frontend-only) | active | @aspirational |
 | AC-121 | No uncontrolled network calls | [§10](#10-observability-light-touch-frontend-only) | active | @stable |
+| AC-N1 | MUST NOT render backend-provided HTML or Markdown | [§12](#12-non-goals--explicit-non-requirements) | active | @stable |
+| AC-N2 | MUST NOT bundle font files with the widget | [§12](#12-non-goals--explicit-non-requirements) | active | @stable |
 
 ---
 
@@ -964,7 +966,19 @@ A change is "done" only when all of the following are true:
 
 ## 12. Non-Goals / Explicit Non-Requirements
 
-Spelled out to prevent scope creep:
+Spelled out to prevent scope creep. Two classes of items live here:
+
+- **Product decisions** — things we've chosen not to do in v1 but
+  which could become features in a later release. These carry no
+  AC-ID; relaxing them still requires explicit human approval per
+  [`.cursor/rules/change-boundary.mdc`](.cursor/rules/change-boundary.mdc)
+  and §10.5.
+- **Invariants** — things the widget **must not** do regardless of
+  release. These are elevated to negative AC-IDs (`AC-Nx`) below so
+  they are enforceable, traceable, and testable the same way other
+  ACs are.
+
+### 12.1 Product decisions (v1 scope)
 
 - The widget does **not** persist conversation history across page
   loads. A hard reload is the intentional reset mechanism; no
@@ -972,11 +986,40 @@ Spelled out to prevent scope creep:
 - The widget does **not** stream tokens (current contract is
   request/response). Streaming is a future extension of
   `ChatService`, not a v1 requirement.
-- The widget does **not** render Markdown or HTML from the backend
-  in v1 — plain text with paragraph breaks only — to minimise the
-  surface for prompt-injection attacks before moderation is in place.
+
+### 12.2 Invariants (`AC-Nx`)
+
+Human-friendly summary:
+
+- The widget does **not** render Markdown or HTML from the backend —
+  plain text with paragraph breaks only — to minimise the surface
+  for prompt-injection attacks before moderation is in place. See
+  **AC-N1**.
 - The widget does **not** ship its own font files; it assumes the
-  host site loads Everett.
+  host site loads Everett (see also AC-73b for fallback behaviour).
+  See **AC-N2**.
+
+The contract:
+
+- **AC-N1** — *MUST NOT render backend-provided HTML or Markdown* · **@stable**
+  - **Given** any string the widget receives from the `ChatService`
+    (question echo, answer body, source label, or error text),
+  - **When** that string is rendered into the DOM,
+  - **Then** it MUST be rendered as plain text (React children /
+    text nodes). The widget MUST NOT use `dangerouslySetInnerHTML`,
+    MUST NOT parse or render Markdown, and MUST NOT interpret HTML
+    tags inside the string. Paragraph separation is the only
+    formatting allowed, applied by splitting on newlines and
+    rendering separate text nodes — never by injecting raw HTML.
+
+- **AC-N2** — *MUST NOT bundle font files with the widget* · **@stable**
+  - **Given** a production build of the widget (`npm run build`),
+  - **When** the contents of `dist/` are inspected,
+  - **Then** the output MUST NOT contain font binary files
+    (`.woff`, `.woff2`, `.ttf`, `.otf`, `.eot`) and the bundled
+    CSS MUST NOT declare `@font-face` rules that reference
+    widget-hosted font URLs. The widget relies on the host page to
+    load Everett; the fallback path is covered by AC-73b.
 
 ---
 

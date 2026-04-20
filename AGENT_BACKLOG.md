@@ -53,7 +53,7 @@ stay within the declared scope. When finished, update the task status to
 | GOV-03 | Tag every AC with `@stable` / `@evolving` / `@aspirational` | S | High | GOV-01 | done |
 | GOV-04 | Extract construction rules out of ACs into rule files | S | High | GOV-01 | done |
 | GOV-05 | Split compound ACs into one-behavior-per-ID | M | High | GOV-01, GOV-04 | done |
-| GOV-06 | Elevate §12 Non-Goals into negative AC-IDs | S | Medium | GOV-05 | todo |
+| GOV-06 | Elevate §12 Non-Goals into negative AC-IDs | S | Medium | GOV-05 | done |
 | GOV-07 | Bind each AC to verification evidence | M | Critical | GOV-05 | todo |
 | GOV-08 | Replace visual prose with Figma node links | S | Medium | GOV-07 | todo |
 | GOV-09 | Audit rule files for differential impact | M | Medium | — | todo |
@@ -221,7 +221,7 @@ An AC that asserts two things cannot be individually verified. "Submit empty is 
 
 ### GOV-06 — Elevate §12 Non-Goals into negative AC-IDs
 
-**Status:** todo · **Size:** S · **Severity:** Medium · **Depends on:** GOV-05
+**Status:** done · **Size:** S · **Severity:** Medium · **Depends on:** GOV-05
 
 **Why**
 "MUST NOT attach globals to window" is a contract, not a note. Making it an AC-ID gives it traceability and lets reviewers/tests reference it.
@@ -237,9 +237,9 @@ An AC that asserts two things cannot be individually verified. "Submit empty is 
 5. Update the catalog.
 
 **Done when**
-- [ ] Every enforceable invariant in §12 has a corresponding `AC-Nx` ID.
-- [ ] §12 reads as a human-friendly summary that points at the ACs.
-- [ ] Catalog includes all new `AC-Nx` rows.
+- [x] Every enforceable invariant in §12 has a corresponding `AC-Nx` ID.
+- [x] §12 reads as a human-friendly summary that points at the ACs.
+- [x] Catalog includes all new `AC-Nx` rows.
 
 **Stop and ask if**
 - An item in §12 is really a product decision ("we're not doing mobile v1") rather than an invariant. Those stay as plain non-goals, don't mint ACs for them.
@@ -491,6 +491,7 @@ Format:
 - 2026-04-20 — GOV-03 — Tagged every AC in `ACCEPTANCE_CRITERIA.md` with a stability marker (32 @stable / 19 @evolving / 13 @aspirational); added Stability markers subsection and Stability column to the AC catalog.
 - 2026-04-20 — GOV-04 — Extracted construction prose from `ACCEPTANCE_CRITERIA.md` into the existing rule files: trimmed AC-112 to behaviour-only, rewrote §11 DoD item 4 to point at `code-governance.mdc`, deprecated AC-71 (Token-only styling) in place (ID retained, catalog row marked `deprecated`, §2.5 umbrella note updated). No rule-file additions needed — `code-governance.mdc` + `project.mdc` already cover strict TS, `onInput`/`currentTarget`, React-via-Preact-compat, CSS Modules, and token-only styling.
 - 2026-04-20 — GOV-05 — Split 14 compound ACs into 25 new IDs (AC-10c, 12b, 20e-20k, 23b, 25b-c, 28b-c, 31b-d, 73b, 81b-d, 92b-c, 120b-c); originals kept with narrowed titles. Catalog + §2.5 Figma Manifest updated; no IDs reused; no split exceeded 5 children.
+- 2026-04-20 — GOV-06 — Minted AC-N1 (MUST NOT render backend HTML/Markdown) and AC-N2 (MUST NOT bundle font files) in `ACCEPTANCE_CRITERIA.md` §12; restructured §12 into §12.1 Product decisions (persistence, streaming — no AC-IDs, remain v1 product decisions) and §12.2 Invariants (AC-Nx); added both rows to the AC Catalog.
 
 ---
 
