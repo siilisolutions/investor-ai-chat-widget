@@ -50,7 +50,7 @@ Implications for the widget:
 ## 2. Scope
 
 **In scope (this repo):**
-- The embeddable React widget rendered inside `#siili-chatbot` on the
+- The embeddable chatbot widget rendered inside `#siili-chatbot` on the
   host page.
 - Compact (hero) and expanded (chat) modes and the transition between
   them.
@@ -139,9 +139,13 @@ that tests and PR descriptions can reference.
     without leaking CSS into the host page.
 
 - **AC-02** — *Zero host dependencies*
-  - **Given** the host page does not load React,
-  - **When** the widget is initialised,
-  - **Then** it still renders correctly (React is bundled internally).
+  - **Given** a host page that loads only `siili-chatbot.css` and
+    `siili-chatbot.iife.js` and exposes `<div id="siili-chatbot"></div>`
+    (no other scripts, no shared runtime, no global libraries),
+  - **When** `SiiliChatbot.init()` runs,
+  - **Then** the widget renders and functions end-to-end. The widget
+    must not reach for any global beyond the `SiiliChatbot` namespace
+    it exports itself.
 
 - **AC-03** — *Idempotent init*
   - **Given** `SiiliChatbot.init()` has already run,
