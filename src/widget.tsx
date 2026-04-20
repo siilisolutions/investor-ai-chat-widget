@@ -12,10 +12,11 @@
 
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import type { Root } from 'react-dom/client'
 import { App } from './App.tsx'
 import type { WidgetOptions } from './types/index.ts'
 import './styles/variables.css'
+
+type Root = ReturnType<typeof createRoot>
 
 const roots = new WeakMap<Element, Root>()
 

@@ -72,9 +72,9 @@ export function ChatInput({
           value={value}
           disabled={disabled}
           rows={1}
-          onChange={(event) => {
-            setValue(event.target.value)
-            const el = event.target
+          onInput={(event) => {
+            const el = event.currentTarget
+            setValue(el.value)
             el.style.height = 'auto'
             el.style.height = `${Math.min(el.scrollHeight, 240)}px`
           }}
