@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Siili Investor Chatbot — Dev Harness</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Everett', sans-serif;
+        background: #f5e8d8;
+      }
+      .hero {
+        position: relative;
+        min-height: 900px;
+        background-image: url('/hero-bg.png');
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 204px 48px 64px;
+      }
+      .hero__title {
+        font-size: 64px;
+        font-weight: 400;
+        color: #ffffff;
+        text-align: center;
+        max-width: 728px;
+        margin: 0 0 96px;
+        line-height: normal;
+      }
+      #siili-chatbot {
+        width: 100%;
+        max-width: 780px;
+        display: flex;
+        justify-content: center;
+      }
+      .note {
+        margin-top: 80px;
+        font-size: 14px;
+        color: #333;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.6);
+        padding: 8px 16px;
+        border-radius: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="hero">
+      <h1 class="hero__title">Siili on nyt myös sijoittajille AI-avusteinen.</h1>
+      <div id="siili-chatbot"></div>
+      <p class="note">
+        Dev harness — the widget mounts inside the div above. On the real host
+        site, only the div exists and the widget IIFE is loaded via
+        <code>&lt;script&gt;</code>.
+      </p>
+    </main>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

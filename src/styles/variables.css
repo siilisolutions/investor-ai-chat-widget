@@ -1,0 +1,68 @@
+/*
+ * Design tokens for the Siili Investor Chatbot widget.
+ *
+ * Values derived from the Figma file `vxWJbloNkZ8Muf5qi14MOy` (IR-site).
+ * If a token here disagrees with Figma, Figma wins -- update this file
+ * rather than the component styles.
+ *
+ * The widget root element receives the `.siiliChatbot` class which
+ * scopes these variables so they don't leak into the host page.
+ */
+
+.siiliChatbot {
+  /* Brand colors */
+  --white-500: #ffffff;
+  --black-500: #000000;
+  --gray-400: #efefef;
+  --gray-500: #e5e5e5;
+  --gray-900: #575757;
+  --blue-500: rgb(50, 50, 255);
+  --violet-500: rgb(170, 50, 255);
+
+  /* Translucent surfaces (compact mode on hero image) */
+  --surface-translucent: rgba(255, 255, 255, 0.3);
+
+  /* Send button gradients */
+  --send-gradient: linear-gradient(
+    -75deg,
+    var(--blue-500) 10.566%,
+    var(--violet-500) 89.058%
+  );
+  --send-overlay-hover: rgba(0, 0, 0, 0.2);
+  --send-overlay-pressed: rgba(0, 0, 0, 0.4);
+
+  /* Typography */
+  --font-family: 'Everett', sans-serif;
+  --font-family-light: 'Everett Light', 'Everett', sans-serif;
+  --font-family-bold: 'Everett Bold', 'Everett', sans-serif;
+
+  /* Geometry */
+  --radius: 20px;
+  --radius-pill: 100px;
+
+  /* Elevations */
+  --textarea-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+
+  /* Spacing tokens (from Figma auto-layout values) */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* Widget layout */
+  --content-width: 800px;
+  --compact-textarea-width: 780px;
+
+  font-family: var(--font-family);
+  color: var(--black-500);
+  box-sizing: border-box;
+}
+
+.siiliChatbot *,
+.siiliChatbot *::before,
+.siiliChatbot *::after {
+  box-sizing: inherit;
+}

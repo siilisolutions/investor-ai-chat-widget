@@ -1,0 +1,95 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  border-radius: var(--radius);
+  width: 100%;
+}
+
+.shellCompact {
+  background: var(--surface-translucent);
+}
+
+.shellExpanded {
+  background: var(--white-500);
+  box-shadow: var(--textarea-shadow);
+}
+
+.inputRow {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: flex-start;
+  min-height: 24px;
+  max-height: 240px;
+  width: 100%;
+}
+
+.textarea {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  resize: none;
+  font-family: var(--font-family);
+  font-size: 20px;
+  line-height: normal;
+  color: var(--black-500);
+  padding: 0;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.textarea::placeholder {
+  color: var(--gray-900);
+}
+
+.sendRow {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.sendButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--send-gradient);
+  cursor: pointer;
+  transition: filter 120ms ease;
+  color: var(--white-500);
+}
+
+.sendButton:hover:not(:disabled) {
+  background: linear-gradient(
+      90deg,
+      var(--send-overlay-hover) 0%,
+      var(--send-overlay-hover) 100%
+    ),
+    var(--send-gradient);
+}
+
+.sendButton:active:not(:disabled) {
+  background: linear-gradient(
+      90deg,
+      var(--send-overlay-pressed) 0%,
+      var(--send-overlay-pressed) 100%
+    ),
+    var(--send-gradient);
+}
+
+.sendButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sendIcon {
+  width: 16px;
+  height: 16px;
+  display: block;
+}

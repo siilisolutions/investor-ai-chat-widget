@@ -1,0 +1,106 @@
+.pair {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  width: 100%;
+}
+
+.questionRow {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.questionBubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--gray-500);
+  border-radius: var(--radius);
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--black-500);
+  max-width: 100%;
+  word-break: break-word;
+}
+
+.answerContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  width: 100%;
+  align-items: flex-start;
+}
+
+.answer {
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--black-500);
+  margin: 0;
+  width: 100%;
+  white-space: pre-wrap;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.loadingText {
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--black-500);
+  margin: 0;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--gray-400);
+  border-top-color: var(--blue-500);
+  animation: spin 900ms linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.references {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+.referencesLabel {
+  font-family: var(--font-family-light);
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 24px;
+  color: var(--black-500);
+  margin: 0;
+}
+
+.referenceList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  align-items: flex-start;
+}
+
+.error {
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 24px;
+  color: #c0392b;
+  margin: 0;
+}

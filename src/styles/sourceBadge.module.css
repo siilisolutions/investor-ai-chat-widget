@@ -1,0 +1,27 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-xs) var(--space-lg);
+  background: var(--gray-400);
+  border-radius: var(--radius);
+  font-family: var(--font-family);
+  font-size: 14px;
+  line-height: normal;
+  color: var(--black-500);
+  white-space: nowrap;
+  text-decoration: none;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+  border: none;
+}
+
+.badgeLink {
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.badgeLink:hover {
+  background: var(--gray-500);
+}

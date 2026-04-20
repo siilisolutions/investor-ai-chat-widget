@@ -1,0 +1,24 @@
+.chip {
+  display: inline-flex;
+  align-items: flex-end;
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--surface-translucent);
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-family);
+  font-size: 14px;
+  line-height: normal;
+  color: var(--black-500);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 120ms ease;
+  text-align: left;
+}
+
+.chip:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.chip:active {
+  background: rgba(255, 255, 255, 0.7);
+}

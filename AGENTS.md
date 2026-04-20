@@ -15,8 +15,8 @@ Host page (siili.com)
             └─ App (state machine: compact | expanded)
                  ├─ CompactView (hero input + chips)
                  └─ ExpandedView (chat messages + input)
-                      ├─ ChatMessagePair (question bubble + answer + sources)
-                      ├─ SourceBadge (reference pill)
+                      ├─ ChatMessage (question bubble + answer + sources)
+                      │    └─ SourceBadge (reference pill)
                       └─ ChatInput (shared textarea + send button)
 ```
 
@@ -155,6 +155,52 @@ npm run build
 2. Create `src/components/MyComponent.tsx` with a JSDoc block comment
 3. Create `src/styles/myComponent.module.css` using tokens from `variables.css`, matching the Figma design exactly
 4. Import and use in the appropriate parent component
+5. If the Figma team is on an Organization/Enterprise plan with a Dev seat, add a Code Connect mapping (see **Code Connect** section below) so the designer sees the real component in Figma's inspect panel
+
+## Code Connect (Figma ↔ Code Mapping)
+
+Code Connect creates a two-way link between Figma components and their React implementations. When the designer inspects a Figma component, instead of seeing auto-generated code they see the actual React component with its props. When an AI agent calls `get_design_context`, the response includes the mapped component info so existing code is reused instead of regenerating duplicates.
+
+### Prerequisite (currently blocking)
+
+Code Connect **requires**:
+- The Figma file's team must be on an **Organization** or **Enterprise** plan
+- The user running the MCP tools must have a **Developer** seat on that plan
+
+The `Siili Design` team is currently on **Pro** with a **Full** seat, which blocks both reads (`get_code_connect_suggestions`, `get_code_connect_map`) and writes (`add_code_connect_map`, `send_code_connect_mappings`). All return: *"You need a Developer seat in an Organization or Enterprise plan to access Code Connect."*
+
+Once the plan/seat is upgraded, the runbook below is ready to execute.
+
+### Runbook: initial mapping set
+
+Run these against `fileKey = vxWJbloNkZ8Muf5qi14MOy` with `label: "React"`. Prefer `send_code_connect_mappings` for a single bulk save; the individual `add_code_connect_map` form is shown per-row for clarity.
+
+| Figma node | Description | `source` | `componentName` |
+|---|---|---|---|
+| `146:1015` | Textarea | `src/components/ChatInput.tsx` | `ChatInput` |
+| `149:1410` / `149:1441` / `150:396` | Send button variants (Active / Hover / Pressed) | `src/components/ChatInput.tsx` | `ChatInput` (send button is part of ChatInput) |
+| `147:1129` | Question + Answer pair | `src/components/ChatMessage.tsx` | `ChatMessage` |
+| `178:441` | Reference tag | `src/components/SourceBadge.tsx` | `SourceBadge` |
+| `178:482` / `201:2273` | Loading spinner / loading state | `src/components/ChatMessage.tsx` | `ChatMessage` (with `loading` prop) |
+| `116:374` / `116:392` / `116:398` | Predefined question chips | `src/components/SuggestionChip.tsx` | `SuggestionChip` |
+
+Whole-frame nodes `113:203` (Investor Hero) and `143:753` (Investor Agent) are page layouts and are **not** mapped — the reusable pieces inside them are.
+
+### Workflow
+
+1. Get AI-suggested mappings for both main frames:
+   - `get_code_connect_suggestions({ fileKey, nodeId: "113:203" })`
+   - `get_code_connect_suggestions({ fileKey, nodeId: "143:753" })`
+2. Review the suggestions against the table above; reconcile any drift.
+3. Bulk-save with `send_code_connect_mappings({ fileKey, nodeId: "143:753", mappings: [...] })` where `mappings` is an array of `{ nodeId, source, componentName, label: "React" }` objects from the table.
+4. For the send-button state variants, optionally create a single template mapping (`template` + `templateDataJson` on `add_code_connect_map`) that maps Figma's `property1: "Active" | "Hover" | "Pressed"` to the corresponding `:hover` / `:active` CSS states in `ChatInput.tsx`.
+5. Verify each mapping persisted:
+   - `get_code_connect_map({ fileKey, nodeId })` for each entry.
+6. Ask the designer to open the Figma file and confirm the Code Connect panel shows the React snippets on inspect.
+
+### Adding mappings for new components
+
+When you add a new component (see **How to add a new component** above), extend the table in this section and append a row via `add_code_connect_map({ fileKey, nodeId, source, componentName, label: "React" })`.
 
 ## Conventions
 
@@ -168,7 +214,7 @@ npm run build
 ## Known Gaps / TODOs
 
 - [ ] **Real backend integration** — `chatService.ts` is a mock; needs real API implementation
-- [ ] **Corporate design tokens** — `variables.css` has placeholder values
+- [ ] **Code Connect mappings** — runbook is ready (see **Code Connect** section), blocked on Figma plan upgrade (Pro → Organization/Enterprise) and a Dev seat
 - [ ] **Everett font loading** — assumes host page loads the font; may need `@font-face` fallback
 - [ ] **Streaming responses** — current interface is request/response; add SSE/WebSocket support
 - [ ] **Reset / new conversation** — no UI to start a fresh chat from expanded mode
