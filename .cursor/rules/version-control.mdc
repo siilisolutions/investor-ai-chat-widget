@@ -1,0 +1,14 @@
+---
+description: Git branches, commits, PRs, and safety practices
+alwaysApply: true
+---
+
+# Version control governance
+
+- **Branches**: Prefer short, prefixed names: `feature/…`, `fix/…`, `chore/…`, `docs/…`. Rebase or merge from the default branch regularly so PRs stay current.
+- **Commits**: Use an imperative subject line (e.g. “Add loading state to ChatMessage”). Keep one logical change per commit when practical; use the body for context, trade-offs, or ticket references.
+- **Secrets**: Do not commit API keys, tokens, or environment files with real credentials. Use CI/host secrets and local env vars; verify sensitive paths are ignored before pushing.
+- **Artifacts**: `dist/` and `node_modules/` are ignored—do not force-add build output unless the team explicitly maintains release artifacts in-repo.
+- **Shared history**: Avoid force-pushing to the default branch. History rewrites on feature branches only with clear team agreement.
+- **Pull requests**: Include a short summary, how you verified the change (e.g. `npm run lint`, `npm run build`, manual steps), and links to issues or acceptance criteria when applicable. Prefer reviewable PR size over mega-diffs.
+- **Hooks**: There is no repo-managed pre-push hook; treat `npm run lint` and `npm run build` (when relevant) as the manual pre-push checklist.

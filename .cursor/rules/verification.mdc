@@ -1,0 +1,14 @@
+---
+description: Commands and smoke checks after substantive edits
+alwaysApply: true
+---
+
+# Verification before finishing
+
+After **non-trivial** changes (new behavior, UI, types, build config, or dependencies), run and report results:
+
+1. **`npm run lint`** — fix new issues in touched files.
+2. **`npm run build`** — must succeed. If `src/`, `vite.config.ts`, or dependencies changed, note **gzip** output for JS + CSS vs the **60 KB** combined budget in `AGENTS.md`.
+3. **UI smoke** (when the change affects components or styles): **`npm run dev`** and manually verify: compact hero → send or chip → expanded chat, loading state if applicable, no console errors on that path.
+
+If a step fails, fix or explain the blocker before treating the task as done. Skip steps that are clearly unrelated (e.g. typo-only doc outside runtime paths) but mention why.

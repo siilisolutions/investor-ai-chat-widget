@@ -1,0 +1,12 @@
+---
+description: ChatService, types, and where network logic lives
+globs: src/**/*
+alwaysApply: false
+---
+
+# API and data contract
+
+- **Types**: Shared shapes (`ChatMessage`, `Source`, `ChatService`, `WidgetOptions`, etc.) live in **`src/types/index.ts`**. Extend the interface there before implementing; do not duplicate ad-hoc object types in components.
+- **HTTP / backend**: Implement **`ChatService`** in **`src/services/`** (or a single dedicated module). **`App.tsx`** (or one thin wiring layer) imports the implementation—**do not** call `fetch` / `XMLHttpRequest` directly from presentational components.
+- **Responses**: Map backend failures to **user-safe** messages; avoid leaking status text, stack traces, or internal IDs in the UI.
+- **Mock swap**: Replacing the mock means a new service file that **implements the same `ChatService` contract** and updating the import in `App.tsx`—do not fork divergent method signatures without updating `src/types/index.ts` and call sites.

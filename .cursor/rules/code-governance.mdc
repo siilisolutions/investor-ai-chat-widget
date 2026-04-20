@@ -1,0 +1,14 @@
+---
+description: Code quality, Preact compat, scope, and bundle budget
+alwaysApply: true
+---
+
+# Code governance
+
+- **Scope**: Change only what the task requires. Avoid drive-by refactors, unrelated formatting, or scope creep in the same PR.
+- **Stack**: Import hooks and JSX types from `'react'` (Preact compat). Do not import from `'preact'` or `'preact/hooks'` unless the team is deliberately migrating off compat.
+- **Inputs**: For `<input>` / `<textarea>`, use `onInput` (not `onChange`). Prefer `event.currentTarget` over `event.target` in handlers.
+- **Types**: Strict TypeScript; no `any`. Shared contracts live in `src/types/index.ts`.
+- **UI & styles**: Follow `AGENTS.md` and `.cursor/rules/project.mdc`: design tokens in `src/styles/variables.css`, CSS Modules per component, Figma-first for any visual change.
+- **Bundle (AC-100)**: After changes under `src/`, to dependencies, or `vite.config.ts`, run `npm run build` and confirm combined gzipped JS + CSS stays within the 60 KB budget documented in `AGENTS.md`.
+- **Lint**: Run `npm run lint` before opening a PR; fix new violations in files you touched.

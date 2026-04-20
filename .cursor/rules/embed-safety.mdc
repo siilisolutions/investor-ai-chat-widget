@@ -1,0 +1,14 @@
+---
+description: IIFE embed — globals, CSS isolation, markup safety
+alwaysApply: true
+---
+
+# Embed and host-page safety
+
+This project ships as an **IIFE** on third-party pages. Assume **strict CSP** and unknown host CSS/JS.
+
+- **Globals**: Expose only the **`SiiliChatbot`** namespace (see `vite.config.ts` + `src/widget.tsx`). Do not attach helpers or state to `window` outside that API.
+- **Styles**: Keep styling in **CSS Modules** and tokens from `src/styles/variables.css`. Avoid global selectors, `!important` hacks, or tag-only rules that could override the host page.
+- **Markup**: Do not use `dangerouslySetInnerHTML` or unsanitized HTML for chat content unless the product explicitly requires it and sanitization is defined. Prefer plain text / React children.
+- **IDs and portals**: Prefer generated or scoped attributes; avoid fixed `id` values that could clash with the host.
+- **Errors**: User-visible errors should be safe strings—no raw stack traces or internal URLs in production UI.

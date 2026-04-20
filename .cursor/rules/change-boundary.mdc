@@ -1,0 +1,16 @@
+---
+description: When agents must pause and ask before proceeding
+alwaysApply: true
+---
+
+# Change boundaries — confirm first
+
+Stop and ask the human **before**:
+
+- Adding, upgrading, or removing **npm dependencies** (runtime or dev).
+- Changing **`vite.config.ts`** (build targets, IIFE global name, aliases, library mode).
+- Changing the **public embedding contract**: `SiiliChatbot` / `init()` signature, `WidgetOptions`, or documented host integration (see `src/widget.tsx`, `src/types/index.ts`, `README.md`).
+- Editing **CI**, release automation, or repo-level **security** config (unless the task explicitly covers it).
+- **Wide refactors** (many files or cross-cutting architecture) when the user only asked for a small or local fix.
+
+If the user has **already approved** that work in the same thread, proceed without re-asking.
