@@ -87,7 +87,7 @@ AC keeps whatever marker it carried when it was retired.
 | AC-64 | Timestamp / freshness cue (recommended) | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational |
 | AC-65 | Clear AI labelling | [§4](#4-content-legal--trust-investor-critical) | active | @stable |
 | AC-70 | Figma parity | [§5](#5-visual-design--brand-award-critical) | active | @evolving |
-| AC-71 | Token-only styling | [§5](#5-visual-design--brand-award-critical) | active | @stable |
+| AC-71 | (deprecated) Token-only styling — moved to rule files (GOV-04) | [§5](#5-visual-design--brand-award-critical) | deprecated | @stable |
 | AC-72 | Send-button states | [§5](#5-visual-design--brand-award-critical) | active | @stable |
 | AC-73 | Typography | [§5](#5-visual-design--brand-award-critical) | active | @stable |
 | AC-74 | Motion polish | [§5](#5-visual-design--brand-award-critical) | active | @evolving |
@@ -193,8 +193,11 @@ PR.
   [`scripts/prompts/figma-sync.md`](scripts/prompts/figma-sync.md) in
   scoped mode per PR and in full-sweep mode weekly / pre-release to
   refresh this table.
-- **Umbrella AC-70 / AC-71** (Figma parity, token-only styling) apply
-  to every row and are not repeated here.
+- **Umbrella AC-70** (Figma parity) applies to every row and is not
+  repeated here. Token-only styling is now a construction rule in
+  [`.cursor/rules/code-governance.mdc`](.cursor/rules/code-governance.mdc)
+  and [`.cursor/rules/project.mdc`](.cursor/rules/project.mdc) —
+  see deprecated AC-71 for history.
 - **Code-authored rows** (`Figma node(s) = — (code-authored)`): the
   AC is currently satisfied by implementation choices (tokens in
   `[src/styles/variables.css](src/styles/variables.css)` or layout
@@ -585,13 +588,20 @@ These criteria exist to satisfy P2's competition-entry ambition.
     spacing, border-radius, typography, and colour within a ±1px
     tolerance. Deltas are tracked as defects, not as acceptable drift.
 
-- **AC-71** — *Token-only styling* · **@stable**
-  - **Given** any `.module.css` file in `src/styles/`,
-  - **Then** it references colours, font families, radii, and shadows
-    only via `var(--token)` from `variables.css`. A grep for
-    hex colours, `rgb(`, or hard-coded `px` radii in component CSS
-    should return zero matches (with the exception of `variables.css`
-    itself).
+- **AC-71** — *(deprecated) Token-only styling* · **@stable**
+  - **[DEPRECATED 2026-04 — GOV-04]** This criterion described a
+    construction rule (component CSS must reference `var(--token)`
+    from `variables.css`; no hex / `rgb(` / hard-coded `px` radii
+    outside `variables.css`) rather than a user-visible behaviour.
+    The rule now lives in
+    [`.cursor/rules/code-governance.mdc`](.cursor/rules/code-governance.mdc)
+    (design tokens in `src/styles/variables.css`, CSS Modules per
+    component) and
+    [`.cursor/rules/project.mdc`](.cursor/rules/project.mdc)
+    §Styling. The behavioural intent — Figma parity on colours,
+    typography, radii, shadows — remains covered by AC-70 (Figma
+    parity) and the §2.5 Figma Manifest. ID retained for
+    traceability; no successor AC-ID.
 
 - **AC-72** — *Send-button states* · **@stable**
   - **Given** the send button in either mode,
@@ -735,9 +745,12 @@ These criteria exist to satisfy P2's competition-entry ambition.
 
 - **AC-112** — *Graceful CSS isolation* · **@stable**
   - **Given** the host page has its own aggressive global styles,
-  - **Then** the widget's layout is not visibly affected because all
-    styling is scoped through CSS Modules and a `siiliChatbot` root
-    class.
+  - **Then** the widget's layout is not visibly affected — all widget
+    styling is scoped to the widget's own root element and does not
+    leak into or absorb from the host page. (The mechanism — CSS
+    Modules plus a scoping root class — is a construction rule
+    in [`.cursor/rules/code-governance.mdc`](.cursor/rules/code-governance.mdc)
+    and [`.cursor/rules/project.mdc`](.cursor/rules/project.mdc).)
 
 ---
 
@@ -816,8 +829,8 @@ A change is "done" only when all of the following are true:
 3. The PR description lists every Figma node ID that was consulted,
    and the `Last checked` / `Checked by` columns in §2.5 Figma
    Manifest have been bumped for those rows.
-4. TypeScript strict compiles with zero errors and no `any`.
-5. Linter (if configured) and `npm run build` both pass.
+4. Code-governance rules (see [`.cursor/rules/code-governance.mdc`](.cursor/rules/code-governance.mdc)) are satisfied — e.g. strict TypeScript, `onInput` handlers, React-via-Preact-compat imports.
+5. Linter and `npm run build` both pass (the build catches type errors; the rule file is the source of truth for strictness and `any` bans).
 6. Happy path, error path, and loading path have been exercised
    manually in the dev harness (`npm run dev`).
 7. Keyboard-only and screen-reader spot-check has been done.

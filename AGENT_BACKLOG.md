@@ -51,7 +51,7 @@ stay within the declared scope. When finished, update the task status to
 | GOV-01 | AC catalog table at top of `ACCEPTANCE_CRITERIA.md` | XS | High | — | done |
 | GOV-02 | Promote AC-100 (60KB bundle budget) into `AGENTS.md` | XS | High | — | done |
 | GOV-03 | Tag every AC with `@stable` / `@evolving` / `@aspirational` | S | High | GOV-01 | done |
-| GOV-04 | Extract construction rules out of ACs into rule files | S | High | GOV-01 | todo |
+| GOV-04 | Extract construction rules out of ACs into rule files | S | High | GOV-01 | done |
 | GOV-05 | Split compound ACs into one-behavior-per-ID | M | High | GOV-01, GOV-04 | todo |
 | GOV-06 | Elevate §12 Non-Goals into negative AC-IDs | S | Medium | GOV-05 | todo |
 | GOV-07 | Bind each AC to verification evidence | M | Critical | GOV-05 | todo |
@@ -164,7 +164,7 @@ Not all ACs deserve strict enforcement. A stability tag tells reviewers (human o
 
 ### GOV-04 — Extract construction rules out of ACs into rule files
 
-**Status:** todo · **Size:** S · **Severity:** High · **Depends on:** GOV-01
+**Status:** done · **Size:** S · **Severity:** High · **Depends on:** GOV-01
 
 **Why**
 ACs describe *what the product does*. Rules describe *how the code is written*. Mixing them bloats the AC doc and weakens both. Items like "use `onInput` not `onChange`" or "import from `'react'` not `'preact'`" are construction rules.
@@ -181,9 +181,9 @@ ACs describe *what the product does*. Rules describe *how the code is written*. 
 4. Update the catalog (GOV-01) if any AC's summary changes.
 
 **Done when**
-- [ ] No remaining AC contains prose about import paths, event handler naming, type strictness, or CSS module conventions.
-- [ ] All such items are covered by a rule file.
-- [ ] No AC-IDs were renumbered or deleted (only trimmed).
+- [x] No remaining AC contains prose about import paths, event handler naming, type strictness, or CSS module conventions.
+- [x] All such items are covered by a rule file.
+- [x] No AC-IDs were renumbered or deleted (only trimmed).
 
 **Stop and ask if**
 - You're unsure whether an item is "construction" or "behavior" (e.g. accessibility ACs can look like both). Default to keeping it in the AC and flag for discussion.
@@ -489,6 +489,7 @@ Format:
 - 2026-04-20 — GOV-02 — Added bold AC-100 bundle-budget callout to `AGENTS.md` §Key Decisions & Constraints, linking to the authoritative AC in `ACCEPTANCE_CRITERIA.md` §8 Performance.
 - 2026-04-20 — GOV-01 — Added `## AC Catalog` index (64 rows) between intro and §1 of `ACCEPTANCE_CRITERIA.md`.
 - 2026-04-20 — GOV-03 — Tagged every AC in `ACCEPTANCE_CRITERIA.md` with a stability marker (32 @stable / 19 @evolving / 13 @aspirational); added Stability markers subsection and Stability column to the AC catalog.
+- 2026-04-20 — GOV-04 — Extracted construction prose from `ACCEPTANCE_CRITERIA.md` into the existing rule files: trimmed AC-112 to behaviour-only, rewrote §11 DoD item 4 to point at `code-governance.mdc`, deprecated AC-71 (Token-only styling) in place (ID retained, catalog row marked `deprecated`, §2.5 umbrella note updated). No rule-file additions needed — `code-governance.mdc` + `project.mdc` already cover strict TS, `onInput`/`currentTarget`, React-via-Preact-compat, CSS Modules, and token-only styling.
 
 ---
 
