@@ -175,6 +175,8 @@ Once the plan/seat is upgraded, the runbook below is ready to execute.
 
 Run these against `fileKey = vxWJbloNkZ8Muf5qi14MOy` with `label: "React"`. Prefer `send_code_connect_mappings` for a single bulk save; the individual `add_code_connect_map` form is shown per-row for clarity.
 
+**Repository:** https://github.com/siilisolutions/investor-ai-chat-widget — use either the relative paths below or full GitHub blob URLs, e.g. `https://github.com/siilisolutions/investor-ai-chat-widget/blob/main/src/components/ChatInput.tsx` (Figma’s inspector links work best with the full URL).
+
 | Figma node | Description | `source` | `componentName` |
 |---|---|---|---|
 | `146:1015` | Textarea | `src/components/ChatInput.tsx` | `ChatInput` |

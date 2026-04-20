@@ -2,6 +2,15 @@
 
 An embeddable chatbot widget for the Siili Solutions investor site. Built with React + TypeScript, bundled as a single script for easy integration.
 
+## Repository
+
+https://github.com/siilisolutions/investor-ai-chat-widget
+
+You do **not** need SSH keys to work with this repo. Use HTTPS (`https://github.com/...`) and authenticate when you push:
+
+1. **GitHub CLI** (simplest): install the `gh` CLI, run `gh auth login`, then `git push` as usual.
+2. **HTTPS + token**: when Git asks for credentials, use your GitHub username and a [Personal Access Token](https://github.com/settings/tokens) (fine-grained or classic with `repo` scope) instead of a password.
+
 ## Quick Start
 
 ```bash
