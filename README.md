@@ -1,6 +1,6 @@
 # Siili Investor Chatbot Widget
 
-An embeddable chatbot widget for the Siili Solutions investor site. Built with React + TypeScript, bundled as a single script for easy integration.
+An embeddable chatbot widget for the Siili Solutions investor site. Written against the React component API (powered by Preact at runtime for a small bundle) + TypeScript, shipped as a single IIFE script for easy integration.
 
 ## Repository
 
@@ -51,7 +51,8 @@ See [AGENTS.md](AGENTS.md) for detailed file map, design tokens, Figma reference
 
 ## Tech Stack
 
-- React 19 + TypeScript
+- Preact 10 via `preact/compat` (code uses React-shaped imports from `'react'`; the alias lives in `vite.config.ts` and `tsconfig.app.json`)
+- TypeScript 6
 - Vite 6 (library mode, IIFE output)
 - CSS Modules with CSS custom properties
 - No external UI libraries

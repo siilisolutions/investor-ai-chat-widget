@@ -4,7 +4,7 @@
 
 ## Project Purpose
 
-An embeddable React chatbot widget for the Siili Solutions investor site (sijoittajille.siili.com). The widget has two modes: a **compact hero mode** (text input + suggestion chips overlaid on the hero section) and an **expanded chat mode** (full conversation view with Q&A pairs, source references, and a sticky input). It is bundled as a single IIFE script + CSS file for embedding via `<script>` tag on the host site. The chatbot backend is developed separately — this project only covers the frontend.
+An embeddable chatbot widget for the Siili Solutions investor site (sijoittajille.siili.com). The UI is written against the React component API but is actually powered by Preact at runtime (via `preact/compat`) to keep the IIFE bundle within AC-100's 60 KB gzip budget. The widget has two modes: a **compact hero mode** (text input + suggestion chips overlaid on the hero section) and an **expanded chat mode** (full conversation view with Q&A pairs, source references, and a sticky input). It is bundled as a single IIFE script + CSS file for embedding via `<script>` tag on the host site. The chatbot backend is developed separately — this project only covers the frontend.
 
 ## Architecture
 
@@ -102,11 +102,12 @@ All tokens live in `src/styles/variables.css` as CSS custom properties. These va
 
 ## Key Decisions & Constraints
 
-1. **Library mode (IIFE)**: The widget bundles React internally so the host page doesn't need React. Output is a single `siili-chatbot.iife.js` + `siili-chatbot.css`.
-2. **CSS Modules**: Scoped styles that won't leak into the host page. No Tailwind — keeps the bundle small and avoids config conflicts.
-3. **No external UI library**: Zero runtime dependencies beyond React/ReactDOM (bundled).
-4. **Mocked backend**: `src/services/chatService.ts` returns fake responses after a delay. The `ChatService` interface in `src/types/index.ts` is the contract to implement.
-5. **Font**: Figma specifies `Everett`. The host site is expected to load this font. The widget falls back to `sans-serif`.
+1. **Library mode (IIFE)**: The widget bundles its UI framework internally so the host page doesn't need anything pre-loaded. Output is a single `siili-chatbot.iife.js` + `siili-chatbot.css`.
+2. **Preact with React compatibility**: The runtime framework is Preact, aliased in `vite.config.ts` and `tsconfig.app.json` so `import { useState } from 'react'` (etc.) resolves to `preact/compat`. Source code reads like React and uses React-shaped type imports (`KeyboardEvent` from `'react'`, JSX `className`, etc.); the bundle only ships Preact. The choice is driven by AC-100: React 19 + ReactDOM gzipped to ~179 KB (≈3× over budget), Preact gzips to ~10 KB.
+3. **CSS Modules**: Scoped styles that won't leak into the host page. No Tailwind — keeps the bundle small and avoids config conflicts.
+4. **No external UI library**: Zero runtime dependencies beyond Preact (bundled). The `react` and `react-dom` npm packages are intentionally **not** installed — adding them back would silently defeat the alias and blow AC-100.
+5. **Mocked backend**: `src/services/chatService.ts` returns fake responses after a delay. The `ChatService` interface in `src/types/index.ts` is the contract to implement.
+6. **Font**: Figma specifies `Everett`. The host site is expected to load this font. The widget falls back to `sans-serif`.
 
 ## Common Tasks
 
@@ -152,10 +153,12 @@ npm run build
 ### How to add a new component
 
 1. Find the component in the Figma file and call `get_design_context` to get its layout, spacing, colors, and states
-2. Create `src/components/MyComponent.tsx` with a JSDoc block comment
+2. Create `src/components/MyComponent.tsx` with a JSDoc block comment. Import hooks and types from `'react'` (the alias redirects to `preact/compat`); do not import from `'preact'` or `'preact/hooks'` directly.
 3. Create `src/styles/myComponent.module.css` using tokens from `variables.css`, matching the Figma design exactly
 4. Import and use in the appropriate parent component
-5. If the Figma team is on an Organization/Enterprise plan with a Dev seat, add a Code Connect mapping (see **Code Connect** section below) so the designer sees the real component in Figma's inspect panel
+5. If the new component has form inputs, use `onInput` (not `onChange`) and `event.currentTarget` (not `event.target`) — see the Conventions section for why.
+6. After adding or changing anything that touches the bundle (component, asset, dep), run `npm run build` and eyeball the `gzip:` column in Vite's output — combined JS + CSS must stay ≤ 60 KB per AC-100.
+7. If the Figma team is on an Organization/Enterprise plan with a Dev seat, add a Code Connect mapping (see **Code Connect** section below) so the designer sees the real component in Figma's inspect panel
 
 ## Code Connect (Figma ↔ Code Mapping)
 
@@ -212,6 +215,10 @@ When you add a new component (see **How to add a new component** above), extend 
 - **CSS Modules** — one `.module.css` per component, class names in camelCase
 - **Component files** — PascalCase, `.tsx` extension, JSDoc block at top
 - **Service files** — camelCase, `.ts` extension, exports both named function and default object
+- **Framework imports** — import from `'react'` / `'react-dom/client'` (the aliases will redirect to `preact/compat`). Do **not** import from `'preact'` or `'preact/hooks'` directly; that bypasses the compat layer and makes a future framework swap painful.
+- **Controlled inputs** — use `onInput`, not `onChange`, for `<input>` / `<textarea>`. Preact follows the DOM spec where `onChange` fires on blur; `onInput` fires on every keystroke and works identically in React should we ever migrate back.
+- **Event targets** — prefer `event.currentTarget` over `event.target` in handlers. Preact's event types are stricter about `target` being a generic `EventTarget`; `currentTarget` is correctly typed to the element.
+- **React-19-only APIs are not available** — `preact/compat` covers the classic React surface (`memo`, `forwardRef`, `createPortal`, `Suspense`, `lazy`, `useId`, `useSyncExternalStore`, `useTransition`, `useDeferredValue` are all supported). What is **not** supported: `use()`, `useActionState`, `useFormStatus`, `useOptimistic`, Server Components, and React Compiler auto-memoization. If you think you need one, flag it — the fix is usually a small refactor, not a framework change.
 
 ## Known Gaps / TODOs
 
