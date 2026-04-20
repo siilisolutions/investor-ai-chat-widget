@@ -51,30 +51,47 @@ AC keeps whatever marker it carried when it was retired.
 | AC-02 | Zero host dependencies | [§3.1](#31-embedding--initialisation) | active | @stable |
 | AC-03 | Idempotent init | [§3.1](#31-embedding--initialisation) | active | @evolving |
 | AC-10 | Initial state | [§3.2](#32-compact-hero-mode) | active | @stable |
-| AC-10a | Continue-conversation pill | [§3.2](#32-compact-hero-mode) | active | @aspirational |
+| AC-10a | Continue-conversation pill — rendering | [§3.2](#32-compact-hero-mode) | active | @aspirational |
 | AC-10b | Suggestion-chip de-duplication | [§3.2](#32-compact-hero-mode) | active | @aspirational |
+| AC-10c | Continue-conversation pill — activation | [§3.2](#32-compact-hero-mode) | active | @aspirational |
 | AC-11 | Placeholder copy | [§3.2](#32-compact-hero-mode) | active | @stable |
 | AC-12 | Suggestion chip content | [§3.2](#32-compact-hero-mode) | active | @stable |
+| AC-12b | Suggestion chip labels do not wrap | [§3.2](#32-compact-hero-mode) | active | @stable |
 | AC-13 | Sending from the textarea | [§3.2](#32-compact-hero-mode) | active | @stable |
 | AC-14 | Sending from a chip | [§3.2](#32-compact-hero-mode) | active | @stable |
 | AC-15 | Empty-submit guard | [§3.2](#32-compact-hero-mode) | active | @stable |
 | AC-16 | Send-button enablement | [§3.2](#32-compact-hero-mode) | active | @stable |
-| AC-20 | Transition | [§3.3](#33-expanded-chat-mode) | active | @stable |
+| AC-20 | Transition — no flicker | [§3.3](#33-expanded-chat-mode) | active | @stable |
 | AC-20a | Fill the viewport | [§3.3](#33-expanded-chat-mode) | active | @evolving |
 | AC-20b | Hero image hidden | [§3.3](#33-expanded-chat-mode) | active | @evolving |
-| AC-20c | Back navigation dismisses expanded mode | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
-| AC-20d | Close button | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
+| AC-20c | Back navigation — history entry pushed on expand | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
+| AC-20d | Close button — rendering | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
+| AC-20e | Transition — first Q+A pair visible immediately | [§3.3](#33-expanded-chat-mode) | active | @stable |
+| AC-20f | Transition — no host-page scroll or reflow | [§3.3](#33-expanded-chat-mode) | active | @evolving |
+| AC-20g | Back navigation — popstate returns to compact | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
+| AC-20h | Back navigation — compact-mode back is not intercepted | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
+| AC-20i | Back navigation — opt-out via `interceptBackNavigation: false` | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
+| AC-20j | Close button — activation dismisses expanded mode | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
+| AC-20k | Close button — reduced motion | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
 | AC-21 | Header | [§3.3](#33-expanded-chat-mode) | active | @stable |
 | AC-22 | Question bubble | [§3.3](#33-expanded-chat-mode) | active | @stable |
-| AC-23 | Loading indicator | [§3.3](#33-expanded-chat-mode) | active | @evolving |
+| AC-23 | Loading indicator — semantics and copy | [§3.3](#33-expanded-chat-mode) | active | @evolving |
+| AC-23b | Loading indicator — blob visual style | [§3.3](#33-expanded-chat-mode) | active | @evolving |
 | AC-24 | Answer rendering | [§3.3](#33-expanded-chat-mode) | active | @stable |
-| AC-25 | Source references | [§3.3](#33-expanded-chat-mode) | active | @stable |
+| AC-25 | Source references — section rendered | [§3.3](#33-expanded-chat-mode) | active | @stable |
+| AC-25b | Source references — linked badge opens in new tab | [§3.3](#33-expanded-chat-mode) | active | @stable |
+| AC-25c | Source references — unlinked badge is static | [§3.3](#33-expanded-chat-mode) | active | @stable |
 | AC-26 | No-sources case | [§3.3](#33-expanded-chat-mode) | active | @stable |
 | AC-27 | Auto-scroll to newest | [§3.3](#33-expanded-chat-mode) | active | @stable |
 | AC-28 | Input positioned below the latest reply | [§3.3](#33-expanded-chat-mode) | active | @evolving |
+| AC-28b | Input placement — short conversations are not bottom-pinned | [§3.3](#33-expanded-chat-mode) | active | @evolving |
+| AC-28c | Input placement — long conversations keep latest reply and input visible | [§3.3](#33-expanded-chat-mode) | active | @evolving |
 | AC-29 | Follow-up questions | [§3.3](#33-expanded-chat-mode) | active | @stable |
 | AC-30 | Input disabled during load | [§3.3](#33-expanded-chat-mode) | active | @stable |
-| AC-31 | Mode transitions & history retention | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
+| AC-31 | Dismissal retains messages | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
+| AC-31b | Compact re-entry surfaces continue-pill and hides asked chips | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
+| AC-31c | Reload or navigation clears history | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
+| AC-31d | New message from compact with history appends | [§3.3](#33-expanded-chat-mode) | active | @aspirational |
 | AC-40 | Service rejection | [§3.4](#34-error-handling) | active | @stable |
 | AC-41 | No crash on error | [§3.4](#34-error-handling) | active | @stable |
 | AC-42 | No developer leakage | [§3.4](#34-error-handling) | active | @evolving |
@@ -89,18 +106,24 @@ AC keeps whatever marker it carried when it was retired.
 | AC-70 | Figma parity | [§5](#5-visual-design--brand-award-critical) | active | @evolving |
 | AC-71 | (deprecated) Token-only styling — moved to rule files (GOV-04) | [§5](#5-visual-design--brand-award-critical) | deprecated | @stable |
 | AC-72 | Send-button states | [§5](#5-visual-design--brand-award-critical) | active | @stable |
-| AC-73 | Typography | [§5](#5-visual-design--brand-award-critical) | active | @stable |
+| AC-73 | Typography — Everett via font tokens | [§5](#5-visual-design--brand-award-critical) | active | @stable |
+| AC-73b | Typography — graceful fallback | [§5](#5-visual-design--brand-award-critical) | active | @stable |
 | AC-74 | Motion polish | [§5](#5-visual-design--brand-award-critical) | active | @evolving |
 | AC-75 | No generic AI aesthetic | [§5](#5-visual-design--brand-award-critical) | active | @evolving |
 | AC-76 | Dark hero compatibility | [§5](#5-visual-design--brand-award-critical) | active | @evolving |
 | AC-80 | Keyboard-only operation | [§6](#6-accessibility) | active | @evolving |
-| AC-81 | Screen-reader labelling | [§6](#6-accessibility) | active | @evolving |
+| AC-81 | Screen-reader labelling — textarea | [§6](#6-accessibility) | active | @evolving |
+| AC-81b | Screen-reader labelling — send button | [§6](#6-accessibility) | active | @evolving |
+| AC-81c | Screen-reader labelling — loading state | [§6](#6-accessibility) | active | @evolving |
+| AC-81d | Screen-reader labelling — errors | [§6](#6-accessibility) | active | @evolving |
 | AC-82 | WCAG 2.1 AA contrast | [§6](#6-accessibility) | active | @evolving |
 | AC-83 | Reduced motion | [§6](#6-accessibility) | active | @aspirational |
 | AC-84 | Zoom and reflow | [§6](#6-accessibility) | active | @evolving |
 | AC-90 | Desktop (≥1024px) | [§7](#7-responsiveness) | active | @stable |
 | AC-91 | Tablet (640–1023px) | [§7](#7-responsiveness) | active | @evolving |
-| AC-92 | Mobile (<640px) | [§7](#7-responsiveness) | active | @evolving |
+| AC-92 | Mobile (<640px) — compact stacks input above chips | [§7](#7-responsiveness) | active | @evolving |
+| AC-92b | Mobile (<640px) — chips scroll or wrap without overflow | [§7](#7-responsiveness) | active | @evolving |
+| AC-92c | Mobile (<640px) — expanded view full width with Figma padding | [§7](#7-responsiveness) | active | @evolving |
 | AC-93 | Textarea auto-grow | [§7](#7-responsiveness) | active | @stable |
 | AC-100 | Bundle budget | [§8](#8-performance) | active | @stable |
 | AC-101 | Cold-start render | [§8](#8-performance) | active | @evolving |
@@ -109,7 +132,9 @@ AC keeps whatever marker it carried when it was retired.
 | AC-110 | Browser matrix | [§9](#9-cross-browser--environment) | active | @evolving |
 | AC-111 | No console errors | [§9](#9-cross-browser--environment) | active | @stable |
 | AC-112 | Graceful CSS isolation | [§9](#9-cross-browser--environment) | active | @stable |
-| AC-120 | Event emission | [§10](#10-observability-light-touch-frontend-only) | active | @aspirational |
+| AC-120 | Event emission — named events for key actions | [§10](#10-observability-light-touch-frontend-only) | active | @aspirational |
+| AC-120b | Event emission — no PII in payloads | [§10](#10-observability-light-touch-frontend-only) | active | @aspirational |
+| AC-120c | Event emission — `chat_closed` payload | [§10](#10-observability-light-touch-frontend-only) | active | @aspirational |
 | AC-121 | No uncontrolled network calls | [§10](#10-observability-light-touch-frontend-only) | active | @stable |
 
 ---
@@ -213,20 +238,30 @@ PR.
 | AC-10   | `113:203`                      | Compact view layout (hero overlay)               | 2026-04-20   | seed sweep |
 | AC-11   | `146:1015`                     | Textarea placeholder copy & colour               | 2026-04-20   | seed sweep |
 | AC-12   | `116:374`, `116:392`, `116:398`| Suggestion chip wording & wrap                   | 2026-04-20   | seed sweep (AC updated to Figma `nowrap`) |
+| AC-12b  | `116:374`, `116:392`, `116:398`| Suggestion chip labels — single-line (nowrap)    | 2026-04-20   | inherits AC-12 sweep (GOV-05 split)      |
 | AC-16   | `149:1410`                     | Send button — Active (gradient)                  | 2026-04-20   | seed sweep |
 | AC-20   | `143:753`                      | Expanded view mount / first-frame layout         | 2026-04-20   | seed sweep |
 | AC-20a  | `143:753`                      | Expanded surface fills viewport                  | 2026-04-20   | seed sweep |
 | AC-20d  | `143:753`                      | Close (×) button styling & placement             | 2026-04-20   | seed sweep (no Figma node — AC extension) |
+| AC-20e  | `143:753`, `147:1129`          | First Q+A pair visible on first expanded frame   | 2026-04-20   | inherits AC-20 sweep (GOV-05 split)      |
 | AC-21   | `143:753`                      | Expanded header ("Siili AI-avustaja")            | 2026-04-20   | seed sweep |
 | AC-22   | `147:1129`                     | Question bubble (Q+A pair)                       | 2026-04-20   | seed sweep |
 | AC-23   | `178:482`, `201:2273`          | Loading blob / loading state                     | 2026-04-20   | seed sweep (spinner → blob applied) |
+| AC-23b  | `178:482`, `201:2273`          | Loading blob — rounded gray shape, pulse tempo   | 2026-04-20   | inherits AC-23 sweep (GOV-05 split)      |
 | AC-25   | `178:441`                      | Source reference badge                           | 2026-04-20   | seed sweep |
+| AC-25b  | `178:441`                      | Source reference — linked (opens in new tab)     | 2026-04-20   | inherits AC-25 sweep (GOV-05 split)      |
+| AC-25c  | `178:441`                      | Source reference — static unlinked badge         | 2026-04-20   | inherits AC-25 sweep (GOV-05 split)      |
 | AC-28   | `143:753`, `146:1015`          | ChatInput placement + textarea shadow            | 2026-04-20   | seed sweep |
+| AC-28b  | `143:753`, `146:1015`          | ChatInput — short conversation, not bottom-pinned| 2026-04-20   | inherits AC-28 sweep (GOV-05 split)      |
+| AC-28c  | `143:753`, `146:1015`          | ChatInput — long conversation, reply+input visible| 2026-04-20  | inherits AC-28 sweep (GOV-05 split)      |
 | AC-72   | `149:1410`, `149:1441`, `150:396` | Send button Active / Hover / Pressed          | 2026-04-20   | seed sweep |
 | AC-73   | — (code-authored)              | Typography — Everett weights (via `--font-family*` tokens) | 2026-04-20   | seed sweep (watching for typography node) |
+| AC-73b  | — (code-authored)              | Typography — sans-serif fallback, no large CLS   | 2026-04-20   | inherits AC-73 sweep (GOV-05 split)      |
 | AC-90   | `113:203`, `143:753`           | Desktop (≥1024px) layout                         | 2026-04-20   | seed sweep |
 | AC-91   | — (code-authored)              | Tablet (640–1023px) layout                       | 2026-04-20   | seed sweep (watching for tablet frame) |
-| AC-92   | — (code-authored)              | Mobile (<640px) layout                           | 2026-04-20   | seed sweep (watching for mobile frame) |
+| AC-92   | — (code-authored)              | Mobile (<640px) layout — compact stacks input    | 2026-04-20   | seed sweep (watching for mobile frame) |
+| AC-92b  | — (code-authored)              | Mobile (<640px) — chips scroll or wrap           | 2026-04-20   | inherits AC-92 sweep (GOV-05 split)      |
+| AC-92c  | — (code-authored)              | Mobile (<640px) — expanded view full width       | 2026-04-20   | inherits AC-92 sweep (GOV-05 split)      |
 
 The §13 Traceability roll-up (persona × section) is derived from this
 manifest — edit rows here, then re-derive §13 if persona mapping
@@ -275,19 +310,22 @@ Maps to Figma node `113:203`.
     suggestion chips, overlaid on the hero section in the layout
     defined in Figma.
 
-- **AC-10a** — *Continue-conversation pill* · **@aspirational**
+- **AC-10a** — *Continue-conversation pill — rendering* · **@aspirational**
   - **Given** the user has previously been in expanded mode within the
     current page session and `messages.length > 0`, and the widget is
     now rendering compact mode,
   - **Then** a single pill is rendered above the suggestion chips
     reading *"Jatka keskustelua"* (styled per Siili tokens: Everett,
     `--radius`, gradient or gray surface per Figma once designed).
+  - **Given** `messages.length === 0`,
+  - **Then** the pill is not rendered.
+
+- **AC-10c** — *Continue-conversation pill — activation* · **@aspirational**
+  - **Given** the continue-conversation pill is rendered (per AC-10a),
   - **When** the user clicks or keyboard-activates the pill,
   - **Then** the widget transitions to expanded mode with the full
     message history intact, scrolled to the latest reply, and fires
     no network call.
-  - **Given** `messages.length === 0`,
-  - **Then** the pill is not rendered.
 
 - **AC-10b** — *Suggestion-chip de-duplication* · **@aspirational**
   - **Given** the user has previously asked one of the three predefined
@@ -311,6 +349,9 @@ Maps to Figma node `113:203`.
     questions in Finnish (segments, dividend policy, revenue growth)
     with the exact wording from Figma `116:374` / `116:392` /
     `116:398` and `src/App.tsx::SUGGESTIONS`.
+
+- **AC-12b** — *Suggestion chip labels do not wrap* · **@stable**
+  - **Given** compact mode is shown,
   - **Then** each chip's label renders on a single line
     (`white-space: nowrap`) matching Figma; overflow of the chip
     row is handled at the breakpoints defined in AC-91 / AC-92 (row
@@ -345,13 +386,20 @@ Maps to Figma node `113:203`.
 
 Maps to Figma node `143:753`.
 
-- **AC-20** — *Transition* · **@stable**
+- **AC-20** — *Transition — no flicker* · **@stable**
   - **Given** the widget is in compact mode and a valid message is
     submitted,
   - **When** the transition occurs,
-  - **Then** expanded mode mounts without a flicker, the first Q+A
-    pair is visible immediately with the question filled in and the
-    assistant answer in loading state.
+  - **Then** expanded mode mounts without a flicker (no unstyled
+    flash, no intermediate empty frame between compact and expanded).
+
+- **AC-20e** — *Transition — first Q+A pair visible immediately* · **@stable**
+  - **Given** compact mode has just transitioned to expanded per
+    AC-20,
+  - **Then** on the first rendered frame of expanded mode the first
+    Q+A pair is already visible with the user's question filled in
+    and the assistant answer in loading state (no blank list, no
+    deferred mount).
 
 - **AC-20a** — *Fill the viewport* · **@evolving**
   - **Given** the widget has entered expanded mode,
@@ -367,39 +415,62 @@ Maps to Figma node `143:753`.
     compact view is no longer visible to the user — either because
     the widget's opaque surface fully covers it, or because the host
     page's hero is hidden/collapsed while the widget is expanded.
-  - **Then** switching to expanded mode does not cause the page
-    underneath to scroll or reflow visibly.
 
-- **AC-20c** — *Back navigation dismisses expanded mode* · **@aspirational**
+- **AC-20f** — *Transition — no host-page scroll or reflow* · **@evolving**
+  - **Given** the widget is transitioning from compact to expanded
+    mode,
+  - **Then** the host page underneath does not scroll or reflow
+    visibly as a side-effect of the transition (the host page's
+    scroll position and layout are preserved for when the user
+    dismisses expanded mode per AC-31).
+
+- **AC-20c** — *Back navigation — history entry pushed on expand* · **@aspirational**
   - **Given** `SiiliChatbot.init({ interceptBackNavigation: true })`
     (default `true`) and the widget is about to enter expanded mode,
   - **When** the compact → expanded transition begins,
   - **Then** the widget pushes a single history entry
     (`history.pushState`) tagged as its own so it can recognise it on
     `popstate`.
+
+- **AC-20g** — *Back navigation — popstate returns to compact* · **@aspirational**
+  - **Given** the widget is in expanded mode with its own history
+    entry on the stack (per AC-20c),
   - **When** the user triggers browser back (desktop back button,
     Android hardware back, iOS swipe-back),
   - **Then** the widget listens for `popstate` for its own entry and
     returns to compact mode with `messages` retained (see AC-31).
-  - **Given** the user is already in compact mode,
-  - **Then** pressing back is not intercepted — the host page's
-    normal navigation applies.
-  - **Given** `interceptBackNavigation: false`,
-  - **Then** no history entry is pushed and `popstate` is not
-    intercepted.
 
-- **AC-20d** — *Close button* · **@aspirational**
+- **AC-20h** — *Back navigation — compact-mode back is not intercepted* · **@aspirational**
+  - **Given** the user is already in compact mode,
+  - **When** the user triggers browser back,
+  - **Then** the event is not intercepted — the host page's normal
+    navigation applies.
+
+- **AC-20i** — *Back navigation — opt-out via `interceptBackNavigation: false`* · **@aspirational**
+  - **Given** `SiiliChatbot.init({ interceptBackNavigation: false })`,
+  - **Then** no history entry is pushed on compact → expanded and
+    `popstate` is not intercepted at any point in the widget
+    lifecycle.
+
+- **AC-20d** — *Close button — rendering* · **@aspirational**
   - **Given** the widget is in expanded mode,
   - **Then** a close (`×`) button is rendered in the top-right of the
     expanded view, styled per Siili tokens (not a generic Material
     `×`), with a 44×44px minimum hit target and
     `aria-label="Sulje keskustelu"`.
+
+- **AC-20j** — *Close button — activation dismisses expanded mode* · **@aspirational**
+  - **Given** the widget is in expanded mode,
   - **When** the user clicks the close button or presses `Esc`
     anywhere inside the widget,
   - **Then** the widget returns to compact mode with `messages`
     retained (see AC-31) and, if `interceptBackNavigation` is on,
     calls `history.back()` to keep the history stack in sync.
+
+- **AC-20k** — *Close button — reduced motion* · **@aspirational**
   - **Given** `prefers-reduced-motion: reduce`,
+  - **When** the user dismisses expanded mode via the close button,
+    `Esc`, or browser back (AC-20j / AC-20g),
   - **Then** the dismiss transition is instant (no fade / slide).
 
 - **AC-21** — *Header* · **@stable**
@@ -412,11 +483,14 @@ Maps to Figma node `143:753`.
   - **Then** the question appears right-aligned in a `--gray-500`
     bubble with `--radius` corners (Figma `147:1129`).
 
-- **AC-23** — *Loading indicator* · **@evolving**
+- **AC-23** — *Loading indicator — semantics and copy* · **@evolving**
   - **Given** an in-flight assistant answer,
   - **Then** a pulsating gray blob (Figma `178:482` / loading state
     `201:2273`) and the text *"Haetaan tietoa..."* appear in place
     of the answer, with `role="status"` and `aria-live="polite"`.
+
+- **AC-23b** — *Loading indicator — blob visual style* · **@evolving**
+  - **Given** the loading indicator is visible (per AC-23),
   - **Then** the blob uses a soft, rounded shape filled with a gray
     token (e.g. `--gray-500`) and animates a smooth scale/opacity
     pulse at the tempo defined in Figma `178:482` — not a spinning
@@ -427,13 +501,17 @@ Maps to Figma node `143:753`.
   - **Then** the pulsating blob is replaced by the answer text,
     preserving paragraph breaks from the backend response.
 
-- **AC-25** — *Source references* · **@stable**
+- **AC-25** — *Source references — section rendered* · **@stable**
   - **Given** an answer includes one or more `sources`,
   - **Then** the section labelled *"Lähteet:"* is rendered below the
     answer with one `SourceBadge` (Figma `178:441`) per source.
-  - **When** a source has an `href`,
+
+- **AC-25b** — *Source references — linked badge opens in new tab* · **@stable**
+  - **Given** a source has an `href`,
   - **Then** the badge is a link that opens in a new tab
     (`target="_blank"`, `rel="noopener noreferrer"`).
+
+- **AC-25c** — *Source references — unlinked badge is static* · **@stable**
   - **Given** a source has no `href`,
   - **Then** the badge is rendered as static, non-interactive text
     (no underline, no hover affordance).
@@ -454,11 +532,15 @@ Maps to Figma node `143:753`.
     most recent assistant reply (or its loading blob), in document
     flow, with the white background and `--textarea-shadow` matching
     Figma.
+
+- **AC-28b** — *Input placement — short conversations are not bottom-pinned* · **@evolving**
   - **Given** the conversation is short enough that all Q+A pairs fit
     in the viewport,
   - **Then** the input sits directly below the latest reply — it is
     **not** pinned to the bottom of the viewport with empty space
     above it.
+
+- **AC-28c** — *Input placement — long conversations keep latest reply and input visible* · **@evolving**
   - **Given** the conversation is long enough to scroll,
   - **Then** after the auto-scroll in AC-27, the latest reply and the
     input beneath it are both visible together, with the input at or
@@ -475,20 +557,26 @@ Maps to Figma node `143:753`.
     greyed per Figma and functionally non-interactive) until the
     response resolves.
 
-- **AC-31** — *Mode transitions & history retention* · **@aspirational**
+- **AC-31** — *Dismissal retains messages* · **@aspirational**
   - **Given** the widget is in expanded mode,
-  - **When** the user dismisses it via the close button (AC-20d),
-    `Esc`, or browser back (AC-20c),
+  - **When** the user dismisses it via the close button (AC-20j),
+    `Esc`, or browser back (AC-20g),
   - **Then** the widget re-renders compact mode *and* retains the full
     `messages` array in memory for the remainder of the page session.
+
+- **AC-31b** — *Compact re-entry surfaces continue-pill and hides asked chips* · **@aspirational**
   - **Given** the user has re-entered compact mode with non-empty
     history,
   - **Then** compact mode shows the continue-conversation pill
     (AC-10a) and hides already-asked chips (AC-10b); the history is
     never rendered in full inside the compact hero.
+
+- **AC-31c** — *Reload or navigation clears history* · **@aspirational**
   - **Given** the user reloads the page or navigates away,
   - **Then** `messages` is cleared — there is no cross-session
     persistence (see §12 non-goals).
+
+- **AC-31d** — *New message from compact with history appends* · **@aspirational**
   - **Given** the user sends a new message from compact mode while
     history exists,
   - **Then** the widget enters expanded mode and **appends** the new
@@ -611,7 +699,7 @@ These criteria exist to satisfy P2's competition-entry ambition.
     [`src/styles/variables.css`](src/styles/variables.css), with
     smooth CSS transitions between states.
 
-- **AC-73** — *Typography* · **@stable**
+- **AC-73** — *Typography — Everett via font tokens* · **@stable**
   - **Given** the widget is rendered on a page that has loaded the
     Everett font,
   - **Then** all text uses the `--font-family*` tokens in
@@ -619,6 +707,8 @@ These criteria exist to satisfy P2's competition-entry ambition.
     Everett weights (Regular, Light, Bold) used across the Figma
     frames. Code-authored row in §2.5 — promote once a dedicated
     typography node exists in Figma.
+
+- **AC-73b** — *Typography — graceful fallback* · **@stable**
   - **Given** Everett fails to load,
   - **Then** the widget falls back to `sans-serif` gracefully without
     layout shift larger than one line-height.
@@ -654,12 +744,23 @@ These criteria exist to satisfy P2's competition-entry ambition.
     chip (compact) / each source badge (expanded), with a visible
     focus ring that contrasts against the background.
 
-- **AC-81** — *Screen-reader labelling* · **@evolving**
+- **AC-81** — *Screen-reader labelling — textarea* · **@evolving**
   - **Given** a screen reader,
-  - **Then** the textarea announces its aria-label, the send button
-    announces "Send message", the loading state announces *"Haetaan
-    tietoa..."* (`aria-live="polite"`), and errors announce via
-    `role="alert"`.
+  - **Then** the textarea announces its configured aria-label.
+
+- **AC-81b** — *Screen-reader labelling — send button* · **@evolving**
+  - **Given** a screen reader,
+  - **Then** the send button announces "Send message" (or its
+    localised equivalent when the widget copy is localised).
+
+- **AC-81c** — *Screen-reader labelling — loading state* · **@evolving**
+  - **Given** a screen reader and an in-flight assistant answer,
+  - **Then** the loading state announces *"Haetaan tietoa..."* via
+    an `aria-live="polite"` region (see AC-23).
+
+- **AC-81d** — *Screen-reader labelling — errors* · **@evolving**
+  - **Given** a screen reader and an error response (per AC-40),
+  - **Then** the error message announces via `role="alert"`.
 
 - **AC-82** — *WCAG 2.1 AA contrast* · **@evolving**
   - **Given** every text/background pair defined by the tokens,
@@ -691,12 +792,22 @@ These criteria exist to satisfy P2's competition-entry ambition.
   - Chips wrap to two rows if needed; the textarea grows to full
     container width; the send button stays inside the input shell.
 
-- **AC-92** — *Mobile (<640px)* · **@evolving**
-  - Compact view stacks the input above the chips; chips are
-    horizontally scrollable or wrap without overflowing the viewport;
-    expanded view uses `100%` container width with padding per Figma
-    mobile guidance (or tasteful scale-down if mobile frames are not
-    yet designed).
+- **AC-92** — *Mobile (<640px) — compact stacks input above chips* · **@evolving**
+  - **Given** a viewport narrower than 640px,
+  - **Then** the compact view stacks the input above the chips (not
+    side-by-side).
+
+- **AC-92b** — *Mobile (<640px) — chips scroll or wrap without overflow* · **@evolving**
+  - **Given** a viewport narrower than 640px,
+  - **Then** the suggestion chips are horizontally scrollable or wrap
+    onto additional rows without overflowing the viewport width.
+
+- **AC-92c** — *Mobile (<640px) — expanded view full width with Figma padding* · **@evolving**
+  - **Given** a viewport narrower than 640px and the widget is in
+    expanded mode,
+  - **Then** the expanded view uses `100%` container width with
+    padding per Figma mobile guidance (or a tasteful scale-down of
+    the desktop frame if mobile frames are not yet designed).
 
 - **AC-93** — *Textarea auto-grow* · **@stable**
   - **Given** the user types multi-line content,
@@ -756,16 +867,26 @@ These criteria exist to satisfy P2's competition-entry ambition.
 
 ## 10. Observability (Light-Touch, Frontend Only)
 
-- **AC-120** — *Event emission* · **@aspirational**
+- **AC-120** — *Event emission — named events for key actions* · **@aspirational**
   - **Given** these user actions — widget mounted, chip clicked,
     message sent, response received, response errored, chat closed
     (via `×` / `Esc` / back), chat reopened (via continue pill),
   - **Then** the widget emits a named event (custom event on
     `window` or calls `window.dataLayer.push` if present) so the IR
-    site's existing analytics can capture them. No PII in payloads.
-  - **Then** the `chat_closed` event payload includes the dismiss
-    method (`"close_button" | "escape_key" | "back_navigation"`) and
-    the message count at dismiss time.
+    site's existing analytics can capture them.
+
+- **AC-120b** — *Event emission — no PII in payloads* · **@aspirational**
+  - **Given** any event emitted per AC-120,
+  - **Then** its payload contains no personally identifiable
+    information (no user message text, no user-supplied free-form
+    content, no identifiers that could be reverse-linked to an
+    individual).
+
+- **AC-120c** — *Event emission — `chat_closed` payload* · **@aspirational**
+  - **Given** the `chat_closed` event is emitted,
+  - **Then** its payload includes the dismiss method
+    (`"close_button" | "escape_key" | "back_navigation"`) and the
+    message count at dismiss time.
 
 - **AC-121** — *No uncontrolled network calls* · **@stable**
   - **Given** the widget is mounted,

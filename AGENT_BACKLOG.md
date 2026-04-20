@@ -52,7 +52,7 @@ stay within the declared scope. When finished, update the task status to
 | GOV-02 | Promote AC-100 (60KB bundle budget) into `AGENTS.md` | XS | High | — | done |
 | GOV-03 | Tag every AC with `@stable` / `@evolving` / `@aspirational` | S | High | GOV-01 | done |
 | GOV-04 | Extract construction rules out of ACs into rule files | S | High | GOV-01 | done |
-| GOV-05 | Split compound ACs into one-behavior-per-ID | M | High | GOV-01, GOV-04 | todo |
+| GOV-05 | Split compound ACs into one-behavior-per-ID | M | High | GOV-01, GOV-04 | done |
 | GOV-06 | Elevate §12 Non-Goals into negative AC-IDs | S | Medium | GOV-05 | todo |
 | GOV-07 | Bind each AC to verification evidence | M | Critical | GOV-05 | todo |
 | GOV-08 | Replace visual prose with Figma node links | S | Medium | GOV-07 | todo |
@@ -192,7 +192,7 @@ ACs describe *what the product does*. Rules describe *how the code is written*. 
 
 ### GOV-05 — Split compound ACs into one-behavior-per-ID
 
-**Status:** todo · **Size:** M · **Severity:** High · **Depends on:** GOV-01, GOV-04
+**Status:** done · **Size:** M · **Severity:** High · **Depends on:** GOV-01, GOV-04
 
 **Why**
 An AC that asserts two things cannot be individually verified. "Submit empty is a no-op AND Enter submits AND Shift+Enter adds newline" should be three ACs, not one.
@@ -209,10 +209,10 @@ An AC that asserts two things cannot be individually verified. "Submit empty is 
 5. Update the catalog.
 
 **Done when**
-- [ ] No AC asserts more than one independently-testable behavior.
-- [ ] No AC-ID was reused for different content.
-- [ ] Tombstones exist wherever a split changed the original meaning.
-- [ ] Catalog reflects every new ID.
+- [x] No AC asserts more than one independently-testable behavior.
+- [x] No AC-ID was reused for different content.
+- [x] Tombstones exist wherever a split changed the original meaning.
+- [x] Catalog reflects every new ID.
 
 **Stop and ask if**
 - Splitting an AC would cause > 5 new IDs from one original — that probably indicates a deeper rewrite is needed; surface for human review.
@@ -490,6 +490,7 @@ Format:
 - 2026-04-20 — GOV-01 — Added `## AC Catalog` index (64 rows) between intro and §1 of `ACCEPTANCE_CRITERIA.md`.
 - 2026-04-20 — GOV-03 — Tagged every AC in `ACCEPTANCE_CRITERIA.md` with a stability marker (32 @stable / 19 @evolving / 13 @aspirational); added Stability markers subsection and Stability column to the AC catalog.
 - 2026-04-20 — GOV-04 — Extracted construction prose from `ACCEPTANCE_CRITERIA.md` into the existing rule files: trimmed AC-112 to behaviour-only, rewrote §11 DoD item 4 to point at `code-governance.mdc`, deprecated AC-71 (Token-only styling) in place (ID retained, catalog row marked `deprecated`, §2.5 umbrella note updated). No rule-file additions needed — `code-governance.mdc` + `project.mdc` already cover strict TS, `onInput`/`currentTarget`, React-via-Preact-compat, CSS Modules, and token-only styling.
+- 2026-04-20 — GOV-05 — Split 14 compound ACs into 25 new IDs (AC-10c, 12b, 20e-20k, 23b, 25b-c, 28b-c, 31b-d, 73b, 81b-d, 92b-c, 120b-c); originals kept with narrowed titles. Catalog + §2.5 Figma Manifest updated; no IDs reused; no split exceeded 5 children.
 
 ---
 
