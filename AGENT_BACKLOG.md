@@ -54,8 +54,8 @@ stay within the declared scope. When finished, update the task status to
 | GOV-04 | Extract construction rules out of ACs into rule files | S | High | GOV-01 | done |
 | GOV-05 | Split compound ACs into one-behavior-per-ID | M | High | GOV-01, GOV-04 | done |
 | GOV-06 | Elevate §12 Non-Goals into negative AC-IDs | S | Medium | GOV-05 | done |
-| GOV-07 | Bind each AC to verification evidence | M | Critical | GOV-05 | todo |
-| GOV-08 | Replace visual prose with Figma node links | S | Medium | GOV-07 | todo |
+| GOV-07 | Bind each AC to verification evidence | M | Critical | GOV-05 | done |
+| GOV-08 | Replace visual prose with Figma node links | S | Medium | GOV-07 | done |
 | GOV-09 | Audit rule files for differential impact | M | Medium | — | todo |
 | GOV-10 | Adopt amendment-logging convention | XS | Medium | — | todo |
 | GOV-11 | Require PR descriptions list AC-IDs touched | S | Medium | GOV-09 | todo |
@@ -248,7 +248,7 @@ An AC that asserts two things cannot be individually verified. "Submit empty is 
 
 ### GOV-07 — Bind each AC to verification evidence
 
-**Status:** todo · **Size:** M · **Severity:** Critical · **Depends on:** GOV-05
+**Status:** done · **Size:** M · **Severity:** Critical · **Depends on:** GOV-05
 
 **Why**
 An AC without an evidence path is prose. This is the single biggest quality lever on the whole document.
@@ -267,9 +267,9 @@ An AC without an evidence path is prose. This is the single biggest quality leve
 4. Update every row in the catalog.
 
 **Done when**
-- [ ] Every AC has a non-empty `Verification` value.
-- [ ] Any AC marked `Verification: none` is also tagged `@aspirational`.
-- [ ] Automated verifications reference real, existing commands.
+- [x] Every AC has a non-empty `Verification` value.
+- [x] Any AC marked `Verification: none` is also tagged `@aspirational`.
+- [x] Automated verifications reference real, existing commands.
 
 **Stop and ask if**
 - More than ~15% of ACs end up with `Verification: none` — that means the spec is largely untestable and needs a broader conversation before proceeding.
@@ -278,7 +278,7 @@ An AC without an evidence path is prose. This is the single biggest quality leve
 
 ### GOV-08 — Replace visual prose with Figma node links
 
-**Status:** todo · **Size:** S · **Severity:** Medium · **Depends on:** GOV-07
+**Status:** done · **Size:** S · **Severity:** Medium · **Depends on:** GOV-07
 
 **Why**
 Prose descriptions of visual design drift from Figma. The manifest in `ACCEPTANCE_CRITERIA.md` §2.5 already names nodes — use them.
@@ -293,8 +293,8 @@ Prose descriptions of visual design drift from Figma. The manifest in `ACCEPTANC
 4. Keep behavioral ACs (states, transitions, interactions) in prose — only replace the *appearance* descriptions.
 
 **Done when**
-- [ ] No AC restates specific color, spacing, or typography values in prose when a Figma node already encodes them.
-- [ ] Every node referenced by an AC appears in §2.5.
+- [x] No AC restates specific color, spacing, or typography values in prose when a Figma node already encodes them.
+- [x] Every node referenced by an AC appears in §2.5.
 
 **Stop and ask if**
 - A Figma node doesn't match what the AC prose currently says. That's design drift — don't silently pick one; surface the conflict.
@@ -492,6 +492,8 @@ Format:
 - 2026-04-20 — GOV-04 — Extracted construction prose from `ACCEPTANCE_CRITERIA.md` into the existing rule files: trimmed AC-112 to behaviour-only, rewrote §11 DoD item 4 to point at `code-governance.mdc`, deprecated AC-71 (Token-only styling) in place (ID retained, catalog row marked `deprecated`, §2.5 umbrella note updated). No rule-file additions needed — `code-governance.mdc` + `project.mdc` already cover strict TS, `onInput`/`currentTarget`, React-via-Preact-compat, CSS Modules, and token-only styling.
 - 2026-04-20 — GOV-05 — Split 14 compound ACs into 25 new IDs (AC-10c, 12b, 20e-20k, 23b, 25b-c, 28b-c, 31b-d, 73b, 81b-d, 92b-c, 120b-c); originals kept with narrowed titles. Catalog + §2.5 Figma Manifest updated; no IDs reused; no split exceeded 5 children.
 - 2026-04-20 — GOV-06 — Minted AC-N1 (MUST NOT render backend HTML/Markdown) and AC-N2 (MUST NOT bundle font files) in `ACCEPTANCE_CRITERIA.md` §12; restructured §12 into §12.1 Product decisions (persistence, streaming — no AC-IDs, remain v1 product decisions) and §12.2 Invariants (AC-Nx); added both rows to the AC Catalog.
+- 2026-04-20 — GOV-07 — Added `Verification` column to the AC catalog in `ACCEPTANCE_CRITERIA.md`, binding each of 91 rows to the cheapest credible evidence path (Automated / Manual / Visual / `none`); 9 aspirational rows marked `none` (9.9%, below the 15% cap); every `none` row is `@aspirational`; automated paths reference real scripts (`npm run build`, `rg`).
+- 2026-04-21 — GOV-08 — Replaced visual-token prose in AC-11, AC-12b, AC-20a, AC-21, AC-22, AC-23b, AC-28, AC-72 with references to the Figma nodes already bound in §2.5 (no new nodes needed, no design drift surfaced); behavioural prose and GOV-07 verification-column values left intact.
 
 ---
 
