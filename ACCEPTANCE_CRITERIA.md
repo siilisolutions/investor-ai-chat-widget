@@ -155,11 +155,11 @@ directly.
 | AC-75 | No generic AI aesthetic | [§5](#5-visual-design--brand-award-critical) | active | @evolving | Visual: review against Figma — no default spinners, Material FAB, plain-tail bubbles, or stock AI motifs |
 | AC-76 | Dark hero compatibility | [§5](#5-visual-design--brand-award-critical) | active | @evolving | Manual: overlay on the real hero asset + axe / contrast tool over the busiest hero region |
 | AC-80 | Keyboard-only operation | [§6](#6-accessibility) | active | @evolving | Manual: Tab through widget — focus order textarea → send → chips / badges, visible focus ring |
-| AC-81 | Screen-reader labelling — textarea | [§6](#6-accessibility) | active | @evolving | Manual: DevTools Accessibility panel — textarea announces configured `aria-label` |
-| AC-81b | Screen-reader labelling — send button | [§6](#6-accessibility) | active | @evolving | Manual: DevTools Accessibility panel — send button announces "Send message" (or localised equivalent) |
-| AC-81c | Screen-reader labelling — loading state | [§6](#6-accessibility) | active | @evolving | Automated: `npm run test -- tests/chatMessage.test.tsx` (`role="status"` + `aria-live="polite"` + "Haetaan tietoa..." copy) |
-| AC-81d | Screen-reader labelling — errors | [§6](#6-accessibility) | active | @evolving | Automated: `npm run test -- tests/chatMessage.test.tsx` (error text announced via `role="alert"`) |
-| AC-82 | WCAG 2.1 AA contrast | [§6](#6-accessibility) | active | @evolving | Manual: axe DevTools contrast scan over token pairs — ≥4.5:1 body, ≥3:1 large / non-text |
+| AC-81 | Screen-reader labelling — textarea | [§6](#6-accessibility) | active | @stable | Manual: DevTools Accessibility panel — textarea announces configured `aria-label` |
+| AC-81b | Screen-reader labelling — send button | [§6](#6-accessibility) | active | @stable | Manual: DevTools Accessibility panel — send button announces "Send message" (or localised equivalent) |
+| AC-81c | Screen-reader labelling — loading state | [§6](#6-accessibility) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (`role="status"` + `aria-live="polite"` + "Haetaan tietoa..." copy) |
+| AC-81d | Screen-reader labelling — errors | [§6](#6-accessibility) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (error text announced via `role="alert"`) |
+| AC-82 | WCAG 2.1 AA contrast | [§6](#6-accessibility) | active | @stable | Manual: axe DevTools contrast scan over token pairs — ≥4.5:1 body, ≥3:1 large / non-text |
 | AC-83 | Reduced motion | [§6](#6-accessibility) | active | @aspirational | Manual: DevTools emulate reduce-motion — transitions, auto-scroll, blob pulse reduced or static (aspirational) |
 | AC-84 | Zoom and reflow | [§6](#6-accessibility) | active | @evolving | Manual: browser zoom to 200% — no widget content clipped, no horizontal scroll inside container |
 | AC-90 | Desktop (≥1024px) | [§7](#7-responsiveness) | active | @stable | Manual: viewport at or above the §12.1 PD-05 desktop threshold — matches §2.5 row AC-90 padding and layout |
@@ -925,25 +925,25 @@ These criteria exist to satisfy P2's competition-entry ambition.
     chip (compact) / each source badge (expanded), with a visible
     focus ring that contrasts against the background.
 
-- **AC-81** — *Screen-reader labelling — textarea* · **@evolving**
+- **AC-81** — *Screen-reader labelling — textarea* · **@stable**
   - **Given** a screen reader,
   - **Then** the textarea announces its configured aria-label.
 
-- **AC-81b** — *Screen-reader labelling — send button* · **@evolving**
+- **AC-81b** — *Screen-reader labelling — send button* · **@stable**
   - **Given** a screen reader,
   - **Then** the send button announces "Send message" (or its
     localised equivalent when the widget copy is localised).
 
-- **AC-81c** — *Screen-reader labelling — loading state* · **@evolving**
+- **AC-81c** — *Screen-reader labelling — loading state* · **@stable**
   - **Given** a screen reader and an in-flight assistant answer,
   - **Then** the loading state announces *"Haetaan tietoa..."* via
     an `aria-live="polite"` region (see AC-23).
 
-- **AC-81d** — *Screen-reader labelling — errors* · **@evolving**
+- **AC-81d** — *Screen-reader labelling — errors* · **@stable**
   - **Given** a screen reader and an error response (per AC-40),
   - **Then** the error message announces via `role="alert"`.
 
-- **AC-82** — *WCAG 2.1 AA contrast* · **@evolving**
+- **AC-82** — *WCAG 2.1 AA contrast* · **@stable**
   - **Given** every text/background pair defined by the tokens,
   - **Then** contrast is at least 4.5:1 for body text and 3:1 for
     large text and non-text UI.
