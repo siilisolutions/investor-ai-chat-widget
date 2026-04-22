@@ -87,17 +87,17 @@ directly.
 | AC-02 | Zero host dependencies | [§3.1](#31-embedding--initialisation) | active | @stable | Manual: `npm run dev` on a page that loads only the widget assets — widget works end-to-end |
 | AC-03 | Idempotent init | [§3.1](#31-embedding--initialisation) | active | @evolving | Manual: call `SiiliChatbot.init()` twice on the same container — single clean mount, no console errors |
 | AC-04 | `apiUrl` option selects backend | [§3.1](#31-embedding--initialisation) | active | @evolving | Manual: init without `apiUrl` — mock responds in ~800ms; init with `apiUrl` — DevTools Network shows a POST to that URL and no other |
-| AC-10 | Initial state | [§3.2](#32-compact-hero-mode) | active | @stable | Visual: Figma `site:13:527` vs rendered compact view (one textarea + three chips) |
+| AC-10 | Initial state | [§3.2](#32-compact-hero-mode) | active | @stable | Visual: see §2.5 row AC-10 vs rendered compact view (one textarea + three chips) |
 | AC-10a | Continue-conversation pill — rendering | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: dev harness with seeded history — pill renders above chips (aspirational) |
 | AC-10b | Suggestion-chip de-duplication | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: ask a chip, re-enter compact — that chip is hidden, order preserved (aspirational) |
 | AC-10c | Continue-conversation pill — activation | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: activate pill — returns to expanded with history, no network call (aspirational) |
 | AC-11 | Placeholder copy | [§3.2](#32-compact-hero-mode) | active | @stable | Manual: `npm run dev` — textarea shows the AC placeholder copy in `--gray-900` |
-| AC-12 | Suggestion chip content | [§3.2](#32-compact-hero-mode) | active | @stable | Visual: Figma `ds:152:86` — chip wording matches `src/App.tsx::SUGGESTIONS` |
+| AC-12 | Suggestion chip content | [§3.2](#32-compact-hero-mode) | active | @stable | Visual: see §2.5 row AC-12 — chip wording matches `src/App.tsx::SUGGESTIONS` |
 | AC-12b | Suggestion chip labels do not wrap | [§3.2](#32-compact-hero-mode) | active | @stable | Manual: shrink chip container — labels stay on one line (`white-space: nowrap`) |
 | AC-13 | Sending from the textarea | [§3.2](#32-compact-hero-mode) | active | @stable | Manual: type text + Enter (and send click) — transitions to expanded, textarea cleared |
 | AC-14 | Sending from a chip | [§3.2](#32-compact-hero-mode) | active | @stable | Manual: click a chip — widget transitions to expanded with the chip's label sent |
 | AC-15 | Empty-submit guard | [§3.2](#32-compact-hero-mode) | active | @stable | Manual: Enter / send click with empty or whitespace-only textarea — no transition |
-| AC-16 | Send-button enablement | [§3.2](#32-compact-hero-mode) | active | @stable | Visual: Figma `ds:152:129` — disabled when empty, Active gradient when non-empty |
+| AC-16 | Send-button enablement | [§3.2](#32-compact-hero-mode) | active | @stable | Visual: see §2.5 row AC-16 — disabled when empty, Active gradient when non-empty |
 | AC-17 | Input shell — click-to-focus target with text cursor | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: hover the input shell padding (both variants) — cursor is text caret; click the padding — textarea receives focus (aspirational) |
 | AC-20 | Transition — no flicker | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: compact → expanded transition — no unstyled flash or empty intermediate frame |
 | AC-20a | Fill the viewport | [§3.3](#33-expanded-chat-mode) | active | @evolving | Manual: enter expanded — surface fills `100vw × 100vh` with solid `--white-500` |
@@ -111,17 +111,17 @@ directly.
 | AC-20i | Back navigation — opt-out via `interceptBackNavigation: false` | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: init with `interceptBackNavigation: false` — no `pushState`/`popstate` handling (aspirational) |
 | AC-20j | Close button — activation dismisses expanded mode | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: `×` or `Esc` dismisses expanded — messages retained, `history.back()` called when intercepting (aspirational) |
 | AC-20k | Close button — reduced motion | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: DevTools emulate reduce-motion — dismiss transition is instant (aspirational) |
-| AC-21 | Header | [§3.3](#33-expanded-chat-mode) | active | @stable | Visual: Figma `ds:152:97` — header reads "Siili AI-avustaja" in Everett |
-| AC-22 | Question bubble | [§3.3](#33-expanded-chat-mode) | active | @stable | Visual: Figma `ds:152:116` — right-aligned `--gray-500` bubble with `--radius` corners |
+| AC-21 | Header | [§3.3](#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-21 — header reads "Siili AI-avustaja" in Everett |
+| AC-22 | Question bubble | [§3.3](#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-22 — right-aligned `--gray-500` bubble with `--radius` corners |
 | AC-23 | Loading indicator — semantics and copy | [§3.3](#33-expanded-chat-mode) | active | @evolving | Manual: inspect in-flight pair — blob + "Haetaan tietoa..." with `role="status"` and `aria-live="polite"` |
-| AC-23b | Loading indicator — blob visual style | [§3.3](#33-expanded-chat-mode) | active | @evolving | Visual: Figma `ds:152:137` / `site:201:2273` — soft rounded gray blob, scale/opacity pulse |
+| AC-23b | Loading indicator — blob visual style | [§3.3](#33-expanded-chat-mode) | active | @evolving | Visual: see §2.5 row AC-23b — soft rounded gray blob, scale/opacity pulse |
 | AC-24 | Answer rendering | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: resolved answer replaces blob, paragraph breaks preserved |
-| AC-25 | Source references — section rendered | [§3.3](#33-expanded-chat-mode) | active | @stable | Visual: Figma `ds:152:135` — "Lähteet:" section with one `SourceBadge` per source |
+| AC-25 | Source references — section rendered | [§3.3](#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-25 — "Lähteet:" section with one `SourceBadge` per source |
 | AC-25b | Source references — linked badge opens in new tab | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: click linked badge — opens new tab (`target="_blank"`, `rel="noopener noreferrer"`) |
 | AC-25c | Source references — unlinked badge is static | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: unlinked badge — no hover, no underline, non-interactive |
 | AC-26 | No-sources case | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: zero-source answer (edit mock) — "Lähteet:" section not rendered at all |
 | AC-27 | Auto-scroll to newest | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: append several Q+A pairs — newest smoothly scrolls into view |
-| AC-28 | Input positioned below the latest reply | [§3.3](#33-expanded-chat-mode) | active | @evolving | Visual: Figma `site:143:601` / `ds:152:121` — input in document flow below latest reply with `--textarea-shadow` |
+| AC-28 | Input positioned below the latest reply | [§3.3](#33-expanded-chat-mode) | active | @evolving | Visual: see §2.5 row AC-28 — input in document flow below latest reply with `--textarea-shadow` |
 | AC-28b | Input placement — short conversations are not bottom-pinned | [§3.3](#33-expanded-chat-mode) | active | @evolving | Manual: short convo — input sits directly below latest reply, no empty space above |
 | AC-28c | Input placement — long conversations keep latest reply and input visible | [§3.3](#33-expanded-chat-mode) | active | @evolving | Manual: long convo — latest reply + input both visible after auto-scroll |
 | AC-29 | Follow-up questions | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: send follow-up — new Q+A appended, prior pairs unchanged, input cleared |
@@ -148,7 +148,7 @@ directly.
 | AC-65 | Clear AI labelling | [§4](#4-content-legal--trust-investor-critical) | active | @stable | Manual: expanded view shows "Siili AI-avustaja" header and any legally required disclaimer |
 | AC-70 | Figma parity | [§5](#5-visual-design--brand-award-critical) | active | @evolving | Visual: `get_design_context` on each §2.5 Figma Manifest row and compare rendered output |
 | AC-71 | (deprecated) Token-only styling — moved to rule files (GOV-04) | [§5](#5-visual-design--brand-award-critical) | deprecated | @stable | n/a (deprecated — see AC body; see AC-70 + `.cursor/rules/` for live coverage) |
-| AC-72 | Send-button states | [§5](#5-visual-design--brand-award-critical) | active | @stable | Visual: Figma `ds:152:129` / `ds:152:131` / `ds:152:133` — Active / Hover / Pressed |
+| AC-72 | Send-button states | [§5](#5-visual-design--brand-award-critical) | active | @stable | Visual: see §2.5 row AC-72 — Active / Hover / Pressed |
 | AC-73 | Typography — Everett via font tokens | [§5](#5-visual-design--brand-award-critical) | active | @stable | Manual: DevTools computed-style check — widget text uses `--font-family*` tokens (Everett when loaded) |
 | AC-73b | Typography — graceful fallback | [§5](#5-visual-design--brand-award-critical) | active | @stable | Manual: block Everett in DevTools Network — widget falls back to `sans-serif` with ≤1 line-height shift |
 | AC-74 | Motion polish | [§5](#5-visual-design--brand-award-critical) | active | @evolving | Manual: interact with chip / send / focus / transition — durations 120–300ms, easing matches IR site |
@@ -162,7 +162,7 @@ directly.
 | AC-82 | WCAG 2.1 AA contrast | [§6](#6-accessibility) | active | @evolving | Manual: axe DevTools contrast scan over token pairs — ≥4.5:1 body, ≥3:1 large / non-text |
 | AC-83 | Reduced motion | [§6](#6-accessibility) | active | @aspirational | Manual: DevTools emulate reduce-motion — transitions, auto-scroll, blob pulse reduced or static (aspirational) |
 | AC-84 | Zoom and reflow | [§6](#6-accessibility) | active | @evolving | Manual: browser zoom to 200% — no widget content clipped, no horizontal scroll inside container |
-| AC-90 | Desktop (≥1024px) | [§7](#7-responsiveness) | active | @stable | Manual: viewport ≥1024px — matches Figma `site:13:527` / `site:143:601` padding and layout |
+| AC-90 | Desktop (≥1024px) | [§7](#7-responsiveness) | active | @stable | Manual: viewport ≥1024px — matches §2.5 row AC-90 padding and layout |
 | AC-91 | Tablet (640–1023px) | [§7](#7-responsiveness) | active | @evolving | Manual: viewport 640–1023px — chips wrap, textarea full width, send button inside input shell |
 | AC-92 | Mobile (<640px) — compact stacks input above chips | [§7](#7-responsiveness) | active | @evolving | Manual: viewport <640px — compact stacks input above chips (not side-by-side) |
 | AC-92b | Mobile (<640px) — chips scroll or wrap without overflow | [§7](#7-responsiveness) | active | @evolving | Manual: viewport <640px — chips wrap or scroll horizontally without overflowing viewport width |
@@ -379,7 +379,7 @@ that tests and PR descriptions can reference.
 
 ### 3.2 Compact (Hero) Mode
 
-Maps to Figma node `site:13:527` (screen composition) and `ds:152:75` (Investor hero main component).
+Maps to the Investor hero composition and its main component; see §2.5 Figma Manifest for the bound nodes.
 
 - **AC-10** — *Initial state* · **@stable**
   - **Given** the page has just loaded and `messages.length === 0`,
@@ -419,22 +419,21 @@ Maps to Figma node `site:13:527` (screen composition) and `ds:152:75` (Investor 
   - **Given** compact mode is shown,
   - **Then** the textarea displays the placeholder
     *"Kysy minulta mitä vaan Siilistä sijoituskohteena tai
-    taloustiedoistamme."* styled per Figma `ds:152:121`
-    (see §2.5 Figma Manifest).
+    taloustiedoistamme."* styled per the textarea component
+    (see §2.5 row AC-11).
 
 - **AC-12** — *Suggestion chip content* · **@stable**
   - **Given** compact mode is shown,
   - **Then** the three chips display the three predefined investor
     questions in Finnish (segments, dividend policy, revenue growth)
-    with the exact wording from Figma `ds:152:86` (main component;
-    see instances `ds:152:83` / `ds:152:84` / `ds:152:85` inside the
-    Investor hero) and `src/App.tsx::SUGGESTIONS`.
+    with the exact wording from the Predefined question component
+    (see §2.5 row AC-12) and `src/App.tsx::SUGGESTIONS`.
 
 - **AC-12b** — *Suggestion chip labels do not wrap* · **@stable**
   - **Given** compact mode is shown,
   - **Then** each chip's label renders on a single line
-    (`white-space: nowrap`) matching Figma `ds:152:86` (see §2.5
-    Figma Manifest); overflow of the chip row
+    (`white-space: nowrap`) matching the Predefined question
+    component (see §2.5 row AC-12b); overflow of the chip row
     is handled at the breakpoints defined in AC-91 / AC-92 (row
     wrap on tablet, horizontal scroll or wrap on mobile), not by
     breaking chip labels.
@@ -461,12 +460,13 @@ Maps to Figma node `site:13:527` (screen composition) and `ds:152:75` (Investor 
   - **Then** the send button is visibly and functionally disabled.
   - **When** at least one non-whitespace character is entered,
   - **Then** the send button becomes enabled with the Active gradient
-    from Figma node `ds:152:129` (Send button — Active variant).
+    from the Send button — Active variant (see §2.5 row AC-16).
 
 - **AC-17** — *Input shell — click-to-focus target with text cursor* · **@aspirational**
-  - **Given** the input shell is rendered in either variant (compact
-    per Figma `ds:152:121` or expanded per `ds:152:121` on the white
-    surface in `site:143:601`),
+  - **Given** the input shell is rendered in either variant
+    (compact or expanded, per the textarea component on the
+    surface in the Investor agent composition; see §2.5 rows
+    AC-11 and AC-28),
   - **When** the user hovers anywhere inside the shell that is not
     the send button (the padding around the textarea, the visible
     whitespace alongside a short single-line value),
@@ -481,7 +481,7 @@ Maps to Figma node `site:13:527` (screen composition) and `ds:152:75` (Investor 
 
 ### 3.3 Expanded (Chat) Mode
 
-Maps to Figma node `site:143:601` (screen composition) and `ds:152:97` (Investor agent main component).
+Maps to the Investor agent composition and its main component; see §2.5 Figma Manifest for the bound nodes.
 
 - **AC-20** — *Transition — no flicker* · **@stable**
   - **Given** the widget is in compact mode and a valid message is
@@ -502,8 +502,8 @@ Maps to Figma node `site:143:601` (screen composition) and `ds:152:97` (Investor
   - **Given** the widget has entered expanded mode,
   - **Then** the chat surface fills the entire browser viewport
     (100vw × 100vh from the widget's root container), with an
-    opaque background matching Figma `site:143:601` (see §2.5 Figma
-    Manifest).
+    opaque background matching the Investor agent composition
+    (see §2.5 row AC-20a).
   - **Then** no host-page content behind the widget is visible through
     it (no translucency, no gaps at the edges).
 
@@ -573,25 +573,27 @@ Maps to Figma node `site:143:601` (screen composition) and `ds:152:97` (Investor
 
 - **AC-21** — *Header* · **@stable**
   - **Given** expanded mode is shown,
-  - **Then** the header reads *"Siili AI-avustaja"* styled per Figma
-    `ds:152:97` (see §2.5 Figma Manifest).
+  - **Then** the header reads *"Siili AI-avustaja"* styled per the
+    Investor agent component (see §2.5 row AC-21).
 
 - **AC-22** — *Question bubble* · **@stable**
   - **Given** any Q+A pair,
   - **Then** the question appears right-aligned in a bubble matching
-    Figma `ds:152:116` (see §2.5 Figma Manifest).
+    the Question+Answer component (see §2.5 row AC-22).
 
 - **AC-23** — *Loading indicator — semantics and copy* · **@evolving**
   - **Given** an in-flight assistant answer,
-  - **Then** a pulsating gray blob (Figma `ds:152:137` / loading state
-    `site:201:2273`) and the text *"Haetaan tietoa..."* appear in place
-    of the answer, with `role="status"` and `aria-live="polite"`.
+  - **Then** a pulsating gray blob (Loading spinner animation and
+    loading state; see §2.5 row AC-23) and the text
+    *"Haetaan tietoa..."* appear in place of the answer, with
+    `role="status"` and `aria-live="polite"`.
 
 - **AC-23b** — *Loading indicator — blob visual style* · **@evolving**
   - **Given** the loading indicator is visible (per AC-23),
   - **Then** the blob's shape, fill, and scale/opacity pulse tempo
-    match Figma `ds:152:137` / `site:201:2273` (see §2.5 Figma Manifest) —
-    not a spinning ring, not a bar, not a stepped dot sequence.
+    match the Loading spinner animation and loading state
+    (see §2.5 row AC-23b) — not a spinning ring, not a bar, not a
+    stepped dot sequence.
 
 - **AC-24** — *Answer rendering* · **@stable**
   - **Given** the chat service resolves with an answer,
@@ -601,7 +603,7 @@ Maps to Figma node `site:143:601` (screen composition) and `ds:152:97` (Investor
 - **AC-25** — *Source references — section rendered* · **@stable**
   - **Given** an answer includes one or more `sources`,
   - **Then** the section labelled *"Lähteet:"* is rendered below the
-    answer with one `SourceBadge` (Figma `ds:152:135`) per source.
+    answer with one `SourceBadge` per source (see §2.5 row AC-25).
 
 - **AC-25b** — *Source references — linked badge opens in new tab* · **@stable**
   - **Given** a source has an `href`,
@@ -627,8 +629,8 @@ Maps to Figma node `site:143:601` (screen composition) and `ds:152:97` (Investor
   - **Given** expanded mode is shown,
   - **Then** the `ChatInput` is rendered immediately underneath the
     most recent assistant reply (or its loading blob), in document
-    flow, matching Figma `site:143:601` / `ds:152:121` (see §2.5 Figma
-    Manifest).
+    flow, matching the Investor agent composition and textarea
+    component (see §2.5 row AC-28).
 
 - **AC-28b** — *Input placement — short conversations are not bottom-pinned* · **@evolving**
   - **Given** the conversation is short enough that all Q+A pairs fit
@@ -871,9 +873,9 @@ These criteria exist to satisfy P2's competition-entry ambition.
 
 - **AC-72** — *Send-button states* · **@stable**
   - **Given** the send button in either mode,
-  - **Then** the Active, Hover, and Pressed visuals match Figma
-    `ds:152:129` / `ds:152:131` / `ds:152:133` respectively (see §2.5
-    Figma Manifest), with smooth CSS transitions between states.
+  - **Then** the Active, Hover, and Pressed visuals match the Send
+    button variants respectively (see §2.5 row AC-72), with smooth
+    CSS transitions between states.
 
 - **AC-73** — *Typography — Everett via font tokens* · **@stable**
   - **Given** the widget is rendered on a page that has loaded the
@@ -960,9 +962,9 @@ These criteria exist to satisfy P2's competition-entry ambition.
 ## 7. Responsiveness
 
 - **AC-90** — *Desktop (≥1024px)* · **@stable**
-  - The compact input and chips sit within the hero per Figma
-    `site:13:527`; expanded view has comfortable horizontal padding
-    matching Figma `site:143:601`.
+  - The compact input and chips sit within the hero composition;
+    expanded view has comfortable horizontal padding matching the
+    Investor agent composition (see §2.5 row AC-90).
 
 - **AC-91** — *Tablet (640–1023px)* · **@evolving**
   - Chips wrap to two rows if needed; the textarea grows to full
@@ -1089,7 +1091,7 @@ not covered.
 - **Edit an existing AC** when the required behaviour has changed.
   Keep the ID; rewrite the Given/When/Then in the same PR as the
   code change, and note the edit in the PR description (e.g.
-  `AC-23 loading copy updated to match Figma ds:152:137`).
+  `AC-23 loading copy updated to match §2.5 row AC-23`).
 - **Deprecate** instead of deleting. Prefix the AC title with
   `(deprecated)`, add a one-line reason, and link to the
   replacement AC-ID if one exists. Retired IDs are never reused so
