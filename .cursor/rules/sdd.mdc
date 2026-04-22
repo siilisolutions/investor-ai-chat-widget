@@ -22,6 +22,8 @@ If an AC is silent, self-contradictory, or disagrees with Figma:
 2. Either (a) propose a one-paragraph AC patch (add / edit / deprecate per §Amending ACs), or (b) ask the user for the intended behaviour.
 3. For visual conflicts, Figma wins — follow [`project.mdc`](project.mdc) §Figma-first workflow and update the AC + token, not the design.
 
+When amending or adding an AC, follow [`ACCEPTANCE_CRITERIA.md` §10.6 AC Authoring](../../ACCEPTANCE_CRITERIA.md#106-ac-authoring) — specificity tracks the stability marker, and node IDs / tokens / fixed counts live in their single source (§2.5 Figma Manifest, [`src/styles/variables.css`](../../src/styles/variables.css), §12.1 Product Decisions), not restated in AC bodies.
+
 ## Traceability
 
 - Commit messages and PR descriptions list every `AC-xx` touched (e.g. `AC-20d, AC-31`).

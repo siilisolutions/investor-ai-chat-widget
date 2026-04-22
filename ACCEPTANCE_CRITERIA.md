@@ -33,15 +33,24 @@ how hard to push back on a change that touches the AC:
 
 - `@stable` — behaviour is shipped and known to work; regressions are
   bugs. Default tag for ACs whose implementation is observable today
-  and has not been flagged as churning.
+  and has not been flagged as churning. **Specificity licence:** the
+  AC body may pin exact copy, token slots, pixel / count / duration
+  values, and specific Figma nodes (via §2.5). Changes are real
+  contract changes — amend per §10.5.
 - `@evolving` — actively being refined; spec and code may drift by
   design. Use when the AC is partially implemented, being iterated on,
   or awaiting a measurement / audit step before it can be called
-  stable. Prefer this over `@stable` when unsure.
+  stable. Prefer this over `@stable` when unsure. **Specificity
+  licence:** describe *intent* only — avoid exact tokens, exact copy
+  (use `e.g. "…"`), exact pixel values, exact counts. Promote to
+  `@stable` when the design locks. See §10.6 AC Authoring.
 - `@aspirational` — target state, not yet implemented or verified.
   Typical for ACs that depend on a system we do not yet have (real
   backend, localisation, analytics pipeline) or for features that are
-  planned but unbuilt.
+  planned but unbuilt. **Specificity licence:** describe the
+  user-visible goal and acceptance path only. Do not pin interactive
+  details, aria-labels, hit-target pixels, or copy strings the design
+  has not yet produced. See §10.6 AC Authoring.
 
 Stability is orthogonal to Status: an `active` AC can be
 `@aspirational` (we mean to ship it but haven't), and a `deprecated`
@@ -1104,6 +1113,84 @@ not covered.
 When in doubt, propose the amendment in chat as a diff against this
 section and the affected `AC-xx`, and let the human confirm before
 the implementation PR lands.
+
+---
+
+## 10.6 AC Authoring
+
+The §10.5 rules tell you *how* to change an AC; these tell you how
+to *write* one in the first place so it survives design iteration.
+The guiding principle: each fact lives in exactly one place, and
+the specificity of an AC body is calibrated to its stability marker
+(see the §Stability markers legend in the AC Catalog).
+
+### One source per fact
+
+When an AC touches any of the facts below, that fact belongs in
+the listed home only. The AC body references the home, it does not
+restate the fact.
+
+| Fact | Single source | AC body should… |
+|------|---------------|-----------------|
+| Behavioural intent (what the user sees / can do) | AC body | …state it, in Given/When/Then. This is the contract. |
+| Figma node IDs (`ds:X:Y`, `site:X:Y`) | §2.5 Figma Manifest | …reference "see §2.5" or name the component; never inline the node ID. |
+| Exact copy strings (Finnish / English text the user reads) | AC body, marked `e.g. "…"` unless the AC is `@stable` | …describe the role of the string and give a representative example. Promote to a pinned literal only when the marker is `@stable`. |
+| Token slots (`--gray-500`, `--radius`) | [`src/styles/variables.css`](src/styles/variables.css) | …name the *role* ("neutral question-bubble surface", "primary action gradient"), not the slot. |
+| Fixed counts / durations / breakpoints (three chips, ~800ms, 1024px) | §12.1 Product Decisions table | …reference the `PD-xx` ID; do not embed the literal. |
+| Verification path (how to test the AC) | AC Catalog `Verification` column | …not restated in the AC body. The `Verification` column itself does not re-cite node IDs that §2.5 already owns (reference "see §2.5 row AC-XX"). |
+
+Granularity smell test: if a single design iteration forces edits
+to more than one AC body (excluding §2.5, §12.1, and
+[`src/styles/variables.css`](src/styles/variables.css)), a fact
+has leaked out of its single source. Consolidate before amending.
+
+### Specificity tracks the stability marker
+
+An AC's marker is a *licence* for how much detail its body may
+pin. Writing below the ceiling is always fine; writing above it
+guarantees churn.
+
+- **`@stable`** — the body *may* pin specifics the AC is known to
+  require: exact copy strings, exact token slots, exact pixel /
+  count / duration values, exact Figma node via §2.5. Changes are
+  real contract changes and require Amending ACs.
+- **`@evolving`** — the body should describe *intent* and defer
+  visuals to §2.5. Avoid exact token slots, exact copy (use
+  `e.g. "…"`), exact pixel values, exact counts. The AC should
+  survive most design iterations without an edit. Promote to
+  `@stable` when the design locks.
+- **`@aspirational`** — the body should describe the user-visible
+  goal and the acceptance path only. Do **not** pin interactive
+  details, aria-labels, pixel hit-targets, or copy strings that
+  the design has not yet produced. Promote specificity when the
+  design and implementation land.
+
+Compound-AC smell: if a `@stable` AC has clauses you expect to
+edit in the next design pass, split the AC so each clause has
+its own marker, or demote the whole AC to `@evolving` until the
+volatile clauses stabilise.
+
+### GOV-05 splits share their Figma anchor
+
+When one visual component is split across sibling ACs
+(e.g. AC-28 / AC-28b / AC-28c all describe one input shell),
+the Figma node is referenced **once** via §2.5 for the group.
+Sibling AC bodies do not re-cite the node; the §2.5 row inherits
+the group's sweep via the existing `inherits AC-XX sweep (GOV-05
+split)` convention.
+
+### What this rule does not govern
+
+- **Amending an existing AC** — see §10.5. That section governs
+  *when* an AC may change; §10.6 governs *how* the resulting body
+  reads.
+- **Running the Figma sync** — see
+  [`scripts/prompts/figma-sync.md`](scripts/prompts/figma-sync.md).
+  That job refreshes §2.5 `Last checked` / `Checked by`; it does
+  not reshape AC bodies.
+- **Deprecations** — §10.5's `(deprecated)` prefix still applies
+  unchanged. A deprecated AC keeps whatever specificity its body
+  had at retirement; do not reshape retired ACs.
 
 ---
 
