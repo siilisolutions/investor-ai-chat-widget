@@ -86,8 +86,8 @@ directly.
 | AC-01 | Host-site embedding | [§3.1](#31-embedding--initialisation) | active | @stable | Manual: `npm run dev` — widget mounts, no console errors, only `SiiliChatbot` on `window` |
 | AC-02 | Zero host dependencies | [§3.1](#31-embedding--initialisation) | active | @stable | Manual: `npm run dev` on a page that loads only the widget assets — widget works end-to-end |
 | AC-03 | Idempotent init | [§3.1](#31-embedding--initialisation) | active | @evolving | Manual: call `SiiliChatbot.init()` twice on the same container — single clean mount, no console errors |
-| AC-04 | `apiUrl` option selects backend | [§3.1](#31-embedding--initialisation) | active | @evolving | Manual: init without `apiUrl` — mock responds in ~800ms; init with `apiUrl` — DevTools Network shows a POST to that URL and no other |
-| AC-10 | Initial state | [§3.2](#32-compact-hero-mode) | active | @stable | Visual: see §2.5 row AC-10 vs rendered compact view (one textarea + three chips) |
+| AC-04 | `apiUrl` option selects backend | [§3.1](#31-embedding--initialisation) | active | @evolving | Manual: init without `apiUrl` — mock responds per §12.1 PD-02; init with `apiUrl` — DevTools Network shows a POST to that URL and no other |
+| AC-10 | Initial state | [§3.2](#32-compact-hero-mode) | active | @stable | Visual: see §2.5 row AC-10 vs rendered compact view (one textarea + chips per §12.1 PD-01) |
 | AC-10a | Continue-conversation pill — rendering | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: dev harness with seeded history — pill renders above chips (aspirational) |
 | AC-10b | Suggestion-chip de-duplication | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: ask a chip, re-enter compact — that chip is hidden, order preserved (aspirational) |
 | AC-10c | Continue-conversation pill — activation | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: activate pill — returns to expanded with history, no network call (aspirational) |
@@ -134,10 +134,10 @@ directly.
 | AC-40 | Service rejection | [§3.4](#34-error-handling) | active | @stable | Manual: force mock rejection — error pair renders with `role="alert"`, no blob, no sources |
 | AC-41 | No crash on error | [§3.4](#34-error-handling) | active | @stable | Manual: after forced error — user can still type + send new messages; error scoped to one pair |
 | AC-42 | No developer leakage | [§3.4](#34-error-handling) | active | @evolving | Manual: throw inside mock with a stack trace — UI shows only safe copy; inspect DOM + console of prod build |
-| AC-43 | Network timeout | [§3.4](#34-error-handling) | active | @evolving | Manual: point `apiUrl` at an endpoint that never responds — failed pair renders in ~30s with safe copy, widget stays interactive |
+| AC-43 | Network timeout | [§3.4](#34-error-handling) | active | @evolving | Manual: point `apiUrl` at an endpoint that never responds — failed pair renders within the §12.1 PD-04 timeout with safe copy, widget stays interactive |
 | AC-44 | Safe error mapping for real backend | [§3.4](#34-error-handling) | active | @evolving | Manual: force the real backend to return 500 / 404 / network error — UI shows the Finnish fallback string; no status codes, URLs, or payload bodies leak into the DOM |
 | AC-50 | Interface stability — components are transport-agnostic | [§3.5](#35-chat-service-contract) | active | @stable | Automated: `npm run build` — TypeScript enforces the `ChatService` surface; only `App.tsx` imports it, `ExpandedView.tsx` / `ChatMessage` / `CompactView` do not |
-| AC-51 | Mock fidelity | [§3.5](#35-chat-service-contract) | active | @stable | Manual: `npm run dev` without `VITE_API_URL` — mock resolves in ~800ms with a Finnish answer and two source references |
+| AC-51 | Mock fidelity | [§3.5](#35-chat-service-contract) | active | @stable | Manual: `npm run dev` without `VITE_API_URL` — mock resolves per §12.1 PD-02 with a Finnish answer and source count per §12.1 PD-03 |
 | AC-52 | Threaded conversation — full history posted per request | [§3.5](#35-chat-service-contract) | active | @evolving | Manual: send two turns against the real backend — second request's JSON body is `{ messages: [{role:"user",…},{role:"assistant",…},{role:"user",…}] }` in chronological order |
 | AC-53 | Real-backend adapter — response mapping and forward-compatible schema | [§3.5](#35-chat-service-contract) | active | @evolving | Manual: backend returns `{ response: "…" }` — widget renders the answer; adapter ignores unknown fields and surfaces `sources` if/when the backend adds them |
 | AC-60 | Every factual claim is sourced | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational | none (aspirational — backend-scoped, not frontend-verifiable) |
@@ -151,7 +151,7 @@ directly.
 | AC-72 | Send-button states | [§5](#5-visual-design--brand-award-critical) | active | @stable | Visual: see §2.5 row AC-72 — Active / Hover / Pressed |
 | AC-73 | Typography — Everett via font tokens | [§5](#5-visual-design--brand-award-critical) | active | @stable | Manual: DevTools computed-style check — widget text uses `--font-family*` tokens (Everett when loaded) |
 | AC-73b | Typography — graceful fallback | [§5](#5-visual-design--brand-award-critical) | active | @stable | Manual: block Everett in DevTools Network — widget falls back to `sans-serif` with ≤1 line-height shift |
-| AC-74 | Motion polish | [§5](#5-visual-design--brand-award-critical) | active | @evolving | Manual: interact with chip / send / focus / transition — durations 120–300ms, easing matches IR site |
+| AC-74 | Motion polish | [§5](#5-visual-design--brand-award-critical) | active | @evolving | Manual: interact with chip / send / focus / transition — durations within §12.1 PD-07, easing matches IR site |
 | AC-75 | No generic AI aesthetic | [§5](#5-visual-design--brand-award-critical) | active | @evolving | Visual: review against Figma — no default spinners, Material FAB, plain-tail bubbles, or stock AI motifs |
 | AC-76 | Dark hero compatibility | [§5](#5-visual-design--brand-award-critical) | active | @evolving | Manual: overlay on the real hero asset + axe / contrast tool over the busiest hero region |
 | AC-80 | Keyboard-only operation | [§6](#6-accessibility) | active | @evolving | Manual: Tab through widget — focus order textarea → send → chips / badges, visible focus ring |
@@ -162,12 +162,12 @@ directly.
 | AC-82 | WCAG 2.1 AA contrast | [§6](#6-accessibility) | active | @evolving | Manual: axe DevTools contrast scan over token pairs — ≥4.5:1 body, ≥3:1 large / non-text |
 | AC-83 | Reduced motion | [§6](#6-accessibility) | active | @aspirational | Manual: DevTools emulate reduce-motion — transitions, auto-scroll, blob pulse reduced or static (aspirational) |
 | AC-84 | Zoom and reflow | [§6](#6-accessibility) | active | @evolving | Manual: browser zoom to 200% — no widget content clipped, no horizontal scroll inside container |
-| AC-90 | Desktop (≥1024px) | [§7](#7-responsiveness) | active | @stable | Manual: viewport ≥1024px — matches §2.5 row AC-90 padding and layout |
-| AC-91 | Tablet (640–1023px) | [§7](#7-responsiveness) | active | @evolving | Manual: viewport 640–1023px — chips wrap, textarea full width, send button inside input shell |
-| AC-92 | Mobile (<640px) — compact stacks input above chips | [§7](#7-responsiveness) | active | @evolving | Manual: viewport <640px — compact stacks input above chips (not side-by-side) |
-| AC-92b | Mobile (<640px) — chips scroll or wrap without overflow | [§7](#7-responsiveness) | active | @evolving | Manual: viewport <640px — chips wrap or scroll horizontally without overflowing viewport width |
-| AC-92c | Mobile (<640px) — expanded view full width with Figma padding | [§7](#7-responsiveness) | active | @evolving | Manual: viewport <640px in expanded — 100% container width with Figma-consistent padding |
-| AC-93 | Textarea auto-grow | [§7](#7-responsiveness) | active | @stable | Manual: paste multi-line content — textarea grows to 240px then scrolls internally; send button stays visible |
+| AC-90 | Desktop (≥1024px) | [§7](#7-responsiveness) | active | @stable | Manual: viewport at or above the §12.1 PD-05 desktop threshold — matches §2.5 row AC-90 padding and layout |
+| AC-91 | Tablet (640–1023px) | [§7](#7-responsiveness) | active | @evolving | Manual: viewport in the §12.1 PD-05 tablet band — chips wrap, textarea full width, send button inside input shell |
+| AC-92 | Mobile (<640px) — compact stacks input above chips | [§7](#7-responsiveness) | active | @evolving | Manual: viewport below the §12.1 PD-05 mobile breakpoint — compact stacks input above chips (not side-by-side) |
+| AC-92b | Mobile (<640px) — chips scroll or wrap without overflow | [§7](#7-responsiveness) | active | @evolving | Manual: viewport below the §12.1 PD-05 mobile breakpoint — chips wrap or scroll horizontally without overflowing viewport width |
+| AC-92c | Mobile (<640px) — expanded view full width with Figma padding | [§7](#7-responsiveness) | active | @evolving | Manual: viewport below the §12.1 PD-05 mobile breakpoint in expanded — 100% container width with Figma-consistent padding |
+| AC-93 | Textarea auto-grow | [§7](#7-responsiveness) | active | @stable | Manual: paste multi-line content — textarea grows to the §12.1 PD-06 cap then scrolls internally; send button stays visible |
 | AC-100 | Bundle budget | [§8](#8-performance) | active | @stable | Automated: `npm run build` — combined gzip `siili-chatbot.iife.js` + `siili-chatbot.css` ≤ 60 KB |
 | AC-101 | Cold-start render | [§8](#8-performance) | active | @evolving | Manual: DevTools 4× CPU throttle — compact interactive ≤150ms after script load completes |
 | AC-102 | No host-page regression | [§8](#8-performance) | active | @aspirational | none (aspirational — Lighthouse on embedded host page not yet measured) |
@@ -379,14 +379,15 @@ that tests and PR descriptions can reference.
 
 ### 3.2 Compact (Hero) Mode
 
-Maps to the Investor hero composition and its main component; see §2.5 Figma Manifest for the bound nodes.
+Maps to the Investor hero composition and its main component; see
+§2.5 Figma Manifest for the bound nodes.
 
 - **AC-10** — *Initial state* · **@stable**
   - **Given** the page has just loaded and `messages.length === 0`,
   - **When** the widget renders for the first time,
-  - **Then** it shows the compact mode: one textarea and exactly three
-    suggestion chips, overlaid on the hero section in the layout
-    defined in Figma.
+  - **Then** it shows the compact mode: one textarea plus the
+    predefined suggestion chips (count per §12.1 PD-01), overlaid on
+    the hero section in the layout defined in Figma.
 
 - **AC-10a** — *Continue-conversation pill — rendering* · **@aspirational**
   - **Given** the user has previously been in expanded mode within the
@@ -424,15 +425,16 @@ Maps to the Investor hero composition and its main component; see §2.5 Figma Ma
 
 - **AC-12** — *Suggestion chip content* · **@stable**
   - **Given** compact mode is shown,
-  - **Then** the three chips display the three predefined investor
+  - **Then** the suggestion chips display the predefined investor
     questions in Finnish (segments, dividend policy, revenue growth)
-    with the exact wording from the Predefined question component
-    (see §2.5 row AC-12) and `src/App.tsx::SUGGESTIONS`.
+    with the exact wording from the predefined-question component
+    (see §2.5 row AC-12) and `src/App.tsx::SUGGESTIONS`. Chip count
+    per §12.1 PD-01.
 
 - **AC-12b** — *Suggestion chip labels do not wrap* · **@stable**
   - **Given** compact mode is shown,
   - **Then** each chip's label renders on a single line
-    (`white-space: nowrap`) matching the Predefined question
+    (`white-space: nowrap`) matching the predefined-question
     component (see §2.5 row AC-12b); overflow of the chip row
     is handled at the breakpoints defined in AC-91 / AC-92 (row
     wrap on tablet, horizontal scroll or wrap on mobile), not by
@@ -459,14 +461,13 @@ Maps to the Investor hero composition and its main component; see §2.5 Figma Ma
   - **Given** the textarea is empty,
   - **Then** the send button is visibly and functionally disabled.
   - **When** at least one non-whitespace character is entered,
-  - **Then** the send button becomes enabled with the Active gradient
-    from the Send button — Active variant (see §2.5 row AC-16).
+  - **Then** the send button becomes enabled with the Active-variant
+    gradient (see §2.5 row AC-16).
 
 - **AC-17** — *Input shell — click-to-focus target with text cursor* · **@aspirational**
-  - **Given** the input shell is rendered in either variant
-    (compact or expanded, per the textarea component on the
-    surface in the Investor agent composition; see §2.5 rows
-    AC-11 and AC-28),
+  - **Given** the input shell is rendered in either variant (compact
+    or expanded; see the textarea component referenced in §2.5 row
+    AC-11 / AC-28),
   - **When** the user hovers anywhere inside the shell that is not
     the send button (the padding around the textarea, the visible
     whitespace alongside a short single-line value),
@@ -481,7 +482,8 @@ Maps to the Investor hero composition and its main component; see §2.5 Figma Ma
 
 ### 3.3 Expanded (Chat) Mode
 
-Maps to the Investor agent composition and its main component; see §2.5 Figma Manifest for the bound nodes.
+Maps to the Investor agent composition and its main component; see
+§2.5 Figma Manifest for the bound nodes.
 
 - **AC-20** — *Transition — no flicker* · **@stable**
   - **Given** the widget is in compact mode and a valid message is
@@ -502,7 +504,7 @@ Maps to the Investor agent composition and its main component; see §2.5 Figma M
   - **Given** the widget has entered expanded mode,
   - **Then** the chat surface fills the entire browser viewport
     (100vw × 100vh from the widget's root container), with an
-    opaque background matching the Investor agent composition
+    opaque background matching the expanded-view composition
     (see §2.5 row AC-20a).
   - **Then** no host-page content behind the widget is visible through
     it (no translucency, no gaps at the edges).
@@ -583,17 +585,15 @@ Maps to the Investor agent composition and its main component; see §2.5 Figma M
 
 - **AC-23** — *Loading indicator — semantics and copy* · **@evolving**
   - **Given** an in-flight assistant answer,
-  - **Then** a pulsating gray blob (Loading spinner animation and
-    loading state; see §2.5 row AC-23) and the text
+  - **Then** a pulsating gray blob (see §2.5 row AC-23) and the text
     *"Haetaan tietoa..."* appear in place of the answer, with
     `role="status"` and `aria-live="polite"`.
 
 - **AC-23b** — *Loading indicator — blob visual style* · **@evolving**
   - **Given** the loading indicator is visible (per AC-23),
   - **Then** the blob's shape, fill, and scale/opacity pulse tempo
-    match the Loading spinner animation and loading state
-    (see §2.5 row AC-23b) — not a spinning ring, not a bar, not a
-    stepped dot sequence.
+    match the loading-state component (see §2.5 row AC-23b) — not a
+    spinning ring, not a bar, not a stepped dot sequence.
 
 - **AC-24** — *Answer rendering* · **@stable**
   - **Given** the chat service resolves with an answer,
@@ -603,7 +603,8 @@ Maps to the Investor agent composition and its main component; see §2.5 Figma M
 - **AC-25** — *Source references — section rendered* · **@stable**
   - **Given** an answer includes one or more `sources`,
   - **Then** the section labelled *"Lähteet:"* is rendered below the
-    answer with one `SourceBadge` per source (see §2.5 row AC-25).
+    answer with one `SourceBadge` per source, matching the reference
+    tag component (see §2.5 row AC-25).
 
 - **AC-25b** — *Source references — linked badge opens in new tab* · **@stable**
   - **Given** a source has an `href`,
@@ -629,8 +630,8 @@ Maps to the Investor agent composition and its main component; see §2.5 Figma M
   - **Given** expanded mode is shown,
   - **Then** the `ChatInput` is rendered immediately underneath the
     most recent assistant reply (or its loading blob), in document
-    flow, matching the Investor agent composition and textarea
-    component (see §2.5 row AC-28).
+    flow, matching the textarea placement in the Investor agent
+    composition (see §2.5 row AC-28).
 
 - **AC-28b** — *Input placement — short conversations are not bottom-pinned* · **@evolving**
   - **Given** the conversation is short enough that all Q+A pairs fit
@@ -724,7 +725,8 @@ Maps to the Investor agent composition and its main component; see §2.5 Figma M
 
 - **AC-43** — *Network timeout* · **@evolving**
   - **Given** a real `ChatService` adapter configured via `apiUrl`,
-  - **When** the backend does not respond within **30 seconds**,
+  - **When** the backend does not respond within the configured
+    request timeout (§12.1 PD-04),
   - **Then** the in-flight request is aborted and the corresponding
     Q+A pair enters the error state per AC-40 with a user-safe
     Finnish string (AC-44). The widget remains fully interactive per
@@ -760,10 +762,11 @@ Maps to the Investor agent composition and its main component; see §2.5 Figma M
 - **AC-51** — *Mock fidelity* · **@stable**
   - **Given** the default mock service is used (no `apiUrl` passed
     to `init()`),
-  - **Then** it resolves after ~800ms with a canned Finnish answer
-    and two source references (enough to demo the full UI without a
-    backend), and accepts the same `ChatTurn[]` history argument as
-    the real adapter so the two are drop-in interchangeable.
+  - **Then** it resolves after the mock latency (§12.1 PD-02) with a
+    canned Finnish answer and the mock source count (§12.1 PD-03) —
+    enough to demo the full UI without a backend — and accepts the
+    same `ChatTurn[]` history argument as the real adapter so the
+    two are drop-in interchangeable.
 
 - **AC-52** — *Threaded conversation — full history posted per request* · **@evolving**
   - **Given** the user has had N prior successful turns in the
@@ -873,9 +876,9 @@ These criteria exist to satisfy P2's competition-entry ambition.
 
 - **AC-72** — *Send-button states* · **@stable**
   - **Given** the send button in either mode,
-  - **Then** the Active, Hover, and Pressed visuals match the Send
-    button variants respectively (see §2.5 row AC-72), with smooth
-    CSS transitions between states.
+  - **Then** the Active, Hover, and Pressed visuals match the three
+    send-button variants (see §2.5 row AC-72), with smooth CSS
+    transitions between states.
 
 - **AC-73** — *Typography — Everett via font tokens* · **@stable**
   - **Given** the widget is rendered on a page that has loaded the
@@ -895,8 +898,8 @@ These criteria exist to satisfy P2's competition-entry ambition.
   - **Given** any interactive element (chip, send button, textarea
     focus, compact → expanded transition),
   - **Then** transitions are tastefully animated (no abrupt flicker,
-    no overshoot) with durations in the 120–300ms range and an
-    easing that matches the rest of the IR site.
+    no overshoot) with durations in the motion range (§12.1 PD-07)
+    and an easing that matches the rest of the IR site.
 
 - **AC-75** — *No generic AI aesthetic* · **@evolving**
   - **Given** a juror inspects the widget,
@@ -962,35 +965,39 @@ These criteria exist to satisfy P2's competition-entry ambition.
 ## 7. Responsiveness
 
 - **AC-90** — *Desktop (≥1024px)* · **@stable**
-  - The compact input and chips sit within the hero composition;
-    expanded view has comfortable horizontal padding matching the
-    Investor agent composition (see §2.5 row AC-90).
+  - The compact input and chips sit within the hero per the Investor
+    hero composition; expanded view has comfortable horizontal
+    padding matching the Investor agent composition (see §2.5 row
+    AC-90).
 
 - **AC-91** — *Tablet (640–1023px)* · **@evolving**
   - Chips wrap to two rows if needed; the textarea grows to full
     container width; the send button stays inside the input shell.
 
 - **AC-92** — *Mobile (<640px) — compact stacks input above chips* · **@evolving**
-  - **Given** a viewport narrower than 640px,
+  - **Given** a viewport narrower than the mobile breakpoint
+    (§12.1 PD-05),
   - **Then** the compact view stacks the input above the chips (not
     side-by-side).
 
 - **AC-92b** — *Mobile (<640px) — chips scroll or wrap without overflow* · **@evolving**
-  - **Given** a viewport narrower than 640px,
+  - **Given** a viewport narrower than the mobile breakpoint
+    (§12.1 PD-05),
   - **Then** the suggestion chips are horizontally scrollable or wrap
     onto additional rows without overflowing the viewport width.
 
 - **AC-92c** — *Mobile (<640px) — expanded view full width with Figma padding* · **@evolving**
-  - **Given** a viewport narrower than 640px and the widget is in
-    expanded mode,
+  - **Given** a viewport narrower than the mobile breakpoint
+    (§12.1 PD-05) and the widget is in expanded mode,
   - **Then** the expanded view uses `100%` container width with
     padding per Figma mobile guidance (or a tasteful scale-down of
     the desktop frame if mobile frames are not yet designed).
 
 - **AC-93** — *Textarea auto-grow* · **@stable**
   - **Given** the user types multi-line content,
-  - **Then** the textarea grows up to 240px of content height, then
-    scrolls internally (never pushes the send button out of view).
+  - **Then** the textarea grows up to the auto-grow cap (§12.1 PD-06)
+    of content height, then scrolls internally (never pushes the
+    send button out of view).
 
 ---
 
@@ -1234,12 +1241,34 @@ Spelled out to prevent scope creep. Two classes of items live here:
 
 ### 12.1 Product decisions (v1 scope)
 
+**v1-scope exclusions** (no `PD-xx` ID — these are things we chose
+not to do, not values to reference):
+
 - The widget does **not** persist conversation history across page
   loads. A hard reload is the intentional reset mechanism; no
   dedicated "new conversation" button is provided in v1.
 - The widget does **not** stream tokens (current contract is
   request/response). Streaming is a future extension of
   `ChatService`, not a v1 requirement.
+
+**Product decision values** (`PD-xx` — quantitative constants
+referenced by behavioural ACs). Per §10.6 AC Authoring, AC bodies
+reference the `PD-ID` instead of restating the literal.
+
+| ID    | Decision                          | Value                            | Referenced by                | Notes |
+|-------|-----------------------------------|----------------------------------|------------------------------|-------|
+| PD-01 | Predefined suggestion chip count  | 3                                | AC-10, AC-12                 | — |
+| PD-02 | Mock response latency             | ~800 ms                          | AC-51                        | Demo fidelity only; not a real-backend target. |
+| PD-03 | Mock source count                 | 2                                | AC-51                        | — |
+| PD-04 | Network timeout for real backend  | 30 s                             | AC-43                        | — |
+| PD-05 | Responsive breakpoints            | ≥1024 / 640–1023 / <640 px       | AC-90, AC-91, AC-92, AC-92b, AC-92c | AC titles carry these as identifiers; renaming a title is an Amending-ACs event (§10.5). |
+| PD-06 | Textarea auto-grow cap            | 240 px                           | AC-93                        | — |
+| PD-07 | Motion duration range             | 120–300 ms                       | AC-74                        | — |
+
+Amending these values follows §10.5 Amending ACs: edit the row
+here, then confirm every AC in the `Referenced by` column still
+holds. Adding a new `PD-xx` row requires at least one referencing
+AC body to cite it.
 
 ### 12.2 Invariants (`AC-Nx`)
 
