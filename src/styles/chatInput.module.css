@@ -5,6 +5,13 @@
   padding: var(--space-lg);
   border-radius: var(--radius);
   width: 100%;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color 150ms ease;
+}
+
+.shell:has(textarea:focus-visible) {
+  outline-color: var(--blue-500);
 }
 
 .shellCompact {
@@ -61,8 +68,14 @@
   border-radius: var(--radius-pill);
   background: var(--send-gradient);
   cursor: pointer;
-  transition: filter 120ms ease;
+  transition: filter 120ms ease, outline-color 150ms ease;
   color: var(--white-500);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.sendButton:focus-visible {
+  outline-color: var(--blue-500);
 }
 
 .sendButton:hover:not(:disabled) {

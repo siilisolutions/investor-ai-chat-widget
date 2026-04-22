@@ -146,13 +146,13 @@ directly.
 | AC-63 | Language parity | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational | none (aspirational — localisation / `FI ↔ EN` toggle not yet built) |
 | AC-64 | Timestamp / freshness cue (recommended) | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational | none (aspirational — backend-scoped, depends on dated source metadata) |
 | AC-65 | Clear AI labelling | [§4](#4-content-legal--trust-investor-critical) | active | @stable | Manual: expanded view shows "Siili AI-avustaja" header and any legally required disclaimer |
-| AC-70 | Figma parity | [§5](#5-visual-design--brand-award-critical) | active | @evolving | Visual: `get_design_context` on each §2.5 Figma Manifest row and compare rendered output |
+| AC-70 | Figma parity | [§5](#5-visual-design--brand-award-critical) | active | @stable | Visual: `get_design_context` on each §2.5 Figma Manifest row and compare rendered output |
 | AC-71 | (deprecated) Token-only styling — moved to rule files (GOV-04) | [§5](#5-visual-design--brand-award-critical) | deprecated | @stable | n/a (deprecated — see AC body; see AC-70 + `.cursor/rules/` for live coverage) |
 | AC-72 | Send-button states | [§5](#5-visual-design--brand-award-critical) | active | @stable | Visual: see §2.5 row AC-72 — Active / Hover / Pressed |
 | AC-73 | Typography — Everett via font tokens | [§5](#5-visual-design--brand-award-critical) | active | @stable | Manual: DevTools computed-style check — widget text uses `--font-family*` tokens (Everett when loaded) |
 | AC-73b | Typography — graceful fallback | [§5](#5-visual-design--brand-award-critical) | active | @stable | Manual: block Everett in DevTools Network — widget falls back to `sans-serif` with ≤1 line-height shift |
-| AC-74 | Motion polish | [§5](#5-visual-design--brand-award-critical) | active | @evolving | Manual: interact with chip / send / focus / transition — durations within §12.1 PD-07, easing matches IR site |
-| AC-75 | No generic AI aesthetic | [§5](#5-visual-design--brand-award-critical) | active | @evolving | Visual: review against Figma — no default spinners, Material FAB, plain-tail bubbles, or stock AI motifs |
+| AC-74 | Motion polish | [§5](#5-visual-design--brand-award-critical) | active | @stable | Manual: interact with chip / send / focus / transition — durations within §12.1 PD-07, easing matches IR site |
+| AC-75 | No generic AI aesthetic | [§5](#5-visual-design--brand-award-critical) | active | @stable | Visual: review against Figma — no default spinners, Material FAB, plain-tail bubbles, or stock AI motifs |
 | AC-76 | Dark hero compatibility | [§5](#5-visual-design--brand-award-critical) | active | @evolving | Manual: overlay on the real hero asset + axe / contrast tool over the busiest hero region |
 | AC-80 | Keyboard-only operation | [§6](#6-accessibility) | active | @evolving | Manual: Tab through widget — focus order textarea → send → chips / badges, visible focus ring |
 | AC-81 | Screen-reader labelling — textarea | [§6](#6-accessibility) | active | @stable | Manual: DevTools Accessibility panel — textarea announces configured `aria-label` |
@@ -284,47 +284,49 @@ PR.
   candidate is approved, move the row out of code-authored by
   filling in the node ID.
 
-> **2026-04-22 — Figma file migration.** All node IDs in the table
-> below were refreshed against the two live Figma files after the IR
-> design moved organisations: `site:` rows point at **IR-site**
-> (`fileKey = 0xXdKUlBJIolF15MjJuaMC`, screen layouts); `ds:` rows
-> point at **IR-DS** (`fileKey = rlh00CEImhMWwdRNOUqW6L`, the
-> published component library where Code Connect mappings live). The
-> refresh is ID-only — visual parity with the prior sweep has **not**
-> been re-confirmed against the new files, so `Last checked` /
-> `Checked by` still show the `2026-04-20` seed-sweep dates. A
-> `figma-sync.md` full-sweep against the two `fileKey`s is owed
-> before the next release gate to bump those columns.
+> **2026-04-22 — Lane E full-sweep completed.** Every `ds:` / `site:`
+> row below was re-validated against the two live Figma files: `site:`
+> rows point at **IR-site** (`fileKey = 0xXdKUlBJIolF15MjJuaMC`);
+> `ds:` rows point at **IR-DS** (`fileKey = rlh00CEImhMWwdRNOUqW6L`).
+> No parity failures blocking AC-70 surfaced. Low-severity findings
+> (Figma placeholder trailing-space artifacts on `ds:152:121` / hero
+> instance, Figma question-bubble `whitespace-nowrap` dummy-text
+> artifact on `ds:152:116`, chip layout direction only diverging for
+> hypothetical short labels) are recorded in the Lane E entry of
+> [`AGENT_BACKLOG.md`](AGENT_BACKLOG.md). Code-authored rows (AC-73,
+> AC-73b, AC-91, AC-92, AC-92b, AC-92c) still have no candidate Figma
+> frame — typography / tablet / mobile scaffolds are absent from both
+> files.
 
 | AC ID   | Figma node(s)                                 | Component / scope                                | Last checked | Checked by |
 | ------- | --------------------------------------------- | ------------------------------------------------ | ------------ | ---------- |
-| AC-10   | `site:13:527`                                 | Compact view layout (hero overlay)               | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
-| AC-11   | `ds:152:121`                                  | Textarea placeholder copy & colour               | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
-| AC-12   | `ds:152:86`                                   | Suggestion chip wording & wrap                   | 2026-04-20   | seed sweep (AC updated to Figma `nowrap`); IDs refreshed 2026-04-22 |
-| AC-12b  | `ds:152:86`                                   | Suggestion chip labels — single-line (nowrap)    | 2026-04-20   | inherits AC-12 sweep (GOV-05 split); IDs refreshed 2026-04-22 |
-| AC-16   | `ds:152:129`                                  | Send button — Active (gradient)                  | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
-| AC-20   | `site:143:601`                                | Expanded view mount / first-frame layout         | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
+| AC-10   | `site:13:527`                                 | Compact view layout (hero overlay)               | 2026-04-22   | Lane E full-sweep — hero composition matches: translucent textarea + three chips overlaid on hero image; widget owns the inner content, host owns title + scroll-to-content CTA |
+| AC-11   | `ds:152:121`                                  | Textarea placeholder copy & colour               | 2026-04-22   | Lane E full-sweep — Everett 20px, `--gray-900` placeholder, shadow, radius all match; Figma placeholder has a trailing U+0020 (copy artifact — AC-11 pins the string without it, code correct) |
+| AC-12   | `ds:152:86`                                   | Suggestion chip wording & wrap                   | 2026-04-22   | Lane E full-sweep — chip tokens (`--surface-translucent`, `--radius`, 8px 16px padding, Everett 14px) match; chip text stays `nowrap` as AC-12 and Figma require |
+| AC-12b  | `ds:152:86`                                   | Suggestion chip labels — single-line (nowrap)    | 2026-04-22   | Lane E full-sweep — three chip labels in `src/App.tsx:22-26` match hero instances `152:83/84/85` verbatim; single-line constraint verified |
+| AC-16   | `ds:152:129`                                  | Send button — Active (gradient)                  | 2026-04-22   | Lane E full-sweep — Active gradient (`-75deg`, blue 10.566% → violet 89.058%), 12px padding, 100px radius all match via `--send-gradient` + `--radius-pill` |
+| AC-20   | `site:143:601`                                | Expanded view mount / first-frame layout         | 2026-04-22   | Lane E full-sweep — Q+A stack composition matches; Figma-vs-AC layout conflict (screen chrome vs full-viewport surface) already flagged in Lane C entry, not re-opened |
 | AC-20a  | `site:143:601`                                | Expanded surface fills viewport                  | 2026-04-22   | Lane C graduation — expanded surface is `position: fixed; inset: 0` with opaque `--white-500`; dev-harness title bounding box at (48, 64) confirms fixed full-viewport with token padding |
-| AC-20d  | `site:143:601`                                | Close (×) button styling & placement             | 2026-04-20   | seed sweep (no Figma node — AC extension); IDs refreshed 2026-04-22 |
-| AC-20e  | `site:143:601`, `ds:152:116`                  | First Q+A pair visible on first expanded frame   | 2026-04-20   | inherits AC-20 sweep (GOV-05 split); IDs refreshed 2026-04-22 |
-| AC-21   | `ds:152:97`                                   | Expanded header ("Siili AI-avustaja")            | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
-| AC-22   | `ds:152:116`                                  | Question bubble (Q+A pair)                       | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
+| AC-20d  | `site:143:601`                                | Close (×) button styling & placement             | 2026-04-22   | Lane E full-sweep — still no Figma node for the close button (AC extension beyond Figma); watching for Figma main component |
+| AC-20e  | `site:143:601`, `ds:152:116`                  | First Q+A pair visible on first expanded frame   | 2026-04-22   | Lane E full-sweep — inherits AC-20 / AC-22 compare; first Q+A pair renders via `ds:152:116` composition on expanded mount |
+| AC-21   | `ds:152:97`                                   | Expanded header ("Siili AI-avustaja")            | 2026-04-22   | Lane E full-sweep — title "Siili AI-avustaja" in Everett Bold 20px matches; outer `--space-2xl` (48px) gap title→slot and inner `--space-3xl` (64px) gap between Q+A pairs match Figma auto-layout values |
+| AC-22   | `ds:152:116`                                  | Question bubble (Q+A pair)                       | 2026-04-22   | Lane E full-sweep — `--gray-500`, `--radius` 20px, Everett 16/24 all match. Figma dummy-text uses `whitespace-nowrap`; code uses `word-break: break-word` intentionally for real multi-word Finnish questions (robustness-over-parity, not a drift) |
 | AC-23   | `ds:152:137`, `site:201:2273`                 | Loading blob / loading state                     | 2026-04-22   | Lane A graduation — semantics + Figma compare, both variants (`152:138` Start / `152:140` End) are 28×28 gray circles; live dev-harness capture matches |
 | AC-23b  | `ds:152:137`, `site:201:2273`                 | Loading blob — rounded gray shape, pulse tempo   | 2026-04-22   | Lane A graduation — CSS pulse (scale 0.82→1, opacity 0.55→1, 1400ms ease-in-out) animates between the two Figma variants; reduced-motion fallback in place |
-| AC-25   | `ds:152:135`                                  | Source reference badge                           | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
-| AC-25b  | `ds:152:135`                                  | Source reference — linked (opens in new tab)     | 2026-04-20   | inherits AC-25 sweep (GOV-05 split); IDs refreshed 2026-04-22 |
-| AC-25c  | `ds:152:135`                                  | Source reference — static unlinked badge         | 2026-04-20   | inherits AC-25 sweep (GOV-05 split); IDs refreshed 2026-04-22 |
+| AC-25   | `ds:152:135`                                  | Source reference badge                           | 2026-04-22   | Lane E full-sweep — `--gray-400` (#efefef), 4/16 padding, `--radius`, Everett 14px, nowrap — all match |
+| AC-25b  | `ds:152:135`                                  | Source reference — linked (opens in new tab)     | 2026-04-22   | Lane E full-sweep — inherits AC-25 base; linked variant adds hover → `--gray-500` (tokenized, no drift); focus-visible ring added this turn |
+| AC-25c  | `ds:152:135`                                  | Source reference — static unlinked badge         | 2026-04-22   | Lane E full-sweep — inherits AC-25 base; static variant matches Figma default state |
 | AC-28   | `site:143:601`, `ds:152:121`                  | ChatInput placement + textarea shadow            | 2026-04-22   | Lane C graduation — input is the last flex child of `.expanded` (in document flow) with `--textarea-shadow` via `.shellExpanded`; textarea y grows with conversation (319px → 479px → 847px) confirming flow placement |
 | AC-28b  | `site:143:601`, `ds:152:121`                  | ChatInput — short conversation, not bottom-pinned| 2026-04-22   | Lane C graduation — 1-pair convo: textarea at y=319 in ~900px viewport, sits directly below latest reply without bottom-pin |
 | AC-28c  | `site:143:601`, `ds:152:121`                  | ChatInput — long conversation, reply+input visible| 2026-04-22  | Lane C graduation — auto-scroll target moved to inputWrapper; `.expanded` scrolls internally via `overflow-y: auto`; 4-pair convo places textarea near viewport bottom with latest reply directly above |
-| AC-72   | `ds:152:129`, `ds:152:131`, `ds:152:133`      | Send button Active / Hover / Pressed             | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
-| AC-73   | — (code-authored)                             | Typography — Everett weights (via `--font-family*` tokens) | 2026-04-20   | seed sweep (watching for typography node) |
-| AC-73b  | — (code-authored)                             | Typography — sans-serif fallback, no large CLS   | 2026-04-20   | inherits AC-73 sweep (GOV-05 split) |
-| AC-90   | `site:13:527`, `site:143:601`                 | Desktop (≥1024px) layout                         | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
-| AC-91   | — (code-authored)                             | Tablet (640–1023px) layout                       | 2026-04-20   | seed sweep (watching for tablet frame) |
-| AC-92   | — (code-authored)                             | Mobile (<640px) layout — compact stacks input    | 2026-04-20   | seed sweep (watching for mobile frame) |
-| AC-92b  | — (code-authored)                             | Mobile (<640px) — chips scroll or wrap           | 2026-04-20   | inherits AC-92 sweep (GOV-05 split) |
-| AC-92c  | — (code-authored)                             | Mobile (<640px) — expanded view full width       | 2026-04-20   | inherits AC-92 sweep (GOV-05 split) |
+| AC-72   | `ds:152:129`, `ds:152:131`, `ds:152:133`      | Send button Active / Hover / Pressed             | 2026-04-22   | Lane E full-sweep — all three variants match: Active gradient alone; Hover overlays `rgba(0,0,0,0.2)`; Pressed overlays `rgba(0,0,0,0.4)` — via `--send-overlay-hover/pressed` on top of `--send-gradient` |
+| AC-73   | — (code-authored)                             | Typography — Everett weights (via `--font-family*` tokens) | 2026-04-22   | Lane E full-sweep — metadata scan found no typography node in either file (IR-DS root has only brand-colour frame `1:2`); still code-authored, watching for a typography main component |
+| AC-73b  | — (code-authored)                             | Typography — sans-serif fallback, no large CLS   | 2026-04-22   | Lane E full-sweep — inherits AC-73 watch; no Figma-specified fallback rule, code-authored `sans-serif` in `--font-family*` tokens stands |
+| AC-90   | `site:13:527`, `site:143:601`                 | Desktop (≥1024px) layout                         | 2026-04-22   | Lane E full-sweep — both screens are 1440px Figma frames; widget's `--content-width` 800px + `--compact-textarea-width` 780px match the inner Q+A column and hero textarea widths respectively |
+| AC-91   | — (code-authored)                             | Tablet (640–1023px) layout                       | 2026-04-22   | Lane E full-sweep — IR-site metadata scan confirmed no tablet frame (all screens 1440px); still code-authored |
+| AC-92   | — (code-authored)                             | Mobile (<640px) layout — compact stacks input    | 2026-04-22   | Lane E full-sweep — IR-site metadata scan confirmed no mobile frame; still code-authored |
+| AC-92b  | — (code-authored)                             | Mobile (<640px) — chips scroll or wrap           | 2026-04-22   | Lane E full-sweep — inherits AC-92 (no mobile frame) |
+| AC-92c  | — (code-authored)                             | Mobile (<640px) — expanded view full width       | 2026-04-22   | Lane E full-sweep — inherits AC-92 (no mobile frame) |
 
 The §13 Traceability roll-up (persona × section) is derived from this
 manifest — edit rows here, then re-derive §13 if persona mapping
@@ -853,7 +855,7 @@ financial decisions. They apply primarily to the backend, but the
 
 These criteria exist to satisfy P2's competition-entry ambition.
 
-- **AC-70** — *Figma parity* · **@evolving**
+- **AC-70** — *Figma parity* · **@stable**
   - **Given** any component referenced in `AGENTS.md §Figma`,
   - **Then** its rendered output matches the Figma frame for layout,
     spacing, border-radius, typography, and colour within a ±1px
@@ -894,14 +896,14 @@ These criteria exist to satisfy P2's competition-entry ambition.
   - **Then** the widget falls back to `sans-serif` gracefully without
     layout shift larger than one line-height.
 
-- **AC-74** — *Motion polish* · **@evolving**
+- **AC-74** — *Motion polish* · **@stable**
   - **Given** any interactive element (chip, send button, textarea
     focus, compact → expanded transition),
   - **Then** transitions are tastefully animated (no abrupt flicker,
     no overshoot) with durations in the motion range (§12.1 PD-07)
     and an easing that matches the rest of the IR site.
 
-- **AC-75** — *No generic AI aesthetic* · **@evolving**
+- **AC-75** — *No generic AI aesthetic* · **@stable**
   - **Given** a juror inspects the widget,
   - **Then** there are no generic "ChatGPT-looking" artifacts: no
     speech bubbles with default tails, no Material-style FAB, no

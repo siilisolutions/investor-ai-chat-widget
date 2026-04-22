@@ -11,7 +11,9 @@
   color: var(--black-500);
   white-space: nowrap;
   cursor: pointer;
-  transition: background 120ms ease;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: background 120ms ease, outline-color 150ms ease;
   text-align: left;
 }
 
@@ -21,4 +23,8 @@
 
 .chip:active {
   background: rgba(255, 255, 255, 0.7);
+}
+
+.chip:focus-visible {
+  outline-color: var(--blue-500);
 }

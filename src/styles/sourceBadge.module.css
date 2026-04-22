@@ -19,9 +19,15 @@
 
 .badgeLink {
   cursor: pointer;
-  transition: background 120ms ease;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: background 120ms ease, outline-color 150ms ease;
 }
 
 .badgeLink:hover {
   background: var(--gray-500);
+}
+
+.badgeLink:focus-visible {
+  outline-color: var(--blue-500);
 }

@@ -10,6 +10,24 @@
   padding: var(--space-3xl) var(--space-2xl);
   background: var(--white-500);
   box-sizing: border-box;
+  animation: expandedMount 200ms ease-out;
+}
+
+@keyframes expandedMount {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expanded {
+    animation: none;
+  }
 }
 
 .title {
