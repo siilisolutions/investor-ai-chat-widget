@@ -3,6 +3,9 @@
  *
  *   AC-29 — follow-ups append without mutating prior Q+A pairs.
  *   AC-30 — input and send button are disabled while a request is in flight.
+ *   AC-42 — raw `err.message` from a ChatService throw is never forwarded
+ *           to the DOM; the rendered error row shows the fixed SAFE_ERROR
+ *           copy instead.
  *   AC-52 — `buildHistory` filters out loading / errored / empty-answer
  *           turns and always ends with the new user message.
  *
@@ -12,6 +15,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/preact'
 import { App } from '../src/App'
 import { buildHistory } from '../src/chatHistory'
+import { SAFE_ERROR } from '../src/errorCopy'
 import type {
   ChatMessage,
   ChatService,
@@ -118,5 +122,27 @@ describe('App', () => {
     expect(screen.getByText('Q1')).toBeInTheDocument()
     expect(screen.getByText('first answer')).toBeInTheDocument()
     expect(screen.getByText('Q2')).toBeInTheDocument()
+  })
+
+  it('AC-42: raw service errors never reach the rendered error row', async () => {
+    const leakyMessage = 'boom from /internal/v1/whoami 500'
+    const service = makeService(() => Promise.reject(new Error(leakyMessage)))
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    render(<App chatService={service} />)
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Mikä on yhtiön nykyinen osinkopolitiikka?',
+      }),
+    )
+
+    const alert = await screen.findByRole('alert')
+    expect(alert).toHaveTextContent(SAFE_ERROR)
+    expect(alert.textContent ?? '').not.toContain('boom')
+    expect(alert.textContent ?? '').not.toContain('whoami')
+    expect(document.body.textContent ?? '').not.toContain(leakyMessage)
+
+    errorSpy.mockRestore()
   })
 })

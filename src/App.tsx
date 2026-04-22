@@ -15,6 +15,7 @@ import { useCallback, useState } from 'react'
 import { CompactView } from './components/CompactView.tsx'
 import { ExpandedView } from './components/ExpandedView.tsx'
 import { buildHistory } from './chatHistory.ts'
+import { SAFE_ERROR } from './errorCopy.ts'
 import type { ChatMessage, ChatService } from './types/index.ts'
 import styles from './styles/app.module.css'
 
@@ -64,11 +65,12 @@ export function App({ chatService }: AppProps) {
           )
         )
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Pahoittelut, jokin meni pieleen.'
+        if (import.meta.env.DEV) {
+          console.error('[SiiliChatbot]', err)
+        }
         setMessages((prev) =>
           prev.map((m) =>
-            m.id === id ? { ...m, loading: false, error: errorMessage } : m
+            m.id === id ? { ...m, loading: false, error: SAFE_ERROR } : m
           )
         )
       } finally {

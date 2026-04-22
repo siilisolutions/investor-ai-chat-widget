@@ -24,11 +24,10 @@ import {
   type MockInstance,
 } from 'vitest'
 import { createApiChatService } from '../src/services/apiChatService'
+import { SAFE_ERROR } from '../src/errorCopy'
 import type { ChatTurn } from '../src/types/index'
 
 const API_URL = 'https://example.test/api/chat'
-const SAFE_ERROR =
-  'Pahoittelut, en pysty juuri nyt hakemaan vastausta. Yritä hetken kuluttua uudelleen.'
 
 let fetchMock: MockInstance<typeof fetch>
 

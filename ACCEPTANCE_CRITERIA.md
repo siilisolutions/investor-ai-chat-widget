@@ -85,7 +85,7 @@ directly.
 |----|------------------|---------|--------|-----------|--------------|
 | AC-01 | Host-site embedding | [§3.1](#31-embedding--initialisation) | active | @stable | Manual: `npm run dev` — widget mounts, no console errors, only `SiiliChatbot` on `window` |
 | AC-02 | Zero host dependencies | [§3.1](#31-embedding--initialisation) | active | @stable | Manual: `npm run dev` on a page that loads only the widget assets — widget works end-to-end |
-| AC-03 | Idempotent init | [§3.1](#31-embedding--initialisation) | active | @evolving | Manual: call `SiiliChatbot.init()` twice on the same container — single clean mount, no console errors |
+| AC-03 | Idempotent init | [§3.1](#31-embedding--initialisation) | active | @stable | Automated: `npm run test -- tests/widget.test.tsx` (two `init()` calls yield a single clean mount, no console errors) |
 | AC-04 | `apiUrl` option selects backend | [§3.1](#31-embedding--initialisation) | active | @evolving | Manual: init without `apiUrl` — mock responds per §12.1 PD-02; init with `apiUrl` — DevTools Network shows a POST to that URL and no other |
 | AC-10 | Initial state | [§3.2](#32-compact-hero-mode) | active | @stable | Visual: see §2.5 row AC-10 vs rendered compact view (one textarea + chips per §12.1 PD-01) |
 | AC-10a | Continue-conversation pill — rendering | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: dev harness with seeded history — pill renders above chips (aspirational) |
@@ -133,7 +133,7 @@ directly.
 | AC-32 | Input focus — retained after send in expanded mode | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: send via Enter and via send-button click in expanded — focus is on the textarea after the pair renders and once the input re-enables (aspirational) |
 | AC-40 | Service rejection | [§3.4](#34-error-handling) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (error pair renders `role="alert"` with the error text; no `role="status"` blob and no "Lähteet:" section) |
 | AC-41 | No crash on error | [§3.4](#34-error-handling) | active | @stable | Manual: after forced error — user can still type + send new messages; error scoped to one pair |
-| AC-42 | No developer leakage | [§3.4](#34-error-handling) | active | @evolving | Manual: throw inside mock with a stack trace — UI shows only safe copy; inspect DOM + console of prod build |
+| AC-42 | No developer leakage | [§3.4](#34-error-handling) | active | @stable | Automated: `npm run test -- tests/app.test.tsx` (App renders the fixed `SAFE_ERROR` copy from `src/errorCopy.ts`; raw `err.message` is never forwarded to the DOM) |
 | AC-43 | Network timeout | [§3.4](#34-error-handling) | active | @evolving | Automated: `npm run test -- tests/apiChatService.test.ts` (30 s `AbortController` rejection maps to the SAFE_ERROR string) |
 | AC-44 | Safe error mapping for real backend | [§3.4](#34-error-handling) | active | @evolving | Automated: `npm run test -- tests/apiChatService.test.ts` (non-2xx, network, non-JSON, missing `response`, non-string `response` all reject with the Finnish fallback string; no status codes or payload bodies leaked) |
 | AC-50 | Interface stability — components are transport-agnostic | [§3.5](#35-chat-service-contract) | active | @stable | Automated: `npm run verify` — TypeScript build enforces the `ChatService` surface and the grep guard rejects any `src/components/**` import from `src/services/**` |
@@ -356,7 +356,7 @@ that tests and PR descriptions can reference.
     must not reach for any global beyond the `SiiliChatbot` namespace
     it exports itself.
 
-- **AC-03** — *Idempotent init* · **@evolving**
+- **AC-03** — *Idempotent init* · **@stable**
   - **Given** `SiiliChatbot.init()` has already run,
   - **When** it is called a second time on the same container,
   - **Then** the widget is remounted cleanly (no duplicate UI, no
@@ -717,7 +717,7 @@ Maps to the Investor agent composition and its main component; see
     type and send new messages; the error state is scoped to the one
     failed pair.
 
-- **AC-42** — *No developer leakage* · **@evolving**
+- **AC-42** — *No developer leakage* · **@stable**
   - **Given** an error occurs,
   - **Then** stack traces, internal identifiers, or raw error payloads
     are never rendered in the UI (they may be logged to the console in

@@ -16,11 +16,9 @@ import type {
   ChatTurn,
   Source,
 } from '../types/index.ts'
+import { SAFE_ERROR } from '../errorCopy.ts'
 
 const TIMEOUT_MS = 30_000
-
-const SAFE_ERROR =
-  'Pahoittelut, en pysty juuri nyt hakemaan vastausta. Yritä hetken kuluttua uudelleen.'
 
 function generateId(): string {
   if (
