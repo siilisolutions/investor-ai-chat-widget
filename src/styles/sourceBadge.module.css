@@ -31,3 +31,9 @@
 .badgeLink:focus-visible {
   outline-color: var(--blue-500);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .badgeLink {
+    transition: none;
+  }
+}

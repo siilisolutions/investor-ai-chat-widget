@@ -18,7 +18,7 @@
  */
 
 import { useRef, useState } from 'react'
-import type { KeyboardEvent } from 'react'
+import type { KeyboardEvent, MouseEvent } from 'react'
 import styles from '../styles/chatInput.module.css'
 
 interface ChatInputProps {
@@ -39,6 +39,7 @@ export function ChatInput({
 }: ChatInputProps) {
   const [value, setValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const sendButtonRef = useRef<HTMLButtonElement>(null)
 
   const submit = () => {
     const trimmed = value.trim()
@@ -57,13 +58,22 @@ export function ChatInput({
     }
   }
 
+  const handleShellMouseDown = (event: MouseEvent<HTMLDivElement>) => {
+    const target = event.target as Node | null
+    if (!target) return
+    if (sendButtonRef.current?.contains(target)) return
+    if (target === textareaRef.current) return
+    event.preventDefault()
+    textareaRef.current?.focus()
+  }
+
   const shellClassName = [
     styles.shell,
     variant === 'compact' ? styles.shellCompact : styles.shellExpanded,
   ].join(' ')
 
   return (
-    <div className={shellClassName}>
+    <div className={shellClassName} onMouseDown={handleShellMouseDown}>
       <div className={styles.inputRow}>
         <textarea
           ref={textareaRef}
@@ -84,6 +94,7 @@ export function ChatInput({
       </div>
       <div className={styles.sendRow}>
         <button
+          ref={sendButtonRef}
           type="button"
           className={styles.sendButton}
           onClick={submit}

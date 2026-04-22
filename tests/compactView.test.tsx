@@ -106,4 +106,23 @@ describe('CompactView', () => {
     fireEvent.input(textarea, { target: { value: '    ' } })
     expect(screen.getByRole('button', { name: 'Send message' })).toBeDisabled()
   })
+
+  it('AC-17: mousedown on the input shell padding focuses the textarea', () => {
+    render(<CompactView suggestions={CHIPS} onSend={() => {}} />)
+    const textarea = screen.getByLabelText('Siili investor chatbot message')
+    const shell = textarea.parentElement?.parentElement as HTMLElement
+    expect(shell).toBeTruthy()
+    expect(document.activeElement).not.toBe(textarea)
+    fireEvent.mouseDown(shell)
+    expect(document.activeElement).toBe(textarea)
+  })
+
+  it('AC-17: mousedown on the send button does not forward focus to the textarea', () => {
+    render(<CompactView suggestions={CHIPS} onSend={() => {}} />)
+    const textarea = screen.getByLabelText('Siili investor chatbot message')
+    const sendButton = screen.getByRole('button', { name: 'Send message' })
+    expect(document.activeElement).not.toBe(textarea)
+    fireEvent.mouseDown(sendButton)
+    expect(document.activeElement).not.toBe(textarea)
+  })
 })

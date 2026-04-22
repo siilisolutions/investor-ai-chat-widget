@@ -43,7 +43,13 @@ export function ExpandedView({ messages, loading, onSend }: ExpandedViewProps) {
   }, [])
 
   useEffect(() => {
-    inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    const prefersReduce =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    inputRef.current?.scrollIntoView({
+      behavior: prefersReduce ? 'auto' : 'smooth',
+      block: 'end',
+    })
   }, [messages])
 
   return (

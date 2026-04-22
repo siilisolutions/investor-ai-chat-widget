@@ -98,7 +98,7 @@ directly.
 | AC-14 | Sending from a chip | [§3.2](#32-compact-hero-mode) | active | @stable | Automated: `npm run test -- tests/compactView.test.tsx` (chip click fires `onSend` with label verbatim) |
 | AC-15 | Empty-submit guard | [§3.2](#32-compact-hero-mode) | active | @stable | Automated: `npm run test -- tests/compactView.test.tsx` (Enter on empty / whitespace-only textarea is a no-op; disabled send button swallows clicks) |
 | AC-16 | Send-button enablement | [§3.2](#32-compact-hero-mode) | active | @stable | Automated: `npm run test -- tests/compactView.test.tsx` (disabled / enabled state by textarea content); Visual: see §2.5 row AC-16 for Active gradient |
-| AC-17 | Input shell — click-to-focus target with text cursor | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: hover the input shell padding (both variants) — cursor is text caret; click the padding — textarea receives focus (aspirational) |
+| AC-17 | Input shell — click-to-focus target with text cursor | [§3.2](#32-compact-hero-mode) | active | @stable | Automated: `npm run test -- tests/compactView.test.tsx` (mousedown on shell focuses textarea; mousedown on send button does not); Manual: hover the input shell padding — cursor is text caret |
 | AC-20 | Transition — no flicker | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: compact → expanded transition — no unstyled flash or empty intermediate frame |
 | AC-20a | Fill the viewport | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: enter expanded — surface fills `100vw × 100vh` with solid `--white-500` |
 | AC-20b | Hero image hidden | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: enter expanded — host hero image not visible behind widget |
@@ -160,7 +160,7 @@ directly.
 | AC-81c | Screen-reader labelling — loading state | [§6](#6-accessibility) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (`role="status"` + `aria-live="polite"` + "Haetaan tietoa..." copy) |
 | AC-81d | Screen-reader labelling — errors | [§6](#6-accessibility) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (error text announced via `role="alert"`) |
 | AC-82 | WCAG 2.1 AA contrast | [§6](#6-accessibility) | active | @stable | Manual: axe DevTools contrast scan over token pairs — ≥4.5:1 body, ≥3:1 large / non-text |
-| AC-83 | Reduced motion | [§6](#6-accessibility) | active | @aspirational | Manual: DevTools emulate reduce-motion — transitions, auto-scroll, blob pulse reduced or static (aspirational) |
+| AC-83 | Reduced motion | [§6](#6-accessibility) | active | @stable | Automated: `npm run test -- tests/expandedView.test.tsx` (auto-scroll `behavior` switches to `auto` under reduce-motion); Manual: DevTools emulate `prefers-reduced-motion: reduce` — mount animation, auto-scroll, blob pulse, and interactive transitions (chip / focus ring / send button / source badge) are all static |
 | AC-84 | Zoom and reflow | [§6](#6-accessibility) | active | @evolving | Manual: browser zoom to 200% — no widget content clipped, no horizontal scroll inside container |
 | AC-90 | Desktop (≥1024px) | [§7](#7-responsiveness) | active | @stable | Manual: viewport at or above the §12.1 PD-05 desktop threshold — matches §2.5 row AC-90 padding and layout |
 | AC-91 | Tablet (640–1023px) | [§7](#7-responsiveness) | active | @evolving | Manual: viewport in the §12.1 PD-05 tablet band — chips wrap, textarea full width, send button inside input shell |
@@ -466,7 +466,7 @@ Maps to the Investor hero composition and its main component; see
   - **Then** the send button becomes enabled with the Active-variant
     gradient (see §2.5 row AC-16).
 
-- **AC-17** — *Input shell — click-to-focus target with text cursor* · **@aspirational**
+- **AC-17** — *Input shell — click-to-focus target with text cursor* · **@stable**
   - **Given** the input shell is rendered in either variant (compact
     or expanded; see the textarea component referenced in §2.5 row
     AC-11 / AC-28),
@@ -950,12 +950,20 @@ These criteria exist to satisfy P2's competition-entry ambition.
   - **Then** contrast is at least 4.5:1 for body text and 3:1 for
     large text and non-text UI.
 
-- **AC-83** — *Reduced motion* · **@aspirational**
+- **AC-83** — *Reduced motion* · **@stable**
   - **Given** `prefers-reduced-motion: reduce`,
-  - **Then** the compact → expanded transition, auto-scroll, and the
-    loading blob's pulse animation are reduced or disabled (the blob
-    is rendered as a static gray shape alongside the "Haetaan
-    tietoa..." text, with no scale/opacity animation).
+  - **Then** the compact → expanded mount animation, the expanded-view
+    auto-scroll, and the loading blob's pulse animation are reduced or
+    disabled (the blob is rendered as a static gray shape alongside the
+    "Haetaan tietoa..." text, with no scale/opacity animation; the
+    auto-scroll uses `behavior: 'auto'`; the expanded surface mounts
+    with no entrance animation).
+  - **Then** interactive transitions on the input shell (focus-ring
+    outline-color), the send button (filter + outline-color), chips
+    (background + outline-color), and linked source badges (background
+    + outline-color) are disabled — the end states (visible focus ring,
+    hover background) still render immediately, only the animated
+    handover is removed.
 
 - **AC-84** — *Zoom and reflow* · **@evolving**
   - **Given** a 200% browser zoom,
