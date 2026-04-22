@@ -63,6 +63,7 @@ stay within the declared scope. When finished, update the task status to
 | GOV-13 | Test-naming convention tied to AC intent | XS | Low | — | todo |
 | GOV-14 | Delete-and-watch experiment on flagged rules | M | Low | GOV-09 | todo |
 | GOV-15 | Quarterly AC decay review (set up + first run) | XS/S | Low | GOV-03 | todo |
+| GOV-16 | Triage non-stable ACs into stabilisation-path buckets | S | High | GOV-03, GOV-07 | done |
 
 Status values: `todo` · `in-progress` · `blocked` · `done` · `cancelled`.
 
@@ -479,6 +480,195 @@ The slow failure mode of any spec doc is drift: code ships, ACs don't move, six 
 
 ---
 
+### GOV-16 — Triage non-stable ACs into stabilisation-path buckets
+
+**Status:** done · **Size:** S · **Severity:** High · **Depends on:** GOV-03, GOV-07
+**Blocks:** stabilisation lanes (future `GOV-xx`)
+
+**Why**
+After GOV-03 tagged stability and GOV-07 bound verification paths, the remaining non-stable ACs (~54 of them, `@evolving` or `@aspirational`) are a mixed bag: some just need their declared verification path run, some need a defined slice of frontend work, and some are blocked on systems this repo does not own. A one-line delta per AC sorts them into those three buckets so stabilisation lanes can be chartered cheaply and we stop treating externally-gated ACs as our bugs.
+
+**Scope**
+- Read-only pass over `ACCEPTANCE_CRITERIA.md` and (for grounding) `src/`.
+- Append a new section `## GOV-16 triage results` to this file.
+- Do not edit AC bodies. Do not change stability tags. Do not touch rule files.
+
+**Steps**
+1. From the AC Catalog, enumerate every AC whose Stability is `@evolving` or `@aspirational`.
+2. For each, write one line stating the concrete delta between it and `@stable`, and classify into one of:
+   - **(a) verify** — implementation appears to satisfy the AC; the remaining step is running the Verification column path and recording the result.
+   - **(b) build** — a defined frontend slice is missing. Note the rough size and any design/Figma gating.
+   - **(c) external** — behaviour is gated on a system this repo does not own (backend, FI/EN toggle, analytics pipeline, embedded host-page Lighthouse). These cannot be stabilised from inside the widget.
+3. Group the output by cluster (so a future lane can pick up a whole cluster at once) rather than by ID.
+4. Ground claims by grepping `src/` for the ARIA / history / media-query / cursor hooks the ACs talk about; avoid speculation.
+5. Call out any AC where the triage itself surfaces a spec question (missing Figma node, ambiguous scope) — those are stop-and-ask candidates for the follow-up lane, not this task.
+
+**Done when**
+- [x] Every `@evolving` and `@aspirational` AC appears exactly once in the triage output with a one-line delta and a bucket.
+- [x] Counts per bucket are reported.
+- [x] No AC body, stability tag, or rule file was modified.
+
+**Stop and ask if**
+- More than ~40% of non-stable ACs fall into bucket (c). That's a signal the spec has drifted into things we don't own and should be surfaced before filing stabilisation lanes.
+
+---
+
+## GOV-16 triage results
+
+Triage of every `@evolving` / `@aspirational` AC from the AC Catalog as of 2026-04-21. Buckets: **(a) verify** — run the declared Verification path; **(b) build** — defined frontend slice needed; **(c) external** — gated on a system outside this repo. Counts:
+
+- `@evolving` (28): **(a)** 21 · **(b)** 7 · **(c)** 0
+- `@aspirational` (26): **(a)** 0 · **(b)** 17 · **(c)** 9
+- **Totals**: (a) 21 · (b) 24 · (c) 9 (17% of 54 — under the 40% stop-and-ask threshold).
+
+Grounding signals collected from `src/` during triage:
+- `role="status"` + `aria-live="polite"` already on the loading blob (`ChatMessage.tsx:35`).
+- `role="alert"` already on the error paragraph (`ChatMessage.tsx:40`).
+- `aria-label="Send message"` on the send button and a Finnish aria-label on the textarea (`ChatInput.tsx:82,91`).
+- Only one `@media` rule exists in `src/styles/` (a `prefers-reduced-motion` block in `chatMessage.module.css:84`) — no viewport breakpoints anywhere.
+- No `pushState`, `popstate`, `history.back`, `Escape`/`Esc` handler, or `interceptBackNavigation` option in `src/`.
+- No `cursor: text` or focus-forwarding on the input shell.
+
+### Cluster 1 — Loading fidelity (2 ACs, all bucket a)
+
+- **AC-23** *(@evolving)* — Semantics already in code (`role="status"`, `aria-live="polite"`, "Haetaan tietoa..." copy). Delta: run the Figma screenshot compare + dev-harness inspection, record, promote.
+- **AC-23b** *(@evolving)* — Blob shape/fill/pulse vs Figma `178:482` / `201:2273`. Delta: one `get_design_context` sweep, confirm blob matches, promote.
+
+Lane cost: one PR, largely note-taking — cheapest graduation in the backlog.
+
+### Cluster 2 — Expanded surface & input placement (6 ACs, all bucket a)
+
+- **AC-20a** *(@evolving)* — Viewport fill + opaque background. Delta: manual verify against Figma `143:753`.
+- **AC-20b** *(@evolving)* — Hero image not visible behind expanded. Delta: verify in dev harness with hero img mounted.
+- **AC-20f** *(@evolving)* — No host-page scroll/reflow during transition. Delta: scroll host mid-height, enter expanded, record.
+- **AC-28** *(@evolving)* — Input in document flow under latest reply + shadow. Delta: visual verify against Figma `143:753` / `146:1015`.
+- **AC-28b** *(@evolving)* — Short convos not bottom-pinned. Delta: single-pair harness run.
+- **AC-28c** *(@evolving)* — Long convos show latest reply + input together. Delta: scripted multi-pair harness run.
+
+Lane cost: one evidence-collection PR; no code expected unless a mismatch surfaces.
+
+### Cluster 3 — Accessibility evidence (7 ACs, all bucket a)
+
+- **AC-80** *(@evolving)* — Tab order textarea → send → chips. Delta: keyboard run, screenshot of focus ring.
+- **AC-81** *(@evolving)* — Textarea announces its aria-label. **Already set** (`Siili investor chatbot message`). Delta: DevTools A11y panel capture.
+- **AC-81b** *(@evolving)* — Send button announces "Send message". **Already set**. Delta: same capture.
+- **AC-81c** *(@evolving)* — Loading state announces "Haetaan tietoa...". **Semantics already in place**. Delta: SR spot-check + capture.
+- **AC-81d** *(@evolving)* — Errors via `role="alert"`. **Already set**. Delta: force mock rejection + SR capture.
+- **AC-82** *(@evolving)* — WCAG AA contrast. Delta: axe DevTools scan, record token pairs.
+- **AC-84** *(@evolving)* — 200% zoom reflow. Delta: browser zoom test.
+
+Lane cost: one evidence PR. Five of the seven are almost certainly already passing — this lane should graduate most of `§6` in a single turn.
+
+### Cluster 4 — Award-critical visual polish (3 ACs, all bucket a)
+
+- **AC-70** *(@evolving)* — Figma parity umbrella. Delta: run `scripts/prompts/figma-sync.md` full-sweep; bump §2.5 `Last checked` rows.
+- **AC-74** *(@evolving)* — Motion polish 120–300ms + IR-site easing. Delta: measure current durations, compare to IR site, document.
+- **AC-75** *(@evolving)* — No generic AI aesthetic. Delta: juror-style review against Figma; record findings.
+
+Lane cost: one Figma-sync pass plus a motion/aesthetic review note. AC-70 graduating pulls §2.5 freshness up as a side-effect.
+
+### Cluster 5 — Host-context visual checks (2 ACs, both bucket a but gated on assets)
+
+- **AC-76** *(@evolving)* — Dark hero compatibility against the **real** hero asset. Delta: obtain the actual IR-site hero image, overlay the compact view, axe/contrast scan.
+- **AC-101** *(@evolving)* — Cold-start ≤150ms at 4× CPU throttle. Delta: DevTools run on a prod build.
+- **AC-103** *(@evolving)* — CLS ≤0.05 across a session. Delta: DevTools Performance capture.
+- **AC-110** *(@evolving)* — Chrome/Edge/Firefox/Safari happy-path run. Delta: four browsers × desktop + mobile happy path.
+
+All bucket (a), but need an environment step (real hero asset for AC-76, multi-browser access for AC-110) before a human or CI can produce the evidence. Group these in a **Performance & environment evidence** lane, separate from cluster 4, and flag AC-76 to block on the IR team handing over the hero image.
+
+### Cluster 6 — Idempotent init & prod-build hygiene (2 ACs, all bucket a)
+
+- **AC-03** *(@evolving)* — Idempotent init. Delta: call `SiiliChatbot.init()` twice on the same container in the dev harness, confirm single clean mount, record.
+- **AC-42** *(@evolving)* — No developer leakage (stack traces / internal IDs) in prod UI or console. Delta: force a throw inside the mock, inspect prod-build DOM + console.
+
+Lane cost: small; both are single-check verifications.
+
+### Cluster 7 — Responsive below desktop (4 ACs, all bucket b)
+
+- **AC-91** *(@evolving)* — Tablet (640–1023px) chip wrap + full-width textarea. Delta: **build**; no viewport breakpoints exist in `src/styles/`.
+- **AC-92** *(@evolving)* — Mobile (<640px) compact stacks input above chips. Delta: **build**.
+- **AC-92b** *(@evolving)* — Mobile chips scroll or wrap without overflow. Delta: **build**.
+- **AC-92c** *(@evolving)* — Mobile expanded view full width with Figma padding. Delta: **build**.
+
+Lane cost: one CSS-only PR adding the breakpoints. Gated on §2.5 code-authored rows — either keep them code-authored with explicit breakpoint decisions documented, or ask the designer for mobile/tablet frames. Flag as stop-and-ask in the lane charter.
+
+### Cluster 8 — Dismiss + back-nav + continue-pill + re-entry (15 ACs, all bucket b)
+
+Largest cluster in the backlog and entirely unimplemented (`grep` found no `pushState`/`popstate`/`Escape`/`interceptBackNavigation` in `src/`). Two Figma gaps block the lane.
+
+Continue-conversation pill:
+- **AC-10a** *(@aspirational)* — Pill rendering above chips when history exists. **Design-blocked**: no Figma node for the pill yet; §2.5 currently has no row.
+- **AC-10b** *(@aspirational)* — Chip de-duplication after a chip is asked.
+- **AC-10c** *(@aspirational)* — Pill activation re-enters expanded with history, no network call.
+
+Close button:
+- **AC-20d** *(@aspirational)* — Close (×) button rendering top-right, 44×44 hit target, `aria-label="Sulje keskustelu"`. **Design-blocked**: §2.5 flags this row as "no Figma node — AC extension".
+- **AC-20j** *(@aspirational)* — × / Esc dismiss retains messages and calls `history.back()` when intercepting.
+- **AC-20k** *(@aspirational)* — Reduced-motion path is instant dismiss.
+
+History / back-nav:
+- **AC-20c** *(@aspirational)* — `pushState` on compact → expanded.
+- **AC-20g** *(@aspirational)* — `popstate` returns to compact.
+- **AC-20h** *(@aspirational)* — Compact-mode back not intercepted (scoping check).
+- **AC-20i** *(@aspirational)* — `interceptBackNavigation: false` opt-out. **API surface change** to `WidgetOptions` — flag to `change-boundary.mdc`.
+
+State retention:
+- **AC-31** *(@aspirational)* — Dismiss retains `messages` in memory.
+- **AC-31b** *(@aspirational)* — Compact re-entry surfaces pill + hides asked chips (depends on AC-10a/b).
+- **AC-31c** *(@aspirational)* — Reload clears. Likely already true since there is no persistence layer; delta reduces to a verify step once state model is explicit.
+- **AC-31d** *(@aspirational)* — New message from compact with history appends, does not reset.
+
+Focus:
+- **AC-32** *(@aspirational)* — Focus retained on textarea after send in expanded (both Enter and send-button click paths).
+
+Lane sequencing proposal: (1) design conversation for pill + close-button Figma nodes → add §2.5 rows; (2) implement close/Esc + messages retention (`AC-20d/j/k`, `AC-31`); (3) add pushState/popstate with opt-out (`AC-20c/g/h/i`) — needs `change-boundary.mdc` approval for the new option; (4) pill + chip de-dup + re-entry (`AC-10a/b/c`, `AC-31b/d`); (5) focus retention (`AC-32`) folded into the send flow. This is 3–5 PRs, not one.
+
+### Cluster 9 — Small ergonomics (2 ACs, all bucket b)
+
+- **AC-17** *(@aspirational)* — Input shell click-to-focus + `cursor: text` on padding. Delta: small CSS (`cursor: text` on shell, `cursor: auto` on send button) + an onMouseDown handler forwarding to the textarea.
+- **AC-83** *(@aspirational)* — Reduced-motion: transitions, auto-scroll, blob pulse reduced/disabled. **Partial**: blob pulse already has a `prefers-reduced-motion` block (`chatMessage.module.css:84`). Delta: audit the compact→expanded transition and `scrollIntoView` behavior and honor reduced motion everywhere, not just the blob.
+
+Lane cost: two small PRs, can be combined.
+
+### Cluster 10 — Externally gated (9 ACs, all bucket c)
+
+Cannot be stabilised from inside the widget repo. Recommendation in the stop-and-ask: tag them explicitly as "externally gated" in the spec (e.g. an `@aspirational (externally gated)` sub-marker or a line in the AC body naming the owner) so they stop counting against our stabilisation budget. **This is a spec amendment and needs human approval** — not done in this triage.
+
+- **AC-60** *(@aspirational)* — Every factual claim sourced. Owner: backend / retrieval.
+- **AC-61** *(@aspirational)* — No forward-looking statements. Owner: backend / guardrails.
+- **AC-62** *(@aspirational)* — No insider information. Owner: backend / content moderation.
+- **AC-63** *(@aspirational)* — FI/EN language parity. Owner: product + backend (no toggle in widget yet).
+- **AC-64** *(@aspirational)* — Dated-source freshness cue on badge. Owner: backend metadata contract, then widget surfaces.
+- **AC-102** *(@aspirational)* — No host-page Lighthouse regression. Owner: embedding on the real host page, not the dev harness.
+- **AC-120** *(@aspirational)* — Named events for key actions. Owner: product sign-off on event names.
+- **AC-120b** *(@aspirational)* — No PII in event payloads.
+- **AC-120c** *(@aspirational)* — `chat_closed` payload shape.
+
+Note: `AC-64` and the `AC-120` family become bucket (b) as soon as their external contract is signed off — the widget side is a small addition once the schema exists.
+
+### Next-step recommendations (for stabilisation-lane charters)
+
+Sequenced by cost-to-value:
+
+1. **Lane A — Loading fidelity** (Cluster 1, 2 ACs). One turn, almost certainly graduates both.
+2. **Lane B — A11y evidence** (Cluster 3, 7 ACs). One evidence PR; five of seven likely graduate immediately.
+3. **Lane C — Expanded layout evidence** (Cluster 2, 6 ACs). One PR; may surface small layout deltas.
+4. **Lane D — Idempotent init & dev-leakage** (Cluster 6, 2 ACs). One small PR.
+5. **Lane E — Figma full-sweep + motion review** (Cluster 4, 3 ACs). Uses `figma-sync.md`; also bumps §2.5 freshness.
+6. **Lane F — Responsive breakpoints** (Cluster 7, 4 ACs). CSS build PR, gated on a design decision per the stop-and-ask.
+7. **Lane G — Ergonomics** (Cluster 9, 2 ACs). One small PR.
+8. **Lane H — Dismiss/history/continue-pill** (Cluster 8, 15 ACs). Multi-PR effort; needs design input and `change-boundary.mdc` approval for the new `WidgetOptions` field.
+9. **Lane I — Performance & environment evidence** (Cluster 5, 4 ACs). Needs real hero asset + multi-browser access.
+10. **Spec housekeeping — externally-gated tagging** (Cluster 10, 9 ACs). Not a lane; a single spec-amendment PR after human approval.
+
+**Stop-and-asks surfaced by triage (do not act on in this task):**
+- Designer needed for **pill** (AC-10a) and **close button** (AC-20d) Figma nodes before Lane H can start.
+- `interceptBackNavigation` (AC-20i) is a new `WidgetOptions` field and needs explicit approval per `change-boundary.mdc`.
+- Lane F: responsive breakpoints without tablet/mobile Figma frames — either request frames or commit to code-authored breakpoints on the record.
+- Cluster 10 tagging is a spec change — human approval needed before amending `ACCEPTANCE_CRITERIA.md` bodies.
+
+---
+
 ## Completion log
 
 <!--
@@ -494,6 +684,7 @@ Format:
 - 2026-04-20 — GOV-06 — Minted AC-N1 (MUST NOT render backend HTML/Markdown) and AC-N2 (MUST NOT bundle font files) in `ACCEPTANCE_CRITERIA.md` §12; restructured §12 into §12.1 Product decisions (persistence, streaming — no AC-IDs, remain v1 product decisions) and §12.2 Invariants (AC-Nx); added both rows to the AC Catalog.
 - 2026-04-20 — GOV-07 — Added `Verification` column to the AC catalog in `ACCEPTANCE_CRITERIA.md`, binding each of 91 rows to the cheapest credible evidence path (Automated / Manual / Visual / `none`); 9 aspirational rows marked `none` (9.9%, below the 15% cap); every `none` row is `@aspirational`; automated paths reference real scripts (`npm run build`, `rg`).
 - 2026-04-21 — GOV-08 — Replaced visual-token prose in AC-11, AC-12b, AC-20a, AC-21, AC-22, AC-23b, AC-28, AC-72 with references to the Figma nodes already bound in §2.5 (no new nodes needed, no design drift surfaced); behavioural prose and GOV-07 verification-column values left intact.
+- 2026-04-21 — GOV-16 — Triaged all 54 non-stable ACs into 10 clusters across three buckets (a verify / b build / c external): 21 verify, 24 build, 9 external (17% external, under the 40% stop-and-ask threshold). Output appended as `## GOV-16 triage results`; proposes 9 stabilisation lanes + 1 spec-housekeeping amendment, ordered by cost-to-value; surfaces 4 stop-and-asks (pill + close-button Figma nodes, `interceptBackNavigation` WidgetOptions addition, responsive breakpoints without mobile frames, externally-gated tagging spec change). No AC bodies, stability tags, or rule files modified.
 
 ---
 

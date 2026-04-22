@@ -4,15 +4,17 @@
  * - `mode`: 'compact' | 'expanded' (flips to expanded on first send)
  * - `messages`: chronological list of Q+A pairs
  *
- * Delegates network I/O to the `ChatService` (mock by default, see
- * `src/services/chatService.ts`).
+ * Delegates network I/O to the `ChatService` passed in by `widget.tsx`
+ * (the composition root picks mock vs. real based on
+ * `WidgetOptions.apiUrl`). The full history of successfully-completed
+ * turns is replayed on every send so the backend LLM can reason over
+ * prior turns (AC-52).
  */
 
 import { useCallback, useState } from 'react'
 import { CompactView } from './components/CompactView.tsx'
 import { ExpandedView } from './components/ExpandedView.tsx'
-import { sendMessage } from './services/chatService.ts'
-import type { ChatMessage } from './types/index.ts'
+import type { ChatMessage, ChatService, ChatTurn } from './types/index.ts'
 import styles from './styles/app.module.css'
 
 const SUGGESTIONS = [
@@ -26,41 +28,71 @@ type Mode = 'compact' | 'expanded'
 let messageCounter = 0
 const nextId = () => `msg-${++messageCounter}`
 
-export function App() {
+interface AppProps {
+  chatService: ChatService
+}
+
+// Per AC-52: only turns that completed successfully feed the backend's
+// history — loading placeholders and errored pairs are dropped so the
+// model sees a clean conversation.
+function buildHistory(
+  messages: ChatMessage[],
+  newQuestion: string
+): ChatTurn[] {
+  const turns: ChatTurn[] = []
+  for (const m of messages) {
+    if (m.loading || m.error || m.answer.length === 0) continue
+    turns.push({ role: 'user', content: m.question })
+    turns.push({ role: 'assistant', content: m.answer })
+  }
+  turns.push({ role: 'user', content: newQuestion })
+  return turns
+}
+
+export function App({ chatService }: AppProps) {
   const [mode, setMode] = useState<Mode>('compact')
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [loading, setLoading] = useState(false)
 
-  const handleSend = useCallback(async (question: string) => {
-    const id = nextId()
-    setMode('expanded')
-    setLoading(true)
-    setMessages((prev) => [
-      ...prev,
-      { id, question, answer: '', loading: true },
-    ])
+  const handleSend = useCallback(
+    async (question: string) => {
+      const id = nextId()
+      const history = buildHistory(messages, question)
+      setMode('expanded')
+      setLoading(true)
+      setMessages((prev) => [
+        ...prev,
+        { id, question, answer: '', loading: true },
+      ])
 
-    try {
-      const response = await sendMessage(question)
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === id
-            ? { ...m, answer: response.answer, sources: response.sources, loading: false }
-            : m
+      try {
+        const response = await chatService.sendMessage(history)
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === id
+              ? {
+                  ...m,
+                  answer: response.answer,
+                  sources: response.sources,
+                  loading: false,
+                }
+              : m
+          )
         )
-      )
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Pahoittelut, jokin meni pieleen.'
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === id ? { ...m, loading: false, error: errorMessage } : m
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Pahoittelut, jokin meni pieleen.'
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === id ? { ...m, loading: false, error: errorMessage } : m
+          )
         )
-      )
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+      } finally {
+        setLoading(false)
+      }
+    },
+    [chatService, messages]
+  )
 
   return (
     <div className={`siiliChatbot ${styles.root}`}>

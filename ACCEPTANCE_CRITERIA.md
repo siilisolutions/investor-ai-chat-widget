@@ -75,6 +75,7 @@ directly.
 | AC-01 | Host-site embedding | [§3.1](#31-embedding--initialisation) | active | @stable | Manual: `npm run dev` — widget mounts, no console errors, only `SiiliChatbot` on `window` |
 | AC-02 | Zero host dependencies | [§3.1](#31-embedding--initialisation) | active | @stable | Manual: `npm run dev` on a page that loads only the widget assets — widget works end-to-end |
 | AC-03 | Idempotent init | [§3.1](#31-embedding--initialisation) | active | @evolving | Manual: call `SiiliChatbot.init()` twice on the same container — single clean mount, no console errors |
+| AC-04 | `apiUrl` option selects backend | [§3.1](#31-embedding--initialisation) | active | @evolving | Manual: init without `apiUrl` — mock responds in ~800ms; init with `apiUrl` — DevTools Network shows a POST to that URL and no other |
 | AC-10 | Initial state | [§3.2](#32-compact-hero-mode) | active | @stable | Visual: Figma `113:203` vs rendered compact view (one textarea + three chips) |
 | AC-10a | Continue-conversation pill — rendering | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: dev harness with seeded history — pill renders above chips (aspirational) |
 | AC-10b | Suggestion-chip de-duplication | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: ask a chip, re-enter compact — that chip is hidden, order preserved (aspirational) |
@@ -86,6 +87,7 @@ directly.
 | AC-14 | Sending from a chip | [§3.2](#32-compact-hero-mode) | active | @stable | Manual: click a chip — widget transitions to expanded with the chip's label sent |
 | AC-15 | Empty-submit guard | [§3.2](#32-compact-hero-mode) | active | @stable | Manual: Enter / send click with empty or whitespace-only textarea — no transition |
 | AC-16 | Send-button enablement | [§3.2](#32-compact-hero-mode) | active | @stable | Visual: Figma `149:1410` — disabled when empty, Active gradient when non-empty |
+| AC-17 | Input shell — click-to-focus target with text cursor | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: hover the input shell padding (both variants) — cursor is text caret; click the padding — textarea receives focus (aspirational) |
 | AC-20 | Transition — no flicker | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: compact → expanded transition — no unstyled flash or empty intermediate frame |
 | AC-20a | Fill the viewport | [§3.3](#33-expanded-chat-mode) | active | @evolving | Manual: enter expanded — surface fills `100vw × 100vh` with solid `--white-500` |
 | AC-20b | Hero image hidden | [§3.3](#33-expanded-chat-mode) | active | @evolving | Manual: enter expanded — host hero image not visible behind widget |
@@ -117,11 +119,16 @@ directly.
 | AC-31b | Compact re-entry surfaces continue-pill and hides asked chips | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: compact re-entry with history — continue pill visible, asked chips hidden (aspirational) |
 | AC-31c | Reload or navigation clears history | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: reload page mid-convo — `messages` cleared, compact shows no pill (aspirational) |
 | AC-31d | New message from compact with history appends | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: send new message from compact with history — expanded appends, does not reset (aspirational) |
+| AC-32 | Input focus — retained after send in expanded mode | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: send via Enter and via send-button click in expanded — focus is on the textarea after the pair renders and once the input re-enables (aspirational) |
 | AC-40 | Service rejection | [§3.4](#34-error-handling) | active | @stable | Manual: force mock rejection — error pair renders with `role="alert"`, no blob, no sources |
 | AC-41 | No crash on error | [§3.4](#34-error-handling) | active | @stable | Manual: after forced error — user can still type + send new messages; error scoped to one pair |
 | AC-42 | No developer leakage | [§3.4](#34-error-handling) | active | @evolving | Manual: throw inside mock with a stack trace — UI shows only safe copy; inspect DOM + console of prod build |
-| AC-50 | Interface stability | [§3.5](#35-chat-service-contract) | active | @stable | Automated: `npm run build` — TypeScript enforces `ChatService` surface used by `App.tsx` / `ExpandedView.tsx` / `ChatMessage` |
-| AC-51 | Mock fidelity | [§3.5](#35-chat-service-contract) | active | @stable | Manual: `npm run dev` — mock resolves in ~800ms with a Finnish answer and two source references |
+| AC-43 | Network timeout | [§3.4](#34-error-handling) | active | @evolving | Manual: point `apiUrl` at an endpoint that never responds — failed pair renders in ~30s with safe copy, widget stays interactive |
+| AC-44 | Safe error mapping for real backend | [§3.4](#34-error-handling) | active | @evolving | Manual: force the real backend to return 500 / 404 / network error — UI shows the Finnish fallback string; no status codes, URLs, or payload bodies leak into the DOM |
+| AC-50 | Interface stability — components are transport-agnostic | [§3.5](#35-chat-service-contract) | active | @stable | Automated: `npm run build` — TypeScript enforces the `ChatService` surface; only `App.tsx` imports it, `ExpandedView.tsx` / `ChatMessage` / `CompactView` do not |
+| AC-51 | Mock fidelity | [§3.5](#35-chat-service-contract) | active | @stable | Manual: `npm run dev` without `VITE_API_URL` — mock resolves in ~800ms with a Finnish answer and two source references |
+| AC-52 | Threaded conversation — full history posted per request | [§3.5](#35-chat-service-contract) | active | @evolving | Manual: send two turns against the real backend — second request's JSON body is `{ messages: [{role:"user",…},{role:"assistant",…},{role:"user",…}] }` in chronological order |
+| AC-53 | Real-backend adapter — response mapping and forward-compatible schema | [§3.5](#35-chat-service-contract) | active | @evolving | Manual: backend returns `{ response: "…" }` — widget renders the answer; adapter ignores unknown fields and surfaces `sources` if/when the backend adds them |
 | AC-60 | Every factual claim is sourced | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational | none (aspirational — backend-scoped, not frontend-verifiable) |
 | AC-61 | No forward-looking statements or advice | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational | none (aspirational — backend-scoped, not frontend-verifiable) |
 | AC-62 | No insider or unpublished information | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational | none (aspirational — backend-scoped, not frontend-verifiable) |
@@ -326,6 +333,21 @@ that tests and PR descriptions can reference.
   - **Then** the widget is remounted cleanly (no duplicate UI, no
     orphaned event listeners, no console errors).
 
+- **AC-04** — *`apiUrl` option selects backend* · **@evolving**
+  - **Given** `WidgetOptions` defined in `src/types/index.ts`,
+  - **Then** it carries an optional `apiUrl: string` field.
+  - **When** the host calls `SiiliChatbot.init({ container, apiUrl })`
+    with a non-empty `apiUrl`,
+  - **Then** the widget wires the real `ChatService` adapter against
+    that URL and issues no other cross-origin calls (per AC-121).
+  - **When** `apiUrl` is omitted (or empty),
+  - **Then** the widget falls back to the bundled mock
+    (`src/services/chatService.ts`) so local dev and the dev harness
+    work offline; no error is thrown and no warning is rendered in
+    production UI.
+  - The URL is **not** baked into the production bundle; it is
+    supplied by the host page at `init()` time.
+
 ### 3.2 Compact (Hero) Mode
 
 Maps to Figma node `113:203`.
@@ -410,6 +432,22 @@ Maps to Figma node `113:203`.
   - **When** at least one non-whitespace character is entered,
   - **Then** the send button becomes enabled with the Active gradient
     from Figma node `149:1410`.
+
+- **AC-17** — *Input shell — click-to-focus target with text cursor* · **@aspirational**
+  - **Given** the input shell is rendered in either variant (compact
+    per Figma `146:1015` or expanded per `146:1015` on the white
+    surface in `143:753`),
+  - **When** the user hovers anywhere inside the shell that is not
+    the send button (the padding around the textarea, the visible
+    whitespace alongside a short single-line value),
+  - **Then** the cursor is rendered as a text caret (`cursor: text`),
+    signalling that the whole shell is a typing target.
+  - **When** the user clicks anywhere inside the shell that is not
+    the send button,
+  - **Then** the underlying `<textarea>` receives focus so typing
+    starts immediately without a second click.
+  - The send button keeps its own `cursor: pointer` and does not
+    forward clicks to the textarea.
 
 ### 3.3 Expanded (Chat) Mode
 
@@ -612,6 +650,26 @@ Maps to Figma node `143:753`.
     Q+A pair to the existing history (it does not start a new
     conversation).
 
+- **AC-32** — *Input focus — retained after send in expanded mode* · **@aspirational**
+  - **Given** the widget is in expanded mode and the user submits a
+    message either by pressing `Enter` on the textarea or by
+    clicking the send button,
+  - **When** the Q+A pair is appended and the textarea is cleared
+    (per AC-29),
+  - **Then** keyboard focus is on the textarea so the user can keep
+    typing without a separate click. For the `Enter` path this is
+    the natural outcome of not moving focus; for the send-button
+    click path the widget must explicitly return focus to the
+    textarea after dispatch.
+  - **Given** the input is temporarily disabled while the assistant
+    answer is in flight (per AC-30),
+  - **Then** focus is **not** forced onto the disabled textarea; it
+    returns to the textarea on the same frame that AC-30 re-enables
+    the input, so the follow-up flow is uninterrupted.
+  - This AC applies to expanded mode only — in compact mode the
+    first send triggers the transition to expanded and AC-28 / AC-29
+    govern where the input lands.
+
 ### 3.4 Error Handling
 
 - **AC-40** — *Service rejection* · **@stable**
@@ -632,19 +690,80 @@ Maps to Figma node `143:753`.
     are never rendered in the UI (they may be logged to the console in
     dev builds only).
 
+- **AC-43** — *Network timeout* · **@evolving**
+  - **Given** a real `ChatService` adapter configured via `apiUrl`,
+  - **When** the backend does not respond within **30 seconds**,
+  - **Then** the in-flight request is aborted and the corresponding
+    Q+A pair enters the error state per AC-40 with a user-safe
+    Finnish string (AC-44). The widget remains fully interactive per
+    AC-41, and the aborted request MUST NOT continue to mutate state
+    if it resolves after the timeout.
+
+- **AC-44** — *Safe error mapping for real backend* · **@evolving**
+  - **Given** the real `ChatService` adapter receives a non-2xx
+    response, a network failure, a non-JSON body, or a schema it
+    cannot parse,
+  - **Then** it rejects with a short, user-safe Finnish string (e.g.
+    *"Pahoittelut, en pysty juuri nyt hakemaan vastausta. Yritä
+    hetken kuluttua uudelleen."*) that AC-40 renders via
+    `role="alert"`.
+  - **Then** HTTP status codes, backend URLs, response bodies,
+    function keys, and stack traces MUST NOT appear in the DOM or in
+    the production console (per AC-42). Dev-build console logging of
+    raw errors is permitted for debugging.
+
 ### 3.5 Chat Service Contract
 
-- **AC-50** — *Interface stability* · **@stable**
+- **AC-50** — *Interface stability — components are transport-agnostic* · **@stable**
   - **Given** the `ChatService` interface in `src/types/index.ts`,
-  - **Then** swapping `src/services/chatService.ts` for a real API
-    client requires **no** changes to `App.tsx`, `ExpandedView.tsx`, or
-    the `ChatMessage` component.
+  - **Then** only `App.tsx` (the composition root) imports a concrete
+    `ChatService` implementation. `ExpandedView.tsx`, `ChatMessage`,
+    `CompactView`, and `ChatInput` MUST NOT import from
+    `src/services/**` directly.
+  - **Then** swapping one `ChatService` implementation for another
+    requires no changes outside `src/services/**`, `src/widget.tsx`
+    (composition wiring), and — if the interface itself changes —
+    `src/types/index.ts` plus an AC amendment here.
 
 - **AC-51** — *Mock fidelity* · **@stable**
-  - **Given** the default mock service is used,
-  - **Then** it resolves after ~800ms with a canned Finnish answer and
-    two source references (enough to demo the full UI without a
-    backend).
+  - **Given** the default mock service is used (no `apiUrl` passed
+    to `init()`),
+  - **Then** it resolves after ~800ms with a canned Finnish answer
+    and two source references (enough to demo the full UI without a
+    backend), and accepts the same `ChatTurn[]` history argument as
+    the real adapter so the two are drop-in interchangeable.
+
+- **AC-52** — *Threaded conversation — full history posted per request* · **@evolving**
+  - **Given** the user has had N prior successful turns in the
+    current tab session,
+  - **When** they send turn N+1,
+  - **Then** `ChatService.sendMessage` receives the chronological
+    `ChatTurn[]` `[userTurn₁, assistantTurn₁, …, userTurnₙ,
+    assistantTurnₙ, userTurnₙ₊₁]` and the real adapter posts it as
+    `{ messages: [{ role: "user" | "assistant", content: string }, …] }`
+    to `apiUrl`.
+  - **Then** turns that are still loading or that errored (per
+    AC-40) MUST be excluded from the posted history — only
+    successfully-completed turns, plus the new user message, are
+    sent.
+  - **Then** history is kept in React state only; it is not
+    persisted across reloads (AC-31c still holds) and is not
+    exposed on `window`.
+
+- **AC-53** — *Real-backend adapter — response mapping and forward-compatible schema* · **@evolving**
+  - **Given** the backend returns `{ "response": "…answer text…" }`
+    with HTTP 200,
+  - **Then** the adapter maps it to a `ChatMessage` with a
+    client-generated `id`, the `question` that was sent, `answer`
+    taken verbatim from `response` (plain text, paragraph breaks
+    via `\n`, never parsed as Markdown or HTML per AC-N1), and no
+    `sources` field.
+  - **Given** the backend later adds extra fields (e.g. `sources:
+    [{ label, href? }]`, `timestamp`, `conversationId`),
+  - **Then** the adapter MUST ignore unknown fields it does not yet
+    support and MUST surface `sources` when the field is present
+    and conforms to the `Source[]` shape, without requiring a new
+    release cycle for the bare mapping to keep working.
 
 ---
 

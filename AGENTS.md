@@ -95,7 +95,8 @@ All tokens live in `src/styles/variables.css` as CSS custom properties. These va
 | `src/components/ChatMessage.tsx` | Single Q&A pair with optional sources and loading state |
 | `src/components/SourceBadge.tsx` | Reference pill (link or static) |
 | `src/components/SuggestionChip.tsx` | Predefined question chip |
-| `src/services/chatService.ts` | **MOCK** chat service — replace with real API |
+| `src/services/chatService.ts` | **MOCK** chat service — used when `WidgetOptions.apiUrl` is omitted (dev default) |
+| `src/services/apiChatService.ts` | Real `ChatService` adapter — posts `{ messages }` to `WidgetOptions.apiUrl`, maps `{ response }` back into a `ChatMessage`, handles timeout + error mapping (AC-43 / AC-44 / AC-52 / AC-53) |
 | `src/types/index.ts` | TypeScript interfaces (ChatMessage, Source, ChatService, WidgetOptions) |
 | `src/styles/variables.css` | CSS custom properties (design tokens) |
 | `src/styles/*.module.css` | Component-scoped CSS modules |
@@ -142,19 +143,26 @@ npm run build
 <div id="siili-chatbot"></div>
 <link rel="stylesheet" href="siili-chatbot.css" />
 <script src="siili-chatbot.iife.js"></script>
-<script>SiiliChatbot.init({ container: '#siili-chatbot' });</script>
+<script>
+  SiiliChatbot.init({
+    container: '#siili-chatbot',
+    apiUrl: 'https://.../api/chat', // optional; omit to use the mock
+  });
+</script>
 ```
 
-### How to swap the mock for a real API
+### How to point the widget at the real backend
 
-1. Create `src/services/apiChatService.ts`
-2. Implement the `ChatService` interface from `src/types/index.ts`
-3. Your `sendMessage(message: string)` must return a `Promise<ChatMessage>`
-4. Update the import in `src/App.tsx`:
-   ```typescript
-   import { sendMessage } from './services/apiChatService.ts'
-   ```
-5. For streaming responses, extend `ChatService` with a streaming method and update `ExpandedView` to handle partial content
+The real `ChatService` adapter already ships with the widget (`src/services/apiChatService.ts`). You don't need to swap files — just pass `apiUrl` at `init()` time (AC-04).
+
+- **Production**: host page calls `SiiliChatbot.init({ container, apiUrl })` with the backend URL. Function keys or query-string tokens end up in the host page's script tag, not in the widget bundle, so they can be rotated without a re-release.
+- **Dev**: copy the URL into `.env.local` as `VITE_API_URL=…` (git-ignored via `*.local`) and run `npm run dev`. `src/main.tsx` reads it and forwards it to `init()`. Leave the var unset to iterate against the bundled mock.
+- **CORS**: the backend must allowlist the host origin plus `http://localhost:5173` for dev. The widget never falls back to a proxy.
+- **History**: per AC-52, every call posts the full successful-turn history as `{ messages: [{ role: "user" | "assistant", content: string }, …] }`. Loading placeholders and errored pairs are filtered out by `App.tsx`.
+- **Response shape**: the adapter expects `{ response: string }` (plain text per AC-N1). Unknown fields are ignored; if the backend adds `sources: [{ label, href? }]` later, the adapter already picks them up with no code change (AC-53).
+- **Error / timeout**: non-2xx responses, network failures, and requests past 30 s are mapped to a user-safe Finnish string (AC-43 / AC-44). Raw errors are logged to the console only in dev builds.
+
+If you need a different adapter (e.g. streaming), implement the `ChatService` interface in a new file and have `src/widget.tsx::resolveService` pick it. The interface signature (`sendMessage(history: ChatTurn[])`) is the contract; changing it requires an AC amendment first (AC-50).
 
 ### How to add or update design tokens
 
@@ -235,7 +243,8 @@ When you add a new component (see **How to add a new component** above), extend 
 
 ## Known Gaps / TODOs
 
-- [ ] **Real backend integration** — `chatService.ts` is a mock; needs real API implementation
+- [x] **Real backend integration** — `apiChatService.ts` adapter is wired. The host page picks it up by passing `apiUrl` to `init()`; the mock remains the default when `apiUrl` is omitted.
+- [ ] **Source references from real backend** — current backend response is `{ response }` only. The adapter already reads `sources` forward-compatibly; the backend needs to start returning them.
 - [ ] **Code Connect mappings** — runbook is ready (see **Code Connect** section), blocked on Figma plan upgrade (Pro → Organization/Enterprise) and a Dev seat
 - [ ] **Everett font loading** — assumes host page loads the font; may need `@font-face` fallback
 - [ ] **Streaming responses** — current interface is request/response; add SSE/WebSocket support

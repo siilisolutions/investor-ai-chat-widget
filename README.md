@@ -35,9 +35,16 @@ Produces `dist/siili-chatbot.iife.js` and `dist/siili-chatbot.css`.
 <link rel="stylesheet" href="path/to/siili-chatbot.css" />
 <script src="path/to/siili-chatbot.iife.js"></script>
 <script>
-  SiiliChatbot.init({ container: '#siili-chatbot' });
+  SiiliChatbot.init({
+    container: '#siili-chatbot',
+    apiUrl: 'https://.../api/chat',
+  });
 </script>
 ```
+
+`apiUrl` is optional — if omitted the widget runs against the bundled mock so local demos work offline. In production, set it to the chatbot backend endpoint.
+
+For local development against the real backend, copy the endpoint into `.env.local` as `VITE_API_URL=…` (the file is git-ignored) and run `npm run dev`.
 
 ## Widget Modes
 
