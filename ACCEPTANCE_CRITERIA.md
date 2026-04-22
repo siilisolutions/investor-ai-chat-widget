@@ -100,12 +100,12 @@ directly.
 | AC-16 | Send-button enablement | [§3.2](#32-compact-hero-mode) | active | @stable | Automated: `npm run test -- tests/compactView.test.tsx` (disabled / enabled state by textarea content); Visual: see §2.5 row AC-16 for Active gradient |
 | AC-17 | Input shell — click-to-focus target with text cursor | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: hover the input shell padding (both variants) — cursor is text caret; click the padding — textarea receives focus (aspirational) |
 | AC-20 | Transition — no flicker | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: compact → expanded transition — no unstyled flash or empty intermediate frame |
-| AC-20a | Fill the viewport | [§3.3](#33-expanded-chat-mode) | active | @evolving | Manual: enter expanded — surface fills `100vw × 100vh` with solid `--white-500` |
-| AC-20b | Hero image hidden | [§3.3](#33-expanded-chat-mode) | active | @evolving | Manual: enter expanded — host hero image not visible behind widget |
+| AC-20a | Fill the viewport | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: enter expanded — surface fills `100vw × 100vh` with solid `--white-500` |
+| AC-20b | Hero image hidden | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: enter expanded — host hero image not visible behind widget |
 | AC-20c | Back navigation — history entry pushed on expand | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: DevTools History — single entry pushed on compact → expanded (aspirational) |
 | AC-20d | Close button — rendering | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Visual: expanded view has `×` button top-right, 44×44px hit target, `aria-label="Sulje keskustelu"` (aspirational) |
 | AC-20e | Transition — first Q+A pair visible immediately | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: first expanded frame already shows question + loading blob (no deferred mount) |
-| AC-20f | Transition — no host-page scroll or reflow | [§3.3](#33-expanded-chat-mode) | active | @evolving | Manual: scroll host page mid-height, enter expanded — host scroll / layout preserved |
+| AC-20f | Transition — no host-page scroll or reflow | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: scroll host page mid-height, enter expanded — host scroll / layout preserved |
 | AC-20g | Back navigation — popstate returns to compact | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: expanded → browser back — returns to compact with messages retained (aspirational) |
 | AC-20h | Back navigation — compact-mode back is not intercepted | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: compact → browser back — host navigation fires normally (aspirational) |
 | AC-20i | Back navigation — opt-out via `interceptBackNavigation: false` | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: init with `interceptBackNavigation: false` — no `pushState`/`popstate` handling (aspirational) |
@@ -121,9 +121,9 @@ directly.
 | AC-25c | Source references — unlinked badge is static | [§3.3](#33-expanded-chat-mode) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (unlinked source renders as `<span>`, never as a link) |
 | AC-26 | No-sources case | [§3.3](#33-expanded-chat-mode) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (empty and undefined `sources` both suppress the "Lähteet:" section) |
 | AC-27 | Auto-scroll to newest | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: append several Q+A pairs — newest smoothly scrolls into view |
-| AC-28 | Input positioned below the latest reply | [§3.3](#33-expanded-chat-mode) | active | @evolving | Visual: see §2.5 row AC-28 — input in document flow below latest reply with `--textarea-shadow` |
-| AC-28b | Input placement — short conversations are not bottom-pinned | [§3.3](#33-expanded-chat-mode) | active | @evolving | Manual: short convo — input sits directly below latest reply, no empty space above |
-| AC-28c | Input placement — long conversations keep latest reply and input visible | [§3.3](#33-expanded-chat-mode) | active | @evolving | Manual: long convo — latest reply + input both visible after auto-scroll |
+| AC-28 | Input positioned below the latest reply | [§3.3](#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-28 — input in document flow below latest reply with `--textarea-shadow` |
+| AC-28b | Input placement — short conversations are not bottom-pinned | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: short convo — input sits directly below latest reply, no empty space above |
+| AC-28c | Input placement — long conversations keep latest reply and input visible | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: long convo — latest reply + input both visible after auto-scroll |
 | AC-29 | Follow-up questions | [§3.3](#33-expanded-chat-mode) | active | @stable | Automated: `npm run test -- tests/app.test.tsx` (second send appends a new pair while the first remains intact) |
 | AC-30 | Input disabled during load | [§3.3](#33-expanded-chat-mode) | active | @stable | Automated: `npm run test -- tests/app.test.tsx` (textarea + send button both `disabled` until the in-flight promise resolves) |
 | AC-31 | Dismissal retains messages | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: dismiss expanded via `×` / `Esc` / back — compact re-renders, `messages` retained (aspirational) |
@@ -304,7 +304,7 @@ PR.
 | AC-12b  | `ds:152:86`                                   | Suggestion chip labels — single-line (nowrap)    | 2026-04-20   | inherits AC-12 sweep (GOV-05 split); IDs refreshed 2026-04-22 |
 | AC-16   | `ds:152:129`                                  | Send button — Active (gradient)                  | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
 | AC-20   | `site:143:601`                                | Expanded view mount / first-frame layout         | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
-| AC-20a  | `site:143:601`                                | Expanded surface fills viewport                  | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
+| AC-20a  | `site:143:601`                                | Expanded surface fills viewport                  | 2026-04-22   | Lane C graduation — expanded surface is `position: fixed; inset: 0` with opaque `--white-500`; dev-harness title bounding box at (48, 64) confirms fixed full-viewport with token padding |
 | AC-20d  | `site:143:601`                                | Close (×) button styling & placement             | 2026-04-20   | seed sweep (no Figma node — AC extension); IDs refreshed 2026-04-22 |
 | AC-20e  | `site:143:601`, `ds:152:116`                  | First Q+A pair visible on first expanded frame   | 2026-04-20   | inherits AC-20 sweep (GOV-05 split); IDs refreshed 2026-04-22 |
 | AC-21   | `ds:152:97`                                   | Expanded header ("Siili AI-avustaja")            | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
@@ -314,9 +314,9 @@ PR.
 | AC-25   | `ds:152:135`                                  | Source reference badge                           | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
 | AC-25b  | `ds:152:135`                                  | Source reference — linked (opens in new tab)     | 2026-04-20   | inherits AC-25 sweep (GOV-05 split); IDs refreshed 2026-04-22 |
 | AC-25c  | `ds:152:135`                                  | Source reference — static unlinked badge         | 2026-04-20   | inherits AC-25 sweep (GOV-05 split); IDs refreshed 2026-04-22 |
-| AC-28   | `site:143:601`, `ds:152:121`                  | ChatInput placement + textarea shadow            | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
-| AC-28b  | `site:143:601`, `ds:152:121`                  | ChatInput — short conversation, not bottom-pinned| 2026-04-20   | inherits AC-28 sweep (GOV-05 split); IDs refreshed 2026-04-22 |
-| AC-28c  | `site:143:601`, `ds:152:121`                  | ChatInput — long conversation, reply+input visible| 2026-04-20  | inherits AC-28 sweep (GOV-05 split); IDs refreshed 2026-04-22 |
+| AC-28   | `site:143:601`, `ds:152:121`                  | ChatInput placement + textarea shadow            | 2026-04-22   | Lane C graduation — input is the last flex child of `.expanded` (in document flow) with `--textarea-shadow` via `.shellExpanded`; textarea y grows with conversation (319px → 479px → 847px) confirming flow placement |
+| AC-28b  | `site:143:601`, `ds:152:121`                  | ChatInput — short conversation, not bottom-pinned| 2026-04-22   | Lane C graduation — 1-pair convo: textarea at y=319 in ~900px viewport, sits directly below latest reply without bottom-pin |
+| AC-28c  | `site:143:601`, `ds:152:121`                  | ChatInput — long conversation, reply+input visible| 2026-04-22  | Lane C graduation — auto-scroll target moved to inputWrapper; `.expanded` scrolls internally via `overflow-y: auto`; 4-pair convo places textarea near viewport bottom with latest reply directly above |
 | AC-72   | `ds:152:129`, `ds:152:131`, `ds:152:133`      | Send button Active / Hover / Pressed             | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
 | AC-73   | — (code-authored)                             | Typography — Everett weights (via `--font-family*` tokens) | 2026-04-20   | seed sweep (watching for typography node) |
 | AC-73b  | — (code-authored)                             | Typography — sans-serif fallback, no large CLS   | 2026-04-20   | inherits AC-73 sweep (GOV-05 split) |
@@ -500,7 +500,7 @@ Maps to the Investor agent composition and its main component; see
     and the assistant answer in loading state (no blank list, no
     deferred mount).
 
-- **AC-20a** — *Fill the viewport* · **@evolving**
+- **AC-20a** — *Fill the viewport* · **@stable**
   - **Given** the widget has entered expanded mode,
   - **Then** the chat surface fills the entire browser viewport
     (100vw × 100vh from the widget's root container), with an
@@ -509,14 +509,14 @@ Maps to the Investor agent composition and its main component; see
   - **Then** no host-page content behind the widget is visible through
     it (no translucency, no gaps at the edges).
 
-- **AC-20b** — *Hero image hidden* · **@evolving**
+- **AC-20b** — *Hero image hidden* · **@stable**
   - **Given** the widget is in expanded mode,
   - **Then** the hero image / hero section that was visible behind the
     compact view is no longer visible to the user — either because
     the widget's opaque surface fully covers it, or because the host
     page's hero is hidden/collapsed while the widget is expanded.
 
-- **AC-20f** — *Transition — no host-page scroll or reflow* · **@evolving**
+- **AC-20f** — *Transition — no host-page scroll or reflow* · **@stable**
   - **Given** the widget is transitioning from compact to expanded
     mode,
   - **Then** the host page underneath does not scroll or reflow
@@ -626,21 +626,21 @@ Maps to the Investor agent composition and its main component; see
   - **Then** the messages container smoothly scrolls the newest pair
     into view.
 
-- **AC-28** — *Input positioned below the latest reply* · **@evolving**
+- **AC-28** — *Input positioned below the latest reply* · **@stable**
   - **Given** expanded mode is shown,
   - **Then** the `ChatInput` is rendered immediately underneath the
     most recent assistant reply (or its loading blob), in document
     flow, matching the textarea placement in the Investor agent
     composition (see §2.5 row AC-28).
 
-- **AC-28b** — *Input placement — short conversations are not bottom-pinned* · **@evolving**
+- **AC-28b** — *Input placement — short conversations are not bottom-pinned* · **@stable**
   - **Given** the conversation is short enough that all Q+A pairs fit
     in the viewport,
   - **Then** the input sits directly below the latest reply — it is
     **not** pinned to the bottom of the viewport with empty space
     above it.
 
-- **AC-28c** — *Input placement — long conversations keep latest reply and input visible* · **@evolving**
+- **AC-28c** — *Input placement — long conversations keep latest reply and input visible* · **@stable**
   - **Given** the conversation is long enough to scroll,
   - **Then** after the auto-scroll in AC-27, the latest reply and the
     input beneath it are both visible together, with the input at or

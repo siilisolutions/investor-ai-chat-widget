@@ -1,12 +1,14 @@
 .expanded {
+  position: fixed;
+  inset: 0;
+  z-index: var(--expanded-z, 2147483000);
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-2xl);
   padding: var(--space-3xl) var(--space-2xl);
   background: var(--white-500);
-  width: 100%;
-  min-height: 100vh;
   box-sizing: border-box;
 }
 
@@ -19,6 +21,7 @@
   width: 100%;
   margin: 0;
   max-width: var(--content-width);
+  flex-shrink: 0;
 }
 
 .messages {
@@ -28,9 +31,11 @@
   gap: var(--space-3xl);
   width: var(--content-width);
   max-width: 100%;
+  flex-shrink: 0;
 }
 
 .inputWrapper {
   width: var(--content-width);
   max-width: 100%;
+  flex-shrink: 0;
 }
