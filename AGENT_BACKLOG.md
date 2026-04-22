@@ -60,7 +60,7 @@ stay within the declared scope. When finished, update the task status to
 | GOV-10 | Adopt amendment-logging convention | XS | Medium | — | todo |
 | GOV-11 | Require PR descriptions list AC-IDs touched | S | Medium | GOV-09 | todo |
 | GOV-12 | Document immutable-ID + tombstone convention | XS | Medium | — | todo |
-| GOV-13 | Test-naming convention tied to AC intent | XS | Low | — | todo |
+| GOV-13 | Test-naming convention tied to AC intent | XS | Low | — | done |
 | GOV-14 | Delete-and-watch experiment on flagged rules | M | Low | GOV-09 | todo |
 | GOV-15 | Quarterly AC decay review (set up + first run) | XS/S | Low | GOV-03 | todo |
 | GOV-16 | Triage non-stable ACs into stabilisation-path buckets | S | High | GOV-03, GOV-07 | done |
@@ -404,10 +404,10 @@ Cheap forever-protection for historical commit references. Once adopted, commits
 
 ### GOV-13 — Test-naming convention tied to AC intent
 
-**Status:** todo · **Size:** XS · **Severity:** Low · **Depends on:** —
+**Status:** done · **Size:** XS · **Severity:** Low · **Depends on:** —
 
 **Why**
-Low urgency (project has ~no tests today), but writing the convention down now costs nothing and guarantees the discipline from the first test onward.
+Low urgency when first filed (project had ~no tests), but writing the convention down before the first test lands guarantees the discipline from turn one. Closed together with the Stage B Vitest rollout in `tests/` — every new test name quotes an AC-ID + intent (e.g. `AC-15: empty submit is a no-op`).
 
 **Scope**
 - Edit: `.cursor/rules/code-governance.mdc` only.
@@ -417,10 +417,8 @@ Low urgency (project has ~no tests today), but writing the convention down now c
 2. Explain briefly why: tests that describe implementation can be made to pass by matching buggy code; tests that describe intent fail when the code drifts from the spec.
 
 **Done when**
-- [ ] `code-governance.mdc` has a named subsection about test naming referencing AC intent.
-
-**Stop and ask if**
-- The rule file already has an incompatible test-naming convention. Don't override silently.
+- [x] `code-governance.mdc` has a named subsection about test naming referencing AC intent.
+- [x] First Vitest suite (`tests/chatMessage.test.tsx`, `tests/compactView.test.tsx`, `tests/apiChatService.test.ts`, `tests/app.test.tsx`) uses the convention end-to-end.
 
 ---
 

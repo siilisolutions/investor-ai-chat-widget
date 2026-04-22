@@ -7,8 +7,10 @@ alwaysApply: true
 
 After **non-trivial** changes (new behavior, UI, types, build config, or dependencies), run and report results:
 
-1. **`npm run lint`** — fix new issues in touched files.
-2. **`npm run build`** — must succeed. If `src/`, `vite.config.ts`, or dependencies changed, note **gzip** output for JS + CSS vs the **60 KB** combined budget in `AGENTS.md`.
+1. **`npm run verify`** — runs `npm run build` internally plus the `Automated:` AC guards from `ACCEPTANCE_CRITERIA.md` (AC-50 import boundary, AC-100 gzip budget, AC-N1 no `dangerouslySetInnerHTML`, AC-N2 no font binaries / `@font-face` in `dist/`, and the `'react'`-via-preact-compat import rule). The pre-commit hook runs the same script, so a green local run means a clean commit. If `src/`, `vite.config.ts`, or dependencies changed, note the **gzip** line it prints for JS + CSS vs the **60 KB** combined budget in `AGENTS.md`.
+2. **`npm run lint`** — covers the whole tree (lint-staged in the hook only covers *staged* files, so run this on any substantive change to catch new issues in untouched files).
 3. **UI smoke** (when the change affects components or styles): **`npm run dev`** and manually verify: compact hero → send or chip → expanded chat, loading state if applicable, no console errors on that path.
 
 If a step fails, fix or explain the blocker before treating the task as done. Skip steps that are clearly unrelated (e.g. typo-only doc outside runtime paths) but mention why.
+
+Note: `npm run verify` is invoked automatically by `.husky/pre-commit` on every commit, alongside `npx lint-staged`. See [`version-control.mdc`](version-control.mdc) for the hook contract and the `git commit --no-verify` escape hatch.

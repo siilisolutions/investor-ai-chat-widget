@@ -91,13 +91,13 @@ directly.
 | AC-10a | Continue-conversation pill — rendering | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: dev harness with seeded history — pill renders above chips (aspirational) |
 | AC-10b | Suggestion-chip de-duplication | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: ask a chip, re-enter compact — that chip is hidden, order preserved (aspirational) |
 | AC-10c | Continue-conversation pill — activation | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: activate pill — returns to expanded with history, no network call (aspirational) |
-| AC-11 | Placeholder copy | [§3.2](#32-compact-hero-mode) | active | @stable | Manual: `npm run dev` — textarea shows the AC placeholder copy in `--gray-900` |
+| AC-11 | Placeholder copy | [§3.2](#32-compact-hero-mode) | active | @stable | Automated: `npm run test -- tests/compactView.test.tsx` (exact Finnish placeholder string); Visual: Figma `146:1015` for `--gray-900` treatment |
 | AC-12 | Suggestion chip content | [§3.2](#32-compact-hero-mode) | active | @stable | Visual: see §2.5 row AC-12 — chip wording matches `src/App.tsx::SUGGESTIONS` |
 | AC-12b | Suggestion chip labels do not wrap | [§3.2](#32-compact-hero-mode) | active | @stable | Manual: shrink chip container — labels stay on one line (`white-space: nowrap`) |
-| AC-13 | Sending from the textarea | [§3.2](#32-compact-hero-mode) | active | @stable | Manual: type text + Enter (and send click) — transitions to expanded, textarea cleared |
-| AC-14 | Sending from a chip | [§3.2](#32-compact-hero-mode) | active | @stable | Manual: click a chip — widget transitions to expanded with the chip's label sent |
-| AC-15 | Empty-submit guard | [§3.2](#32-compact-hero-mode) | active | @stable | Manual: Enter / send click with empty or whitespace-only textarea — no transition |
-| AC-16 | Send-button enablement | [§3.2](#32-compact-hero-mode) | active | @stable | Visual: see §2.5 row AC-16 — disabled when empty, Active gradient when non-empty |
+| AC-13 | Sending from the textarea | [§3.2](#32-compact-hero-mode) | active | @stable | Automated: `npm run test -- tests/compactView.test.tsx` (Enter sends trimmed value and clears, Shift+Enter does not submit, send-button click submits) |
+| AC-14 | Sending from a chip | [§3.2](#32-compact-hero-mode) | active | @stable | Automated: `npm run test -- tests/compactView.test.tsx` (chip click fires `onSend` with label verbatim) |
+| AC-15 | Empty-submit guard | [§3.2](#32-compact-hero-mode) | active | @stable | Automated: `npm run test -- tests/compactView.test.tsx` (Enter on empty / whitespace-only textarea is a no-op; disabled send button swallows clicks) |
+| AC-16 | Send-button enablement | [§3.2](#32-compact-hero-mode) | active | @stable | Automated: `npm run test -- tests/compactView.test.tsx` (disabled / enabled state by textarea content); Visual: see §2.5 row AC-16 for Active gradient |
 | AC-17 | Input shell — click-to-focus target with text cursor | [§3.2](#32-compact-hero-mode) | active | @aspirational | Manual: hover the input shell padding (both variants) — cursor is text caret; click the padding — textarea receives focus (aspirational) |
 | AC-20 | Transition — no flicker | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: compact → expanded transition — no unstyled flash or empty intermediate frame |
 | AC-20a | Fill the viewport | [§3.3](#33-expanded-chat-mode) | active | @evolving | Manual: enter expanded — surface fills `100vw × 100vh` with solid `--white-500` |
@@ -112,34 +112,34 @@ directly.
 | AC-20j | Close button — activation dismisses expanded mode | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: `×` or `Esc` dismisses expanded — messages retained, `history.back()` called when intercepting (aspirational) |
 | AC-20k | Close button — reduced motion | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: DevTools emulate reduce-motion — dismiss transition is instant (aspirational) |
 | AC-21 | Header | [§3.3](#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-21 — header reads "Siili AI-avustaja" in Everett |
-| AC-22 | Question bubble | [§3.3](#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-22 — right-aligned `--gray-500` bubble with `--radius` corners |
-| AC-23 | Loading indicator — semantics and copy | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: inspect in-flight pair — blob + "Haetaan tietoa..." with `role="status"` and `aria-live="polite"` |
+| AC-22 | Question bubble | [§3.3](#33-expanded-chat-mode) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (question text renders verbatim); Visual: see §2.5 row AC-22 for bubble styling |
+| AC-23 | Loading indicator — semantics and copy | [§3.3](#33-expanded-chat-mode) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (`role="status"`, `aria-live="polite"`, "Haetaan tietoa..." copy, answer + sources hidden while loading) |
 | AC-23b | Loading indicator — blob visual style | [§3.3](#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-23b — soft rounded gray blob, scale/opacity pulse |
-| AC-24 | Answer rendering | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: resolved answer replaces blob, paragraph breaks preserved |
-| AC-25 | Source references — section rendered | [§3.3](#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-25 — "Lähteet:" section with one `SourceBadge` per source |
-| AC-25b | Source references — linked badge opens in new tab | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: click linked badge — opens new tab (`target="_blank"`, `rel="noopener noreferrer"`) |
-| AC-25c | Source references — unlinked badge is static | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: unlinked badge — no hover, no underline, non-interactive |
-| AC-26 | No-sources case | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: zero-source answer (edit mock) — "Lähteet:" section not rendered at all |
+| AC-24 | Answer rendering | [§3.3](#33-expanded-chat-mode) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (resolved answer renders as plain text in a paragraph) |
+| AC-25 | Source references — section rendered | [§3.3](#33-expanded-chat-mode) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` ("Lähteet:" section + one badge per source); Visual: see §2.5 row AC-25 for pill styling |
+| AC-25b | Source references — linked badge opens in new tab | [§3.3](#33-expanded-chat-mode) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (linked badge has `href`, `target="_blank"`, `rel="noopener noreferrer"`) |
+| AC-25c | Source references — unlinked badge is static | [§3.3](#33-expanded-chat-mode) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (unlinked source renders as `<span>`, never as a link) |
+| AC-26 | No-sources case | [§3.3](#33-expanded-chat-mode) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (empty and undefined `sources` both suppress the "Lähteet:" section) |
 | AC-27 | Auto-scroll to newest | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: append several Q+A pairs — newest smoothly scrolls into view |
 | AC-28 | Input positioned below the latest reply | [§3.3](#33-expanded-chat-mode) | active | @evolving | Visual: see §2.5 row AC-28 — input in document flow below latest reply with `--textarea-shadow` |
 | AC-28b | Input placement — short conversations are not bottom-pinned | [§3.3](#33-expanded-chat-mode) | active | @evolving | Manual: short convo — input sits directly below latest reply, no empty space above |
 | AC-28c | Input placement — long conversations keep latest reply and input visible | [§3.3](#33-expanded-chat-mode) | active | @evolving | Manual: long convo — latest reply + input both visible after auto-scroll |
-| AC-29 | Follow-up questions | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: send follow-up — new Q+A appended, prior pairs unchanged, input cleared |
-| AC-30 | Input disabled during load | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: during in-flight answer — textarea + send button visibly greyed and non-interactive |
+| AC-29 | Follow-up questions | [§3.3](#33-expanded-chat-mode) | active | @stable | Automated: `npm run test -- tests/app.test.tsx` (second send appends a new pair while the first remains intact) |
+| AC-30 | Input disabled during load | [§3.3](#33-expanded-chat-mode) | active | @stable | Automated: `npm run test -- tests/app.test.tsx` (textarea + send button both `disabled` until the in-flight promise resolves) |
 | AC-31 | Dismissal retains messages | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: dismiss expanded via `×` / `Esc` / back — compact re-renders, `messages` retained (aspirational) |
 | AC-31b | Compact re-entry surfaces continue-pill and hides asked chips | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: compact re-entry with history — continue pill visible, asked chips hidden (aspirational) |
 | AC-31c | Reload or navigation clears history | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: reload page mid-convo — `messages` cleared, compact shows no pill (aspirational) |
 | AC-31d | New message from compact with history appends | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: send new message from compact with history — expanded appends, does not reset (aspirational) |
 | AC-32 | Input focus — retained after send in expanded mode | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: send via Enter and via send-button click in expanded — focus is on the textarea after the pair renders and once the input re-enables (aspirational) |
-| AC-40 | Service rejection | [§3.4](#34-error-handling) | active | @stable | Manual: force mock rejection — error pair renders with `role="alert"`, no blob, no sources |
+| AC-40 | Service rejection | [§3.4](#34-error-handling) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (error pair renders `role="alert"` with the error text; no `role="status"` blob and no "Lähteet:" section) |
 | AC-41 | No crash on error | [§3.4](#34-error-handling) | active | @stable | Manual: after forced error — user can still type + send new messages; error scoped to one pair |
 | AC-42 | No developer leakage | [§3.4](#34-error-handling) | active | @evolving | Manual: throw inside mock with a stack trace — UI shows only safe copy; inspect DOM + console of prod build |
-| AC-43 | Network timeout | [§3.4](#34-error-handling) | active | @evolving | Manual: point `apiUrl` at an endpoint that never responds — failed pair renders within the §12.1 PD-04 timeout with safe copy, widget stays interactive |
-| AC-44 | Safe error mapping for real backend | [§3.4](#34-error-handling) | active | @evolving | Manual: force the real backend to return 500 / 404 / network error — UI shows the Finnish fallback string; no status codes, URLs, or payload bodies leak into the DOM |
-| AC-50 | Interface stability — components are transport-agnostic | [§3.5](#35-chat-service-contract) | active | @stable | Automated: `npm run build` — TypeScript enforces the `ChatService` surface; only `App.tsx` imports it, `ExpandedView.tsx` / `ChatMessage` / `CompactView` do not |
+| AC-43 | Network timeout | [§3.4](#34-error-handling) | active | @evolving | Automated: `npm run test -- tests/apiChatService.test.ts` (30 s `AbortController` rejection maps to the SAFE_ERROR string) |
+| AC-44 | Safe error mapping for real backend | [§3.4](#34-error-handling) | active | @evolving | Automated: `npm run test -- tests/apiChatService.test.ts` (non-2xx, network, non-JSON, missing `response`, non-string `response` all reject with the Finnish fallback string; no status codes or payload bodies leaked) |
+| AC-50 | Interface stability — components are transport-agnostic | [§3.5](#35-chat-service-contract) | active | @stable | Automated: `npm run verify` — TypeScript build enforces the `ChatService` surface and the grep guard rejects any `src/components/**` import from `src/services/**` |
 | AC-51 | Mock fidelity | [§3.5](#35-chat-service-contract) | active | @stable | Manual: `npm run dev` without `VITE_API_URL` — mock resolves per §12.1 PD-02 with a Finnish answer and source count per §12.1 PD-03 |
-| AC-52 | Threaded conversation — full history posted per request | [§3.5](#35-chat-service-contract) | active | @evolving | Manual: send two turns against the real backend — second request's JSON body is `{ messages: [{role:"user",…},{role:"assistant",…},{role:"user",…}] }` in chronological order |
-| AC-53 | Real-backend adapter — response mapping and forward-compatible schema | [§3.5](#35-chat-service-contract) | active | @evolving | Manual: backend returns `{ response: "…" }` — widget renders the answer; adapter ignores unknown fields and surfaces `sources` if/when the backend adds them |
+| AC-52 | Threaded conversation — full history posted per request | [§3.5](#35-chat-service-contract) | active | @evolving | Automated: `npm run test -- tests/apiChatService.test.ts` (POST body is `{ messages: ChatTurn[] }` in chronological order) and `npm run test -- tests/app.test.tsx` (`buildHistory` drops loading / errored / empty-answer turns) |
+| AC-53 | Real-backend adapter — response mapping and forward-compatible schema | [§3.5](#35-chat-service-contract) | active | @evolving | Automated: `npm run test -- tests/apiChatService.test.ts` (`{ response }` → `ChatMessage`, unknown fields ignored, `sources` forward-compatibly surfaced, malformed source entries dropped) |
 | AC-60 | Every factual claim is sourced | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational | none (aspirational — backend-scoped, not frontend-verifiable) |
 | AC-61 | No forward-looking statements or advice | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational | none (aspirational — backend-scoped, not frontend-verifiable) |
 | AC-62 | No insider or unpublished information | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational | none (aspirational — backend-scoped, not frontend-verifiable) |
@@ -157,8 +157,8 @@ directly.
 | AC-80 | Keyboard-only operation | [§6](#6-accessibility) | active | @evolving | Manual: Tab through widget — focus order textarea → send → chips / badges, visible focus ring |
 | AC-81 | Screen-reader labelling — textarea | [§6](#6-accessibility) | active | @evolving | Manual: DevTools Accessibility panel — textarea announces configured `aria-label` |
 | AC-81b | Screen-reader labelling — send button | [§6](#6-accessibility) | active | @evolving | Manual: DevTools Accessibility panel — send button announces "Send message" (or localised equivalent) |
-| AC-81c | Screen-reader labelling — loading state | [§6](#6-accessibility) | active | @evolving | Manual: inspect loading node — `role="status"` + `aria-live="polite"`, content "Haetaan tietoa..." |
-| AC-81d | Screen-reader labelling — errors | [§6](#6-accessibility) | active | @evolving | Manual: trigger error path — error text announced via `role="alert"` |
+| AC-81c | Screen-reader labelling — loading state | [§6](#6-accessibility) | active | @evolving | Automated: `npm run test -- tests/chatMessage.test.tsx` (`role="status"` + `aria-live="polite"` + "Haetaan tietoa..." copy) |
+| AC-81d | Screen-reader labelling — errors | [§6](#6-accessibility) | active | @evolving | Automated: `npm run test -- tests/chatMessage.test.tsx` (error text announced via `role="alert"`) |
 | AC-82 | WCAG 2.1 AA contrast | [§6](#6-accessibility) | active | @evolving | Manual: axe DevTools contrast scan over token pairs — ≥4.5:1 body, ≥3:1 large / non-text |
 | AC-83 | Reduced motion | [§6](#6-accessibility) | active | @aspirational | Manual: DevTools emulate reduce-motion — transitions, auto-scroll, blob pulse reduced or static (aspirational) |
 | AC-84 | Zoom and reflow | [§6](#6-accessibility) | active | @evolving | Manual: browser zoom to 200% — no widget content clipped, no horizontal scroll inside container |
@@ -168,7 +168,7 @@ directly.
 | AC-92b | Mobile (<640px) — chips scroll or wrap without overflow | [§7](#7-responsiveness) | active | @evolving | Manual: viewport below the §12.1 PD-05 mobile breakpoint — chips wrap or scroll horizontally without overflowing viewport width |
 | AC-92c | Mobile (<640px) — expanded view full width with Figma padding | [§7](#7-responsiveness) | active | @evolving | Manual: viewport below the §12.1 PD-05 mobile breakpoint in expanded — 100% container width with Figma-consistent padding |
 | AC-93 | Textarea auto-grow | [§7](#7-responsiveness) | active | @stable | Manual: paste multi-line content — textarea grows to the §12.1 PD-06 cap then scrolls internally; send button stays visible |
-| AC-100 | Bundle budget | [§8](#8-performance) | active | @stable | Automated: `npm run build` — combined gzip `siili-chatbot.iife.js` + `siili-chatbot.css` ≤ 60 KB |
+| AC-100 | Bundle budget | [§8](#8-performance) | active | @stable | Automated: `npm run verify` — parses `vite build` gzip output and fails if combined `siili-chatbot.iife.js` + `siili-chatbot.css` exceed 60 KB |
 | AC-101 | Cold-start render | [§8](#8-performance) | active | @evolving | Manual: DevTools 4× CPU throttle — compact interactive ≤150ms after script load completes |
 | AC-102 | No host-page regression | [§8](#8-performance) | active | @aspirational | none (aspirational — Lighthouse on embedded host page not yet measured) |
 | AC-103 | No layout thrash | [§8](#8-performance) | active | @evolving | Manual: DevTools Performance panel — widget-attributed CLS ≤0.05 across a full session |
@@ -179,8 +179,8 @@ directly.
 | AC-120b | Event emission — no PII in payloads | [§10](#10-observability-light-touch-frontend-only) | active | @aspirational | none (aspirational — event emission not yet implemented) |
 | AC-120c | Event emission — `chat_closed` payload | [§10](#10-observability-light-touch-frontend-only) | active | @aspirational | none (aspirational — event emission not yet implemented) |
 | AC-121 | No uncontrolled network calls | [§10](#10-observability-light-touch-frontend-only) | active | @stable | Manual: DevTools Network — no calls beyond the configured `ChatService` endpoint and host-declared fonts/CSS |
-| AC-N1 | MUST NOT render backend-provided HTML or Markdown | [§12](#12-non-goals--explicit-non-requirements) | active | @stable | Automated: `rg "dangerouslySetInnerHTML" src/` returns no matches; Manual: send HTML-bearing mock response — chars render as text |
-| AC-N2 | MUST NOT bundle font files with the widget | [§12](#12-non-goals--explicit-non-requirements) | active | @stable | Automated: `npm run build` then inspect `dist/` for `.woff` / `.woff2` / `.ttf` / `.otf` / `.eot` and `@font-face` in CSS |
+| AC-N1 | MUST NOT render backend-provided HTML or Markdown | [§12](#12-non-goals--explicit-non-requirements) | active | @stable | Automated: `npm run verify` (grep guard — `dangerouslySetInnerHTML` forbidden in `src/`) + `npm run test -- tests/chatMessage.test.tsx` (HTML / Markdown in answers, source labels, and error messages all render as escaped text with no DOM injection) |
+| AC-N2 | MUST NOT bundle font files with the widget | [§12](#12-non-goals--explicit-non-requirements) | active | @stable | Automated: `npm run verify` — builds then scans `dist/` for `.woff` / `.woff2` / `.ttf` / `.otf` / `.eot` binaries and any `@font-face` in bundled CSS |
 
 ---
 

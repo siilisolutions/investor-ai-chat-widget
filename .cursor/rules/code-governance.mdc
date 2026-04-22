@@ -10,5 +10,25 @@ alwaysApply: true
 - **Inputs**: For `<input>` / `<textarea>`, use `onInput` (not `onChange`). Prefer `event.currentTarget` over `event.target` in handlers.
 - **Types**: Strict TypeScript; no `any`. Shared contracts live in `src/types/index.ts`.
 - **UI & styles**: Follow `AGENTS.md` and `.cursor/rules/project.mdc`: design tokens in `src/styles/variables.css`, CSS Modules per component, Figma-first for any visual change.
-- **Bundle (AC-100)**: After changes under `src/`, to dependencies, or `vite.config.ts`, run `npm run build` and confirm combined gzipped JS + CSS stays within the 60 KB budget documented in `AGENTS.md`.
-- **Lint**: Run `npm run lint` before opening a PR; fix new violations in files you touched.
+- **Bundle (AC-100)**: After changes under `src/`, to dependencies, or `vite.config.ts`, run `npm run verify` (builds + enforces AC-100 / AC-N2 / AC-50 / AC-N1 mechanically) and confirm the gzip total it prints stays within the 60 KB budget documented in `AGENTS.md`. The pre-commit hook runs the same script, so a clean local run means a clean commit.
+- **Lint**: `.husky/pre-commit` runs `npx lint-staged` (ESLint `--fix` on staged `.ts` / `.tsx`) automatically. Run `npm run lint` manually before opening a PR to cover unstaged files too; fix new violations in files you touched.
+
+## Test naming (GOV-13)
+
+When adding automated tests (Vitest suites live under `tests/`), the **test name must quote the AC's intent**, not the current implementation. Use the form `AC-xx: <intent>` — or `AC-xx + AC-yy: <intent>` when a single test covers several ACs.
+
+<good-example>
+```ts
+it('AC-15: empty submit is a no-op', () => { /* … */ })
+it('AC-25b: linked source badge opens in a new tab with rel="noopener noreferrer"', () => { /* … */ })
+```
+</good-example>
+
+<bad-example>
+```ts
+it('handleSubmit returns early on empty', () => { /* … */ })
+it('SourceBadge renders an anchor with target _blank', () => { /* … */ })
+```
+</bad-example>
+
+**Why:** tests that describe implementation can be made to pass by matching buggy code — rename the helper and the assertion keeps passing. Tests that describe AC intent fail when the code drifts from the spec, which is the whole point of binding tests to `AC-xx` in the first place (see [`sdd.mdc`](sdd.mdc) §Traceability).

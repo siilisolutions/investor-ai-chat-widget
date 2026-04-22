@@ -14,7 +14,8 @@
 import { useCallback, useState } from 'react'
 import { CompactView } from './components/CompactView.tsx'
 import { ExpandedView } from './components/ExpandedView.tsx'
-import type { ChatMessage, ChatService, ChatTurn } from './types/index.ts'
+import { buildHistory } from './chatHistory.ts'
+import type { ChatMessage, ChatService } from './types/index.ts'
 import styles from './styles/app.module.css'
 
 const SUGGESTIONS = [
@@ -30,23 +31,6 @@ const nextId = () => `msg-${++messageCounter}`
 
 interface AppProps {
   chatService: ChatService
-}
-
-// Per AC-52: only turns that completed successfully feed the backend's
-// history — loading placeholders and errored pairs are dropped so the
-// model sees a clean conversation.
-function buildHistory(
-  messages: ChatMessage[],
-  newQuestion: string
-): ChatTurn[] {
-  const turns: ChatTurn[] = []
-  for (const m of messages) {
-    if (m.loading || m.error || m.answer.length === 0) continue
-    turns.push({ role: 'user', content: m.question })
-    turns.push({ role: 'assistant', content: m.answer })
-  }
-  turns.push({ role: 'user', content: newQuestion })
-  return turns
 }
 
 export function App({ chatService }: AppProps) {
