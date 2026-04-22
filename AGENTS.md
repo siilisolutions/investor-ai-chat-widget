@@ -28,39 +28,60 @@ Host page (siili.com)
 
 > **IMPORTANT:** The Figma design file is the single source of truth for every visual decision — layout, spacing, colors, typography, component structure, and interactive states. When making any visual or styling change, **always consult Figma first** using the Figma MCP tools. Do not guess or rely solely on the token table below; extract the actual values from the design.
 
-### Figma file
+### Figma files
 
-https://www.figma.com/design/vxWJbloNkZ8Muf5qi14MOy/IR-site
+The design splits across two files. Know which one you need before calling any MCP tool.
+
+| File | `fileKey` | URL | Contains |
+|------|-----------|-----|----------|
+| **IR-site** | `0xXdKUlBJIolF15MjJuaMC` | https://www.figma.com/design/0xXdKUlBJIolF15MjJuaMC/IR-site | Screen-level layouts — the composite frames that place the widget inside the host site (hero page, AI-agent page, loading state). Instances here point at published components from IR-DS. |
+| **IR-DS** | `rlh00CEImhMWwdRNOUqW6L` | https://www.figma.com/design/rlh00CEImhMWwdRNOUqW6L/IR-DS | The design system / component library — main components (Textarea, Question+Answer, Reference tag, Send button variants, etc.), brand colors, and token palette. This is where Code Connect mappings live. |
+
+Rule of thumb: use **IR-DS** when working on a component in isolation (matching visuals, states, props, tokens) and **IR-site** when working on whole-screen composition (spacing between sections, scroll behaviour, relation to the surrounding host page).
 
 ### Key node IDs
 
+#### IR-site — screen frames (`fileKey = 0xXdKUlBJIolF15MjJuaMC`)
+
 | Node ID | Description |
 |---------|-------------|
-| `113:203` | Investor Hero (compact mode) |
-| `143:753` | Investor Agent (expanded mode) |
-| `201:2273` | Loading state |
-| `116:260` | Brand colors section |
-| `149:1410` | Send button — Active |
-| `149:1441` | Send button — Hover |
-| `150:396` | Send button — Pressed |
-| `146:1015` | Textarea component |
-| `147:1129` | Question + Answer pair |
-| `178:441` | Reference tag |
-| `178:482` | Loading spinner |
+| `13:527` | Etusivu — hero screen composition (compact mode in context) |
+| `143:601` | AI-agentti — expanded chat screen composition |
+| `201:2273` | AI-agentti, haetaan tietoa — loading-state screen composition |
+
+#### IR-DS — main components (`fileKey = rlh00CEImhMWwdRNOUqW6L`)
+
+| Node ID | Description | Maps to |
+|---------|-------------|---------|
+| `152:75` | Investor hero (component) | `src/components/CompactView.tsx` |
+| `152:97` | Investor agent (component) | `src/components/ExpandedView.tsx` |
+| `152:121` | Textarea | `src/components/ChatInput.tsx` |
+| `152:128` | Send button (with `Property 1` variants `Active` `152:129` / `Hover` `152:131` / `Pressed` `152:133`) | `src/components/ChatInput.tsx` (send button is part of ChatInput) |
+| `152:116` | Question + Answer pair | `src/components/ChatMessage.tsx` |
+| `152:111` | Question (sub-component of Q+A) | part of `ChatMessage.tsx` |
+| `152:114` | Answer (sub-component of Q+A) | part of `ChatMessage.tsx` |
+| `152:145` | References (sub-component of Q+A) | part of `ChatMessage.tsx` |
+| `152:135` | Reference tag | `src/components/SourceBadge.tsx` |
+| `152:137` | Loading spinner animation (variants `Start` `152:138` / `End` `152:140`) | part of `ChatMessage.tsx` (loading state) |
+| `152:142` | Loading information | part of `ChatMessage.tsx` (loading state) |
+| `152:86` | Predefined question (chip) | `src/components/SuggestionChip.tsx` |
+| `152:88` | Reset button | *(not implemented yet — backlog)* |
+| `1:2` | Siili Brand Colors swatches | — (reference for `src/styles/variables.css`) |
+| `152:92` / `152:104` | **Deprecated** "Send button - old" / "Textarea - old" | do not use — left in the file for context |
 
 ### How to use Figma MCP tools
 
 When you have access to the Figma MCP server (`user-figma`), use it to inspect designs:
 
-1. **`get_design_context`** — Primary tool. Pass the `fileKey` (`vxWJbloNkZ8Muf5qi14MOy`) and the relevant `nodeId` from the table above. Returns code hints, a screenshot, and contextual information.
+1. **`get_design_context`** — Primary tool. Pass the appropriate `fileKey` (IR-DS for component-level work, IR-site for screen composition) and the relevant `nodeId` from the tables above. Returns code hints, a screenshot, and contextual information. For components mapped via Code Connect, the response links back to the real React source.
 2. **`get_screenshot`** — Grab a visual snapshot of any node to compare against the running app.
 3. **`get_metadata`** — Retrieve file-level metadata (pages, components, styles).
 
 **Workflow for visual changes:**
-1. Identify the relevant Figma node(s) for the area you are changing.
+1. Identify whether the change is component-level (IR-DS) or screen-level (IR-site), and pick the matching `fileKey` and node ID.
 2. Call `get_design_context` (or `get_screenshot`) to see the current design.
 3. Implement changes to match the Figma design exactly — spacing, border-radius, colors, font sizes, line heights, etc.
-4. If the Figma design conflicts with existing CSS tokens, update the tokens in `src/styles/variables.css` to match Figma, then update component styles accordingly.
+4. If the Figma design conflicts with existing CSS tokens, update the tokens in `src/styles/variables.css` to match Figma, then update component styles accordingly. The brand-colors / token source lives in IR-DS (see `1:2` Siili Brand Colors, plus the library's text/style variables).
 5. Never invent visual values (colors, spacing, font sizes) that are not in the Figma file.
 
 ## Design Tokens
@@ -179,54 +200,48 @@ If you need a different adapter (e.g. streaming), implement the `ChatService` in
 4. Import and use in the appropriate parent component
 5. If the new component has form inputs, use `onInput` (not `onChange`) and `event.currentTarget` (not `event.target`) — see the Conventions section for why.
 6. After adding or changing anything that touches the bundle (component, asset, dep), run `npm run build` and eyeball the `gzip:` column in Vite's output — combined JS + CSS must stay ≤ 60 KB per AC-100.
-7. If the Figma team is on an Organization/Enterprise plan with a Dev seat, add a Code Connect mapping (see **Code Connect** section below) so the designer sees the real component in Figma's inspect panel
+7. If the component has a Figma main component in IR-DS, add a Code Connect mapping for it (see **Code Connect** section) so the designer sees the real React component in Figma's inspect panel.
 
 ## Code Connect (Figma ↔ Code Mapping)
 
 Code Connect creates a two-way link between Figma components and their React implementations. When the designer inspects a Figma component, instead of seeing auto-generated code they see the actual React component with its props. When an AI agent calls `get_design_context`, the response includes the mapped component info so existing code is reused instead of regenerating duplicates.
 
-### Prerequisite (currently blocking)
+### Where mappings live
 
-Code Connect **requires**:
-- The Figma file's team must be on an **Organization** or **Enterprise** plan
-- The user running the MCP tools must have a **Developer** seat on that plan
+All Code Connect mappings live in the **IR-DS** file (`fileKey = rlh00CEImhMWwdRNOUqW6L`), not in IR-site. Main components are published there; Code Connect only attaches to main components, not to instances in screen frames. When writing or reading mappings, always pass the IR-DS `fileKey`.
 
-The `Siili Design` team is currently on **Pro** with a **Full** seat, which blocks both reads (`get_code_connect_suggestions`, `get_code_connect_map`) and writes (`add_code_connect_map`, `send_code_connect_mappings`). All return: *"You need a Developer seat in an Organization or Enterprise plan to access Code Connect."*
+### Current state
 
-Once the plan/seat is upgraded, the runbook below is ready to execute.
+All reusable main components are mapped. Confirmed live via `get_code_connect_map`:
 
-### Runbook: initial mapping set
+| Figma node | Component | `source` |
+|---|---|---|
+| `152:75` | Investor hero | `src/components/CompactView.tsx` |
+| `152:97` | Investor agent | `src/components/ExpandedView.tsx` |
+| `152:121` | Textarea | `src/components/ChatInput.tsx` |
+| `152:116` | Question + Answer | `src/components/ChatMessage.tsx` |
+| `152:135` | Reference tag | `src/components/SourceBadge.tsx` |
+| `152:86` | Predefined question | `src/components/SuggestionChip.tsx` |
+| `152:128` Send button — component set → stored per-variant on `152:129` Active / `152:131` Hover / `152:133` Pressed | — (variants) | `src/components/ChatInput.tsx` (the send button is part of `ChatInput`) |
+| `152:137` Loading spinner animation — component set → stored per-variant on `152:138` Start / `152:140` End | — (variants) | `src/components/ChatMessage.tsx` (loading state) |
 
-Run these against `fileKey = vxWJbloNkZ8Muf5qi14MOy` with `label: "React"`. Prefer `send_code_connect_mappings` for a single bulk save; the individual `add_code_connect_map` form is shown per-row for clarity.
+A note on how the bottom two rows are stored: `152:128` and `152:137` are Figma component sets. `send_code_connect_mappings` accepts the parent node ID but Figma persists the mapping on each child variant, so a `get_code_connect_map` on `152:128` returns entries for `152:129/131/133` (not `152:128` itself). Either ID resolves correctly from an instance lookup in Figma's inspect panel.
 
-**Repository:** https://github.com/siilisolutions/investor-ai-chat-widget — use either the relative paths below or full GitHub blob URLs, e.g. `https://github.com/siilisolutions/investor-ai-chat-widget/blob/main/src/components/ChatInput.tsx` (Figma’s inspector links work best with the full URL).
+Instance-level mappings also exist inside the two screen components — `152:83` / `152:84` / `152:85` (chip instances in Investor hero) and `152:100` / `152:101` / `152:102` / `152:103` (Q+A and Textarea instances in Investor agent). These look like they were auto-populated when `Investor hero` / `Investor agent` were first mapped; leave them alone unless you're consciously refactoring.
 
-| Figma node | Description | `source` | `componentName` |
-|---|---|---|---|
-| `146:1015` | Textarea | `src/components/ChatInput.tsx` | `ChatInput` |
-| `149:1410` / `149:1441` / `150:396` | Send button variants (Active / Hover / Pressed) | `src/components/ChatInput.tsx` | `ChatInput` (send button is part of ChatInput) |
-| `147:1129` | Question + Answer pair | `src/components/ChatMessage.tsx` | `ChatMessage` |
-| `178:441` | Reference tag | `src/components/SourceBadge.tsx` | `SourceBadge` |
-| `178:482` / `201:2273` | Loading spinner / loading state | `src/components/ChatMessage.tsx` | `ChatMessage` (with `loading` prop) |
-| `116:374` / `116:392` / `116:398` | Predefined question chips | `src/components/SuggestionChip.tsx` | `SuggestionChip` |
+### What's intentionally unmapped
 
-Whole-frame nodes `113:203` (Investor Hero) and `143:753` (Investor Agent) are page layouts and are **not** mapped — the reusable pieces inside them are.
+- **Sub-parts of `Question + Answer`** — `152:111` Question, `152:114` Answer, `152:145` References — and of the loading state (`152:142` Loading information). They're rendered inline by `ChatMessage.tsx`; mapping them would duplicate the `152:116` / `152:137` entries already in place.
+- **Deprecated components** — `152:92` "Send button - old" and `152:104` "Textarea - old". Left in IR-DS for historical context only.
+- **`152:88` Reset button** — no React component yet (backlog). Map it when the component lands.
 
-### Workflow
+### Optional next step — variant templates
 
-1. Get AI-suggested mappings for both main frames:
-   - `get_code_connect_suggestions({ fileKey, nodeId: "113:203" })`
-   - `get_code_connect_suggestions({ fileKey, nodeId: "143:753" })`
-2. Review the suggestions against the table above; reconcile any drift.
-3. Bulk-save with `send_code_connect_mappings({ fileKey, nodeId: "143:753", mappings: [...] })` where `mappings` is an array of `{ nodeId, source, componentName, label: "React" }` objects from the table.
-4. For the send-button state variants, optionally create a single template mapping (`template` + `templateDataJson` on `add_code_connect_map`) that maps Figma's `property1: "Active" | "Hover" | "Pressed"` to the corresponding `:hover` / `:active` CSS states in `ChatInput.tsx`.
-5. Verify each mapping persisted:
-   - `get_code_connect_map({ fileKey, nodeId })` for each entry.
-6. Ask the designer to open the Figma file and confirm the Code Connect panel shows the React snippets on inspect.
+The send-button and spinner variants are mapped as plain records (one per variant, all pointing at the same file). If we later want Figma's inspect panel to surface the `Property 1: Active | Hover | Pressed` (and `Start | End`) enum on the snippet itself, we can upgrade those to template mappings via `add_code_connect_map` with `template` + `templateDataJson`, mapping the Figma variant prop to the corresponding CSS pseudo-state (`:hover` / `:active`) in `ChatInput.tsx`. Not required for the snippet to show up — the current mappings already do that.
 
 ### Adding mappings for new components
 
-When you add a new component (see **How to add a new component** above), extend the table in this section and append a row via `add_code_connect_map({ fileKey, nodeId, source, componentName, label: "React" })`.
+When you add a new React component that has a corresponding main component in IR-DS, append a row to the **Current state** table above and register it via `add_code_connect_map({ fileKey: "rlh00CEImhMWwdRNOUqW6L", nodeId, source, componentName, label: "React" })`. If the component lives only in IR-site (i.e. a screen composition rather than a reusable piece), it does **not** get a Code Connect mapping.
 
 ## Conventions
 
@@ -245,7 +260,7 @@ When you add a new component (see **How to add a new component** above), extend 
 
 - [x] **Real backend integration** — `apiChatService.ts` adapter is wired. The host page picks it up by passing `apiUrl` to `init()`; the mock remains the default when `apiUrl` is omitted.
 - [ ] **Source references from real backend** — current backend response is `{ response }` only. The adapter already reads `sources` forward-compatibly; the backend needs to start returning them.
-- [ ] **Code Connect mappings** — runbook is ready (see **Code Connect** section), blocked on Figma plan upgrade (Pro → Organization/Enterprise) and a Dev seat
+- [x] **Code Connect mappings — initial set complete** — eight main components mapped in IR-DS (`Investor hero`, `Investor agent`, `Textarea`, `Question + Answer`, `Reference tag`, `Predefined question`, `Send button` with all three variants, `Loading spinner animation` with both variants). See the **Code Connect** section for the state table and the optional variant-template follow-up.
 - [ ] **Everett font loading** — assumes host page loads the font; may need `@font-face` fallback
 - [ ] **Streaming responses** — current interface is request/response; add SSE/WebSocket support
 - [ ] **Reset / new conversation** — no UI to start a fresh chat from expanded mode

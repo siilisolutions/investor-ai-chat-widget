@@ -1,7 +1,8 @@
 /**
  * `CompactView` — the hero-mode rendering of the chatbot. Maps to
- * Figma node `113:203` ("Investor hero") with a focus on the inner
- * `116:358` container (textarea + predefined-question chips).
+ * Figma nodes `ds:152:75` ("Investor hero" main component) and
+ * `site:13:527` ("Etusivu" screen frame), focused on the inner
+ * container for the textarea + predefined-question chips.
  *
  * The surrounding hero title and background image are provided by the
  * host page, so this component only renders the interactive widget

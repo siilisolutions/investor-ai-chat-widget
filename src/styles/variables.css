@@ -1,9 +1,12 @@
 /*
  * Design tokens for the Siili Investor Chatbot widget.
  *
- * Values derived from the Figma file `vxWJbloNkZ8Muf5qi14MOy` (IR-site).
- * If a token here disagrees with Figma, Figma wins -- update this file
- * rather than the component styles.
+ * Values derived from the Figma IR-DS design system file
+ * (`rlh00CEImhMWwdRNOUqW6L`) -- brand colors live under node `1:2`
+ * (Siili Brand Colors) and the component main components carry the
+ * radius / shadow / font tokens. See IR-site (`0xXdKUlBJIolF15MjJuaMC`)
+ * for screen-level context. If a token here disagrees with Figma,
+ * Figma wins -- update this file rather than the component styles.
  *
  * The widget root element receives the `.siiliChatbot` class which
  * scopes these variables so they don't leak into the host page.

@@ -263,7 +263,7 @@ An AC without an evidence path is prose. This is the single biggest quality leve
 2. For each AC, pick the cheapest credible verification path:
    - **Automated**: a command (`npm run lint`, `npm run build` + gzip check, a named test).
    - **Manual**: a concrete dev-harness step ("open `/`, send empty message, confirm no state change").
-   - **Visual**: a Figma node reference (`compare against Figma node 143:753`).
+   - **Visual**: a Figma node reference (`compare against Figma node site:143:601`).
 3. If no credible path exists, mark the AC `Verification: none` and flag it — that AC is aspirational and should probably be tagged `@aspirational` per GOV-03.
 4. Update every row in the catalog.
 
@@ -532,16 +532,16 @@ Grounding signals collected from `src/` during triage:
 ### Cluster 1 — Loading fidelity (2 ACs, all bucket a)
 
 - **AC-23** *(@evolving)* — Semantics already in code (`role="status"`, `aria-live="polite"`, "Haetaan tietoa..." copy). Delta: run the Figma screenshot compare + dev-harness inspection, record, promote.
-- **AC-23b** *(@evolving)* — Blob shape/fill/pulse vs Figma `178:482` / `201:2273`. Delta: one `get_design_context` sweep, confirm blob matches, promote.
+- **AC-23b** *(@evolving)* — Blob shape/fill/pulse vs Figma `ds:152:137` / `site:201:2273`. Delta: one `get_design_context` sweep, confirm blob matches, promote.
 
 Lane cost: one PR, largely note-taking — cheapest graduation in the backlog.
 
 ### Cluster 2 — Expanded surface & input placement (6 ACs, all bucket a)
 
-- **AC-20a** *(@evolving)* — Viewport fill + opaque background. Delta: manual verify against Figma `143:753`.
+- **AC-20a** *(@evolving)* — Viewport fill + opaque background. Delta: manual verify against Figma `site:143:601`.
 - **AC-20b** *(@evolving)* — Hero image not visible behind expanded. Delta: verify in dev harness with hero img mounted.
 - **AC-20f** *(@evolving)* — No host-page scroll/reflow during transition. Delta: scroll host mid-height, enter expanded, record.
-- **AC-28** *(@evolving)* — Input in document flow under latest reply + shadow. Delta: visual verify against Figma `143:753` / `146:1015`.
+- **AC-28** *(@evolving)* — Input in document flow under latest reply + shadow. Delta: visual verify against Figma `site:143:601` / `ds:152:121`.
 - **AC-28b** *(@evolving)* — Short convos not bottom-pinned. Delta: single-pair harness run.
 - **AC-28c** *(@evolving)* — Long convos show latest reply + input together. Delta: scripted multi-pair harness run.
 

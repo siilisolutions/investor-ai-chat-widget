@@ -1,7 +1,8 @@
 /**
  * `SuggestionChip` — a predefined-question chip rendered below the
- * textarea in compact (hero) mode. Maps to Figma nodes `116:374`,
- * `116:392`, `116:398` ("Predefined question").
+ * textarea in compact (hero) mode. Maps to Figma node `ds:152:86`
+ * ("Predefined question" main component; instances `ds:152:83`,
+ * `ds:152:84`, `ds:152:85` sit inside `ds:152:75` "Investor hero").
  *
  * Clicking a chip submits its label as the user's first message,
  * which triggers the transition to expanded mode.

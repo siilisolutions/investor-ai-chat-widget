@@ -1,6 +1,6 @@
 /**
  * `SourceBadge` — a pill-shaped reference tag rendered beneath an
- * assistant answer. Maps to Figma node `178:441` ("Reference tag").
+ * assistant answer. Maps to Figma node `ds:152:135` ("Reference tag").
  *
  * When `href` is provided the badge renders as an anchor with hover
  * state; otherwise it's a non-interactive span.

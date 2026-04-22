@@ -1,8 +1,8 @@
 /**
  * `ChatInput` — shared textarea + send button used in both compact
- * (hero) and expanded (chat) modes. Maps to Figma nodes `146:1015`
- * ("Textarea") and `149:1410` / `149:1441` / `150:396` (Send button
- * Active / Hover / Pressed states).
+ * (hero) and expanded (chat) modes. Maps to Figma nodes `ds:152:121`
+ * ("Textarea") and `ds:152:129` / `ds:152:131` / `ds:152:133` (Send
+ * button Active / Hover / Pressed variants of set `ds:152:128`).
  *
  * Variants:
  * - `compact`: translucent white background, no shadow (overlaid on

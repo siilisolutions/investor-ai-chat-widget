@@ -1,6 +1,7 @@
 /**
  * `ExpandedView` — the full chat rendering shown after the first
- * message is sent. Maps to Figma node `143:753` ("Investor agent").
+ * message is sent. Maps to Figma nodes `ds:152:97` ("Investor agent"
+ * main component) and `site:143:601` ("AI-agentti" screen frame).
  *
  * Layout: header ("Siili AI-avustaja"), a vertical stack of Q+A
  * pairs, and a sticky textarea at the bottom for follow-up questions.

@@ -42,8 +42,9 @@ If the invoker does not specify a mode, assume `scoped`.
 - [`ACCEPTANCE_CRITERIA.md`](../../ACCEPTANCE_CRITERIA.md) — the spec,
   including §2.5 Figma Manifest, §11 Definition of Done, §12
   Non-Goals, and §Amending ACs.
-- [`AGENTS.md`](../../AGENTS.md) §Figma (node table, file key
-  `vxWJbloNkZ8Muf5qi14MOy`) — only if the in-scope ACs are visual.
+- [`AGENTS.md`](../../AGENTS.md) §Figma (two files — IR-site
+  `0xXdKUlBJIolF15MjJuaMC` for screens, IR-DS `rlh00CEImhMWwdRNOUqW6L`
+  for components) — only if the in-scope ACs are visual.
 - [`src/types/index.ts`](../../src/types/index.ts) — for contract ACs
   (AC-50 band).
 - The component / service / CSS files in scope for the selected mode.
@@ -142,7 +143,7 @@ For any code path in scope with no matching AC, propose:
 
 Name the single apply-turn the human should run next, e.g.:
 - "Apply code fixes for AC-22, AC-28."
-- "Run figma-sync scoped for nodes 147:1129, 143:753."
+- "Run figma-sync scoped for nodes ds:152:116, site:143:601."
 - "Amend AC-27 wording per spec-drift note."
 ```
 

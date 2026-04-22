@@ -71,4 +71,5 @@ See [AGENTS.md](AGENTS.md) for detailed file map, design tokens, Figma reference
 
 ## Design Reference
 
-Figma: https://www.figma.com/design/vxWJbloNkZ8Muf5qi14MOy/IR-site
+- Screens: [IR-site](https://www.figma.com/design/0xXdKUlBJIolF15MjJuaMC/IR-site) — composite frames for hero page, AI-agent page, and loading state.
+- Design system: [IR-DS](https://www.figma.com/design/rlh00CEImhMWwdRNOUqW6L/IR-DS) — main components, brand colors, and token palette. Code Connect mappings live here.

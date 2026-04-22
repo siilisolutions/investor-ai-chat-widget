@@ -44,10 +44,14 @@ Procedure:
    along with a short search hint for each (derived from the row's
    Component / scope column — e.g. `AC-91` → "tablet", `AC-92` →
    "mobile", `AC-73` → "typography / type / font weights").
-2. Call `get_metadata({ fileKey: "vxWJbloNkZ8Muf5qi14MOy", nodeId:
-   "0:1" })` once to get the file-level structure. (`0:1` is the
-   root page; if the file has multiple pages, repeat per page ID
-   returned by the first call.)
+2. Call `get_metadata` once on each Figma file to get the
+   file-level structure:
+   - IR-site screens: `get_metadata({ fileKey:
+     "0xXdKUlBJIolF15MjJuaMC", nodeId: "0:1" })`.
+   - IR-DS components: `get_metadata({ fileKey:
+     "rlh00CEImhMWwdRNOUqW6L", nodeId: "0:1" })`.
+   `0:1` is the root page in each file; if a file has multiple pages,
+   repeat per page ID returned by the first call.
 3. For each code-authored row, scan the returned XML for frame /
    component names whose lower-cased `name` contains any of the
    row's search hints. Collect candidate `nodeId` + `name` pairs.
@@ -63,8 +67,10 @@ match; a later "apply" turn then updates §2.5 and any AC wording.
 
 - [`ACCEPTANCE_CRITERIA.md`](../../ACCEPTANCE_CRITERIA.md) §2.5 Figma
   Manifest (the authoritative list of node ↔ AC bindings).
-- [`AGENTS.md`](../../AGENTS.md) §Figma (node table, tooling, file
-  key `vxWJbloNkZ8Muf5qi14MOy`).
+- [`AGENTS.md`](../../AGENTS.md) §Figma — two files:
+  `0xXdKUlBJIolF15MjJuaMC` (IR-site, screen layouts) and
+  `rlh00CEImhMWwdRNOUqW6L` (IR-DS, component library + Code Connect).
+  Pick the file that matches the row's scope.
 - [`src/styles/variables.css`](../../src/styles/variables.css) for
   the current token values.
 - The component/CSS files touched by `scoped` mode.
@@ -75,16 +81,20 @@ match; a later "apply" turn then updates §2.5 and any AC wording.
    push`, or any non-readonly tool. The only output is a markdown
    report to chat.
 2. **One MCP call per node.** For each node in scope, call
-   `get_design_context({ fileKey: "vxWJbloNkZ8Muf5qi14MOy", nodeId })`
-   exactly once. Prefer text metadata over screenshots; only request
+   `get_design_context({ fileKey, nodeId })` exactly once, with the
+   correct `fileKey` for that node (`0xXdKUlBJIolF15MjJuaMC` for
+   IR-site screen frames, `rlh00CEImhMWwdRNOUqW6L` for IR-DS
+   components). Prefer text metadata over screenshots; only request
    `get_screenshot` if the design-context response is ambiguous.
 3. **No speculation.** If a node returns insufficient info, mark the
    row `unknown` rather than guessing.
 4. **Compare against tokens first, components second.** A value in
    `variables.css` trumps the same value hard-coded in a component —
    drift on a token is higher priority.
-5. **Never invent fixes that require Code Connect** — it is not yet
-   enabled on this Figma plan (see `AGENTS.md` §Code Connect).
+5. **Do not modify Code Connect mappings from this prompt** — Code
+   Connect is live on IR-DS and six components are already mapped
+   (see `AGENTS.md` §Code Connect). Adding, editing, or removing
+   mappings is a separate write-turn, not part of drift reporting.
 
 ## Output contract
 

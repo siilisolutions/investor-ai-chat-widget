@@ -32,13 +32,14 @@ Read `AGENTS.md` at the repo root for full project context, file map, design tok
 
 ## Design Reference
 
-- Figma: https://www.figma.com/design/vxWJbloNkZ8Muf5qi14MOy/IR-site
+- Figma (screens): https://www.figma.com/design/0xXdKUlBJIolF15MjJuaMC/IR-site — `fileKey = 0xXdKUlBJIolF15MjJuaMC`. Use for screen-level composition (hero page, AI-agent page, loading state).
+- Figma (design system): https://www.figma.com/design/rlh00CEImhMWwdRNOUqW6L/IR-DS — `fileKey = rlh00CEImhMWwdRNOUqW6L`. Use for component-level work (Textarea, Question+Answer, Reference tag, etc.). Code Connect mappings live here. See `AGENTS.md` §Figma for the node-ID table of both files.
 - Font: Everett (Regular, Bold, Light). Assumed to be loaded by the host page.
 
 ## Figma-first workflow (visual changes)
 
 - Before editing anything under `src/styles/**` or `src/components/**`, call `get_design_context` on the relevant Figma node(s). Find the node IDs in `AGENTS.md` §Figma and in `ACCEPTANCE_CRITERIA.md` §2.5 (Figma Manifest).
 - Never invent visual values (colours, spacing, font sizes, radii). If Figma and the current implementation disagree, Figma wins — update the token in `src/styles/variables.css` and/or the component, not the node.
-- In the change summary (commit message / PR description), list every Figma node ID you consulted, e.g. `Figma: 149:1410, 147:1129`. Reviewers and the sync job rely on this trail.
+- In the change summary (commit message / PR description), list every Figma node ID you consulted, prefixed with the file (`site:` for IR-site screens, `ds:` for IR-DS components) — e.g. `Figma: ds:152:129, ds:152:116`. Reviewers and the sync job rely on this trail.
 - After a visual change is merged, bump the `Last checked` / `Checked by` columns for the affected rows in `ACCEPTANCE_CRITERIA.md` §2.5.
 - For broader drift checks, use the reusable prompt at `scripts/prompts/figma-sync.md` (scoped per PR, full-sweep weekly / pre-release). That prompt is read-only; applying its fixes is a separate turn.
