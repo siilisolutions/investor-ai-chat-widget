@@ -113,8 +113,8 @@ directly.
 | AC-20k | Close button — reduced motion | [§3.3](#33-expanded-chat-mode) | active | @aspirational | Manual: DevTools emulate reduce-motion — dismiss transition is instant (aspirational) |
 | AC-21 | Header | [§3.3](#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-21 — header reads "Siili AI-avustaja" in Everett |
 | AC-22 | Question bubble | [§3.3](#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-22 — right-aligned `--gray-500` bubble with `--radius` corners |
-| AC-23 | Loading indicator — semantics and copy | [§3.3](#33-expanded-chat-mode) | active | @evolving | Manual: inspect in-flight pair — blob + "Haetaan tietoa..." with `role="status"` and `aria-live="polite"` |
-| AC-23b | Loading indicator — blob visual style | [§3.3](#33-expanded-chat-mode) | active | @evolving | Visual: see §2.5 row AC-23b — soft rounded gray blob, scale/opacity pulse |
+| AC-23 | Loading indicator — semantics and copy | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: inspect in-flight pair — blob + "Haetaan tietoa..." with `role="status"` and `aria-live="polite"` |
+| AC-23b | Loading indicator — blob visual style | [§3.3](#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-23b — soft rounded gray blob, scale/opacity pulse |
 | AC-24 | Answer rendering | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: resolved answer replaces blob, paragraph breaks preserved |
 | AC-25 | Source references — section rendered | [§3.3](#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-25 — "Lähteet:" section with one `SourceBadge` per source |
 | AC-25b | Source references — linked badge opens in new tab | [§3.3](#33-expanded-chat-mode) | active | @stable | Manual: click linked badge — opens new tab (`target="_blank"`, `rel="noopener noreferrer"`) |
@@ -309,8 +309,8 @@ PR.
 | AC-20e  | `site:143:601`, `ds:152:116`                  | First Q+A pair visible on first expanded frame   | 2026-04-20   | inherits AC-20 sweep (GOV-05 split); IDs refreshed 2026-04-22 |
 | AC-21   | `ds:152:97`                                   | Expanded header ("Siili AI-avustaja")            | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
 | AC-22   | `ds:152:116`                                  | Question bubble (Q+A pair)                       | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
-| AC-23   | `ds:152:137`, `site:201:2273`                 | Loading blob / loading state                     | 2026-04-20   | seed sweep (spinner → blob applied); IDs refreshed 2026-04-22 |
-| AC-23b  | `ds:152:137`, `site:201:2273`                 | Loading blob — rounded gray shape, pulse tempo   | 2026-04-20   | inherits AC-23 sweep (GOV-05 split); IDs refreshed 2026-04-22 |
+| AC-23   | `ds:152:137`, `site:201:2273`                 | Loading blob / loading state                     | 2026-04-22   | Lane A graduation — semantics + Figma compare, both variants (`152:138` Start / `152:140` End) are 28×28 gray circles; live dev-harness capture matches |
+| AC-23b  | `ds:152:137`, `site:201:2273`                 | Loading blob — rounded gray shape, pulse tempo   | 2026-04-22   | Lane A graduation — CSS pulse (scale 0.82→1, opacity 0.55→1, 1400ms ease-in-out) animates between the two Figma variants; reduced-motion fallback in place |
 | AC-25   | `ds:152:135`                                  | Source reference badge                           | 2026-04-20   | seed sweep; IDs refreshed 2026-04-22 |
 | AC-25b  | `ds:152:135`                                  | Source reference — linked (opens in new tab)     | 2026-04-20   | inherits AC-25 sweep (GOV-05 split); IDs refreshed 2026-04-22 |
 | AC-25c  | `ds:152:135`                                  | Source reference — static unlinked badge         | 2026-04-20   | inherits AC-25 sweep (GOV-05 split); IDs refreshed 2026-04-22 |
@@ -583,13 +583,13 @@ Maps to the Investor agent composition and its main component; see
   - **Then** the question appears right-aligned in a bubble matching
     the Question+Answer component (see §2.5 row AC-22).
 
-- **AC-23** — *Loading indicator — semantics and copy* · **@evolving**
+- **AC-23** — *Loading indicator — semantics and copy* · **@stable**
   - **Given** an in-flight assistant answer,
   - **Then** a pulsating gray blob (see §2.5 row AC-23) and the text
     *"Haetaan tietoa..."* appear in place of the answer, with
     `role="status"` and `aria-live="polite"`.
 
-- **AC-23b** — *Loading indicator — blob visual style* · **@evolving**
+- **AC-23b** — *Loading indicator — blob visual style* · **@stable**
   - **Given** the loading indicator is visible (per AC-23),
   - **Then** the blob's shape, fill, and scale/opacity pulse tempo
     match the loading-state component (see §2.5 row AC-23b) — not a
