@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+# Maintainer-local planning notes — tracked in an external ticketing system.
+AGENT_BACKLOG.md
+scripts/prompts/backlog-worker.md
+
+# Handoff bundles — produced ad-hoc for maintainer handoff, not versioned.
+*.tar.gz
+*.zip
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

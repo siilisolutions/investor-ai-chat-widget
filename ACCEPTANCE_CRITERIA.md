@@ -289,24 +289,24 @@ PR.
 > rows point at **IR-site** (`fileKey = 0xXdKUlBJIolF15MjJuaMC`);
 > `ds:` rows point at **IR-DS** (`fileKey = rlh00CEImhMWwdRNOUqW6L`).
 > No parity failures blocking AC-70 surfaced. Low-severity findings
-> (Figma placeholder trailing-space artifacts on `ds:152:121` / hero
-> instance, Figma question-bubble `whitespace-nowrap` dummy-text
-> artifact on `ds:152:116`, chip layout direction only diverging for
-> hypothetical short labels) are recorded in the Lane E entry of
-> [`AGENT_BACKLOG.md`](AGENT_BACKLOG.md). Code-authored rows (AC-73,
-> AC-73b, AC-91, AC-92, AC-92b, AC-92c) have no candidate Figma frame
-> — typography / tablet / mobile scaffolds are absent from both files.
+> were captured during the sweep (Figma placeholder trailing-space
+> artifacts on `ds:152:121` / hero instance, Figma question-bubble
+> `whitespace-nowrap` dummy-text artifact on `ds:152:116`, chip layout
+> direction only diverging for hypothetical short labels). Code-authored
+> rows (AC-73, AC-73b, AC-91, AC-92, AC-92b, AC-92c) have no candidate
+> Figma frame — typography / tablet / mobile scaffolds are absent from
+> both files.
 >
 > **2026-04-22 — Lane F graduation addendum.** The responsive rows
 > (AC-91, AC-92, AC-92b, AC-92c) are now `@stable` as code-authored
 > after the designer explicitly delegated responsive judgment to
 > engineering ("the app should work responsively, no indication of
 > breakpoints"). They stay code-authored in §2.5 because no Figma
-> frames exist at the tablet / mobile bands — see the Lane F entry in
-> [`AGENT_BACKLOG.md`](AGENT_BACKLOG.md) for the two chosen defaults
-> (horizontal-scroll chip row at `<640px`, `var(--space-xl) var(--space-lg)`
-> expanded padding at `<640px`). The typography rows (AC-73, AC-73b)
-> remain `@stable` code-authored as before.
+> frames exist at the tablet / mobile bands. The two chosen defaults
+> are: horizontal-scroll chip row at `<640px`, and
+> `var(--space-xl) var(--space-lg)` expanded padding at `<640px`. The
+> typography rows (AC-73, AC-73b) remain `@stable` code-authored as
+> before.
 
 | AC ID   | Figma node(s)                                 | Component / scope                                | Last checked | Checked by |
 | ------- | --------------------------------------------- | ------------------------------------------------ | ------------ | ---------- |

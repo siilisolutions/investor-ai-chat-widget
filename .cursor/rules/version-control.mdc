@@ -7,7 +7,12 @@ alwaysApply: true
 
 - **Branches**: Prefer short, prefixed names: `feature/…`, `fix/…`, `chore/…`, `docs/…`. Rebase or merge from the default branch regularly so PRs stay current.
 - **Commits**: Use an imperative subject line (e.g. “Add loading state to ChatMessage”). Keep one logical change per commit when practical; use the body for context, trade-offs, or ticket references.
-- **Secrets**: Do not commit API keys, tokens, or environment files with real credentials. Use CI/host secrets and local env vars; verify sensitive paths are ignored before pushing.
+- **Public repository — no secrets, ever.** This repo is public on GitHub. Anything committed becomes world-readable and cannot be un-published by a later deletion (history is preserved on forks and mirrors). Before `git add`, scan your staged content for credentials.
+  - **Azure Function key** (the `?code=…` suffix on the backend URL): belongs in the **host page's `<script>` tag** that calls `SiiliChatbot.init({ apiUrl })`, never in this repo.
+  - **`VITE_API_URL`** for local development: belongs in **`.env.local`** (already matched by the `*.local` rule in `.gitignore`). Do not hardcode the URL in `src/main.tsx`, `README.md`, or examples — use a `https://YOUR-BACKEND/api/chat` placeholder.
+  - **Other credentials** (personal access tokens, service principals, SAS URLs, private CORS origins): never in the repo. Use the host's / CI's secret store.
+  - If a secret is committed by accident, treat the secret as compromised: **rotate it first**, then scrub history. Do not rely on `git rm` or a force-push to "hide" it — assume it's already been scraped.
+  - External disclosure of a leaked secret: follow [`../../SECURITY.md`](../../SECURITY.md) (`it@siili.com`).
 - **Artifacts**: `dist/` and `node_modules/` are ignored—do not force-add build output unless the team explicitly maintains release artifacts in-repo.
 - **Shared history**: Avoid force-pushing to the default branch. History rewrites on feature branches only with clear team agreement.
 - **Pull requests**: Include a short summary, how you verified the change (e.g. `npm run lint`, `npm run build`, manual steps), and links to issues or acceptance criteria when applicable. Prefer reviewable PR size over mega-diffs.
