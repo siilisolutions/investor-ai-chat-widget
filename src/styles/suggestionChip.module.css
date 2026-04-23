@@ -1,6 +1,7 @@
 .chip {
   display: inline-flex;
   align-items: flex-end;
+  flex-shrink: 0;
   padding: var(--space-sm) var(--space-lg);
   background: var(--surface-translucent);
   border: none;

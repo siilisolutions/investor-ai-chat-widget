@@ -161,12 +161,12 @@ directly.
 | AC-81d | Screen-reader labelling — errors | [§6](#6-accessibility) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (error text announced via `role="alert"`) |
 | AC-82 | WCAG 2.1 AA contrast | [§6](#6-accessibility) | active | @stable | Manual: axe DevTools contrast scan over token pairs — ≥4.5:1 body, ≥3:1 large / non-text |
 | AC-83 | Reduced motion | [§6](#6-accessibility) | active | @stable | Automated: `npm run test -- tests/expandedView.test.tsx` (auto-scroll `behavior` switches to `auto` under reduce-motion); Manual: DevTools emulate `prefers-reduced-motion: reduce` — mount animation, auto-scroll, blob pulse, and interactive transitions (chip / focus ring / send button / source badge) are all static |
-| AC-84 | Zoom and reflow | [§6](#6-accessibility) | active | @evolving | Manual: browser zoom to 200% — no widget content clipped, no horizontal scroll inside container |
+| AC-84 | Zoom and reflow | [§6](#6-accessibility) | active | @stable | Manual: browser zoom to 200% — no widget content clipped, no horizontal scroll inside container |
 | AC-90 | Desktop (≥1024px) | [§7](#7-responsiveness) | active | @stable | Manual: viewport at or above the §12.1 PD-05 desktop threshold — matches §2.5 row AC-90 padding and layout |
-| AC-91 | Tablet (640–1023px) | [§7](#7-responsiveness) | active | @evolving | Manual: viewport in the §12.1 PD-05 tablet band — chips wrap, textarea full width, send button inside input shell |
-| AC-92 | Mobile (<640px) — compact stacks input above chips | [§7](#7-responsiveness) | active | @evolving | Manual: viewport below the §12.1 PD-05 mobile breakpoint — compact stacks input above chips (not side-by-side) |
-| AC-92b | Mobile (<640px) — chips scroll or wrap without overflow | [§7](#7-responsiveness) | active | @evolving | Manual: viewport below the §12.1 PD-05 mobile breakpoint — chips wrap or scroll horizontally without overflowing viewport width |
-| AC-92c | Mobile (<640px) — expanded view full width with Figma padding | [§7](#7-responsiveness) | active | @evolving | Manual: viewport below the §12.1 PD-05 mobile breakpoint in expanded — 100% container width with Figma-consistent padding |
+| AC-91 | Tablet (640–1023px) | [§7](#7-responsiveness) | active | @stable | Manual: viewport in the §12.1 PD-05 tablet band — chips wrap, textarea full width, send button inside input shell |
+| AC-92 | Mobile (<640px) — compact stacks input above chips | [§7](#7-responsiveness) | active | @stable | Manual: viewport below the §12.1 PD-05 mobile breakpoint — compact stacks input above chips (not side-by-side) |
+| AC-92b | Mobile (<640px) — chips scroll or wrap without overflow | [§7](#7-responsiveness) | active | @stable | Manual: viewport below the §12.1 PD-05 mobile breakpoint — chips wrap or scroll horizontally without overflowing viewport width |
+| AC-92c | Mobile (<640px) — expanded view full width with Figma padding | [§7](#7-responsiveness) | active | @stable | Manual: viewport below the §12.1 PD-05 mobile breakpoint in expanded — 100% container width with Figma-consistent padding |
 | AC-93 | Textarea auto-grow | [§7](#7-responsiveness) | active | @stable | Manual: paste multi-line content — textarea grows to the §12.1 PD-06 cap then scrolls internally; send button stays visible |
 | AC-100 | Bundle budget | [§8](#8-performance) | active | @stable | Automated: `npm run verify` — parses `vite build` gzip output and fails if combined `siili-chatbot.iife.js` + `siili-chatbot.css` exceed 60 KB |
 | AC-101 | Cold-start render | [§8](#8-performance) | active | @evolving | Manual: DevTools 4× CPU throttle — compact interactive ≤150ms after script load completes |
@@ -294,9 +294,19 @@ PR.
 > artifact on `ds:152:116`, chip layout direction only diverging for
 > hypothetical short labels) are recorded in the Lane E entry of
 > [`AGENT_BACKLOG.md`](AGENT_BACKLOG.md). Code-authored rows (AC-73,
-> AC-73b, AC-91, AC-92, AC-92b, AC-92c) still have no candidate Figma
-> frame — typography / tablet / mobile scaffolds are absent from both
-> files.
+> AC-73b, AC-91, AC-92, AC-92b, AC-92c) have no candidate Figma frame
+> — typography / tablet / mobile scaffolds are absent from both files.
+>
+> **2026-04-22 — Lane F graduation addendum.** The responsive rows
+> (AC-91, AC-92, AC-92b, AC-92c) are now `@stable` as code-authored
+> after the designer explicitly delegated responsive judgment to
+> engineering ("the app should work responsively, no indication of
+> breakpoints"). They stay code-authored in §2.5 because no Figma
+> frames exist at the tablet / mobile bands — see the Lane F entry in
+> [`AGENT_BACKLOG.md`](AGENT_BACKLOG.md) for the two chosen defaults
+> (horizontal-scroll chip row at `<640px`, `var(--space-xl) var(--space-lg)`
+> expanded padding at `<640px`). The typography rows (AC-73, AC-73b)
+> remain `@stable` code-authored as before.
 
 | AC ID   | Figma node(s)                                 | Component / scope                                | Last checked | Checked by |
 | ------- | --------------------------------------------- | ------------------------------------------------ | ------------ | ---------- |
@@ -323,10 +333,10 @@ PR.
 | AC-73   | — (code-authored)                             | Typography — Everett weights (via `--font-family*` tokens) | 2026-04-22   | Lane E full-sweep — metadata scan found no typography node in either file (IR-DS root has only brand-colour frame `1:2`); still code-authored, watching for a typography main component |
 | AC-73b  | — (code-authored)                             | Typography — sans-serif fallback, no large CLS   | 2026-04-22   | Lane E full-sweep — inherits AC-73 watch; no Figma-specified fallback rule, code-authored `sans-serif` in `--font-family*` tokens stands |
 | AC-90   | `site:13:527`, `site:143:601`                 | Desktop (≥1024px) layout                         | 2026-04-22   | Lane E full-sweep — both screens are 1440px Figma frames; widget's `--content-width` 800px + `--compact-textarea-width` 780px match the inner Q+A column and hero textarea widths respectively |
-| AC-91   | — (code-authored)                             | Tablet (640–1023px) layout                       | 2026-04-22   | Lane E full-sweep — IR-site metadata scan confirmed no tablet frame (all screens 1440px); still code-authored |
-| AC-92   | — (code-authored)                             | Mobile (<640px) layout — compact stacks input    | 2026-04-22   | Lane E full-sweep — IR-site metadata scan confirmed no mobile frame; still code-authored |
-| AC-92b  | — (code-authored)                             | Mobile (<640px) — chips scroll or wrap           | 2026-04-22   | Lane E full-sweep — inherits AC-92 (no mobile frame) |
-| AC-92c  | — (code-authored)                             | Mobile (<640px) — expanded view full width       | 2026-04-22   | Lane E full-sweep — inherits AC-92 (no mobile frame) |
+| AC-91   | — (code-authored)                             | Tablet (640–1023px) layout                       | 2026-04-22   | Lane F graduation — passes by construction at tablet widths: `.chips` already `flex-wrap: wrap`, `.shell` `width: 100%`, send button structurally inside shell; `.compact` clamps at `--compact-textarea-width` 780px so 640–1023px widths shrink naturally. Designer delegated responsive judgment; no Figma tablet frame exists or is expected |
+| AC-92   | — (code-authored)                             | Mobile (<640px) layout — compact stacks input    | 2026-04-22   | Lane F graduation — passes by construction at every width: `.compact { flex-direction: column }` with `<ChatInput />` rendered above `<div className={styles.chips}>` in `CompactView.tsx`; no `@media` rule needed. Designer delegated responsive judgment; no Figma mobile frame exists or is expected |
+| AC-92b  | — (code-authored)                             | Mobile (<640px) — chips scroll or wrap           | 2026-04-22   | Lane F graduation — `@media (max-width: 639px)` in `compactView.module.css` turns `.chips` into a horizontal-scroll row (`flex-wrap: nowrap; overflow-x: auto`); chips keep `flex-shrink: 0` + `white-space: nowrap` so `@stable` AC-12b single-line contract is preserved (AC-92b text allows "scroll or wrap" — scroll chosen). Scrollbar hidden via `scrollbar-width: none` + `::-webkit-scrollbar { display: none }` |
+| AC-92c  | — (code-authored)                             | Mobile (<640px) — expanded view full width       | 2026-04-22   | Lane F graduation — `@media (max-width: 639px)` in `expandedView.module.css` reduces `.expanded` padding from `var(--space-3xl) var(--space-2xl)` (64/48px desktop) to `var(--space-xl) var(--space-lg)` (32/16px mobile), matching the widget's existing spacing rhythm; width stays `100vw` via desktop `position: fixed; inset: 0`. Designer delegated responsive judgment; existing tokens reused, no new token added |
 
 The §13 Traceability roll-up (persona × section) is derived from this
 manifest — edit rows here, then re-derive §13 if persona mapping
@@ -965,7 +975,7 @@ These criteria exist to satisfy P2's competition-entry ambition.
     hover background) still render immediately, only the animated
     handover is removed.
 
-- **AC-84** — *Zoom and reflow* · **@evolving**
+- **AC-84** — *Zoom and reflow* · **@stable**
   - **Given** a 200% browser zoom,
   - **Then** no content is clipped or requires horizontal scrolling
     within the widget's container.
@@ -980,23 +990,23 @@ These criteria exist to satisfy P2's competition-entry ambition.
     padding matching the Investor agent composition (see §2.5 row
     AC-90).
 
-- **AC-91** — *Tablet (640–1023px)* · **@evolving**
+- **AC-91** — *Tablet (640–1023px)* · **@stable**
   - Chips wrap to two rows if needed; the textarea grows to full
     container width; the send button stays inside the input shell.
 
-- **AC-92** — *Mobile (<640px) — compact stacks input above chips* · **@evolving**
+- **AC-92** — *Mobile (<640px) — compact stacks input above chips* · **@stable**
   - **Given** a viewport narrower than the mobile breakpoint
     (§12.1 PD-05),
   - **Then** the compact view stacks the input above the chips (not
     side-by-side).
 
-- **AC-92b** — *Mobile (<640px) — chips scroll or wrap without overflow* · **@evolving**
+- **AC-92b** — *Mobile (<640px) — chips scroll or wrap without overflow* · **@stable**
   - **Given** a viewport narrower than the mobile breakpoint
     (§12.1 PD-05),
   - **Then** the suggestion chips are horizontally scrollable or wrap
     onto additional rows without overflowing the viewport width.
 
-- **AC-92c** — *Mobile (<640px) — expanded view full width with Figma padding* · **@evolving**
+- **AC-92c** — *Mobile (<640px) — expanded view full width with Figma padding* · **@stable**
   - **Given** a viewport narrower than the mobile breakpoint
     (§12.1 PD-05) and the widget is in expanded mode,
   - **Then** the expanded view uses `100%` container width with

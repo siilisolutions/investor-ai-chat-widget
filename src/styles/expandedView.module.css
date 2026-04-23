@@ -30,6 +30,18 @@
   }
 }
 
+/*
+ * AC-92c (mobile <640px, PD-05) — tighter padding so the Q+A column isn't
+ * starved on narrow viewports. Designer delegated responsive judgment (no
+ * mobile Figma frame); code-authored per the Lane F graduation entry in
+ * AGENT_BACKLOG.md using existing spacing tokens.
+ */
+@media (max-width: 639px) {
+  .expanded {
+    padding: var(--space-xl) var(--space-lg);
+  }
+}
+
 .title {
   font-family: var(--font-family-bold);
   font-weight: 700;

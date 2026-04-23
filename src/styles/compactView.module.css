@@ -13,3 +13,23 @@
   gap: var(--space-sm) var(--space-sm);
   align-items: flex-end;
 }
+
+/*
+ * AC-92b (mobile <640px, PD-05) — chips overflow as a single-row horizontal
+ * scroll container so `@stable` AC-12b (single-line labels) still holds.
+ * Designer delegated responsive judgment (no mobile Figma frame); code-
+ * authored per the Lane F graduation entry in AGENT_BACKLOG.md.
+ */
+@media (max-width: 639px) {
+  .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: 100%;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .chips::-webkit-scrollbar {
+    display: none;
+  }
+}
