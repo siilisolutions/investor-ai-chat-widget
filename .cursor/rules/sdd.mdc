@@ -28,6 +28,8 @@ When amending or adding an AC, follow [`ACCEPTANCE_CRITERIA.md` §10.6 AC Author
 
 - Commit messages and PR descriptions list every `AC-xx` touched (e.g. `AC-20d, AC-31`).
 - If a new component or behaviour does not map to an existing AC, the same PR must add the new AC and, when visual, the matching row in §2.5 Figma Manifest.
+- When you add or amend an AC body in the same PR, annotate the AC with the inline log marker defined in [`ACCEPTANCE_CRITERIA.md` §10.5 Amendment logging](../../ACCEPTANCE_CRITERIA.md#105-amending-acs) — `(added YYYY-MM, #PR)` for new ACs, `(amended YYYY-MM, #PR)` for edits. Deprecations use the tombstone line instead; the convention is not retroactive on pre-GOV-10 ACs.
+- AC-IDs are **immutable** — never renumber, never reuse a retired ID. When an AC's meaning changes materially, tombstone the old ID and mint a new one per §10.5 Tombstone format.
 - Tests, when added, reference the AC-ID in the test name / description (e.g. `AC-15: empty submit is a no-op`).
 
 ## Self-review before finishing

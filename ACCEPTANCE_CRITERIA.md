@@ -1120,20 +1120,39 @@ working under [`.cursor/rules/sdd.mdc`](.cursor/rules/sdd.mdc) must
 propose amendments here *before* coding against behaviour that is
 not covered.
 
+**Immutable IDs.** AC-IDs are immutable. Never renumber an existing
+ID and never reuse a retired one — historical commits, PR
+descriptions, and test names already cite those IDs, and the
+citations must keep resolving to the same contract (or to a
+tombstone pointing at the successor). When an AC's behaviour
+changes, either edit the body in place (the ID keeps its meaning)
+or tombstone the old ID and mint a new one via the patterns below.
+Reusing `AC-22` for unrelated behaviour later is a spec-integrity
+violation and is never acceptable.
+
 - **Add a new AC** when a task introduces behaviour no existing
   criterion covers. Pick the next free `AC-xx` in the relevant band
   (3.1 embedding, 3.2 compact, 3.3 expanded, 3.4 errors, 3.5
   service, 4 content/legal, 5 visual, 6 a11y, 7 responsiveness, 8
   performance, 9 browser, 10 observability) and write it as
   Given/When/Then with a short title. Do not reuse a retired ID.
+  Append an inline log marker on the new AC body (see **Amendment
+  logging** below).
 - **Edit an existing AC** when the required behaviour has changed.
   Keep the ID; rewrite the Given/When/Then in the same PR as the
-  code change, and note the edit in the PR description (e.g.
-  `AC-23 loading copy updated to match §2.5 row AC-23`).
+  code change, note the edit in the PR description (e.g.
+  `AC-23 loading copy updated to match §2.5 row AC-23`), and
+  append an inline log marker on the AC body.
 - **Deprecate** instead of deleting. Prefix the AC title with
-  `(deprecated)`, add a one-line reason, and link to the
-  replacement AC-ID if one exists. Retired IDs are never reused so
-  historical PRs keep resolving to something.
+  `(deprecated)`, add a **Tombstone line** (format below) as the
+  first line of the body, and link to the replacement AC-ID if one
+  exists. Retired IDs are never reused so historical PRs keep
+  resolving to something.
+- **Split** an AC (one ID → several) when it asserts more than one
+  independently-testable behaviour (see GOV-05 history). Allocate
+  the new IDs with lettered suffixes (`AC-15a`, `AC-15b`), replace
+  the original body with a `[SPLIT …]` tombstone, and add catalog
+  rows for each child.
 - **Visual ACs** must either cite a Figma node in §2.5 Figma
   Manifest or mark the row `— (code-authored)` with a short
   justification. A new visual AC without a manifest row is
@@ -1149,6 +1168,65 @@ not covered.
   `Checked by` in §2.5 for the bound row.
 - **§13 Traceability roll-up** is derived from §2.5 — re-derive it
   only when persona mapping changes, not for every AC edit.
+
+### Tombstone format
+
+When an AC is deprecated or split, the first line of its body
+carries a machine-readable tombstone so agents and humans can tell
+at a glance where the ID has moved. Canonical shapes:
+
+- **Deprecation:**
+  `[DEPRECATED YYYY-MM — superseded by AC-<id>, reason: <one line>]`
+- **Deprecation with no successor** (rule extracted, concept
+  dropped, etc.):
+  `[DEPRECATED YYYY-MM — <GOV-xx or reason>, reason: <one line>]`
+- **Split:**
+  `[SPLIT YYYY-MM — see AC-<id>a, AC-<id>b, …]`
+
+The AC title keeps the `(deprecated)` prefix defined in the
+Deprecate bullet above; the tombstone line lives directly below
+the title inside the AC body. The AC Catalog row for the retired
+ID moves to `Status: deprecated` (or `superseded`) — see the
+Stability markers legend at the top of the catalog.
+
+**Worked example (live in this document):** AC-71 *(Token-only
+styling)* was retired in 2026-04 when GOV-04 extracted construction
+prose out of the spec. Its body opens with
+`[DEPRECATED 2026-04 — GOV-04]` followed by a one-line reason
+(the rule now lives in `.cursor/rules/code-governance.mdc` + 
+`project.mdc`, and the behavioural intent remains covered by
+AC-70). The catalog row shows `Status: deprecated`. See AC-71
+under §5 for the full shape.
+
+### Amendment logging (inline)
+
+Amendments carry a short inline marker on the affected AC body so
+the edit trail is visible in-document without requiring a git blame:
+
+- **New AC**: append `(added YYYY-MM, #<PR or commit>)` as the last
+  line of the AC body.
+- **Edited AC**: append `(amended YYYY-MM, #<PR or commit>)` the
+  same way. Multiple amendments accumulate as a comma-separated
+  list on the same trailing line (e.g.
+  `(added 2026-01, #12; amended 2026-04, #57)`).
+- **Deprecated AC**: the tombstone line already encodes date and
+  reason; no separate `amended` marker is needed.
+
+Use the PR number when one exists; fall back to the commit short
+hash when the change lands via direct commit on a branch with no
+PR. Hypothetical shape:
+
+```
+- **AC-40** — *Error surface is a single safe string* · **@stable**
+  - **Given** …
+  - **Then** …
+  (added 2026-01, #12; amended 2026-04, #57)
+```
+
+**Not retroactive.** ACs ratified before GOV-10 landed are not
+back-filled with markers — the convention applies from GOV-10's
+landing forward. Gaps in the log for older ACs are expected and
+are not drift.
 
 When in doubt, propose the amendment in chat as a diff against this
 section and the affected `AC-xx`, and let the human confirm before
