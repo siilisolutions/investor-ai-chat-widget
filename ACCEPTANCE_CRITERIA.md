@@ -51,10 +51,32 @@ how hard to push back on a change that touches the AC:
   user-visible goal and acceptance path only. Do not pin interactive
   details, aria-labels, hit-target pixels, or copy strings the design
   has not yet produced. See §10.6 AC Authoring.
+  - **Sub-marker — `(externally gated)`:** an `@aspirational` AC may
+    additionally carry `(externally gated)` when its unshipped
+    behaviour depends on a system this repository does not own
+    (backend retrieval / guardrails / moderation, localisation
+    toggle, host-page Lighthouse, analytics event contract, etc.).
+    The full inline tag reads `**@aspirational (externally gated)**`
+    on the AC heading and `@aspirational (externally gated)` in the
+    catalog Stability column. Externally-gated ACs do **not** count
+    against the internal stabilisation budget reported in
+    completion-log entries — they cannot graduate from inside this
+    repo until the external contract lands — but each body must name
+    the external owner (backend team, product, host-page integration,
+    …) on an `**Owner:**` line so the dependency is explicit rather
+    than implicit. Once the external contract ships, the AC is
+    promoted by dropping the sub-marker (typically graduating to
+    `@evolving` first, then `@stable` once the widget-side slice
+    lands and verifies).
 
 Stability is orthogonal to Status: an `active` AC can be
 `@aspirational` (we mean to ship it but haven't), and a `deprecated`
 AC keeps whatever marker it carried when it was retired.
+
+Completion-log entries that report catalog stability break out the
+externally-gated bucket separately, e.g. `57 @stable / 14 @evolving /
+15 @aspirational / 9 @aspirational (externally gated)`, so the
+internally-actionable backlog is visible at a glance.
 
 Verification values (added GOV-07) name the cheapest credible path to
 confirm the AC:
@@ -140,11 +162,11 @@ directly.
 | AC-51 | Mock fidelity | [§3.5](#35-chat-service-contract) | active | @stable | Manual: `npm run dev` without `VITE_API_URL` — mock resolves per §12.1 PD-02 with a Finnish answer and source count per §12.1 PD-03 |
 | AC-52 | Threaded conversation — full history posted per request | [§3.5](#35-chat-service-contract) | active | @evolving | Automated: `npm run test -- tests/apiChatService.test.ts` (POST body is `{ messages: ChatTurn[] }` in chronological order) and `npm run test -- tests/app.test.tsx` (`buildHistory` drops loading / errored / empty-answer turns) |
 | AC-53 | Real-backend adapter — response mapping and forward-compatible schema | [§3.5](#35-chat-service-contract) | active | @evolving | Automated: `npm run test -- tests/apiChatService.test.ts` (`{ response }` → `ChatMessage`, unknown fields ignored, `sources` forward-compatibly surfaced, malformed source entries dropped) |
-| AC-60 | Every factual claim is sourced | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational | none (aspirational — backend-scoped, not frontend-verifiable) |
-| AC-61 | No forward-looking statements or advice | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational | none (aspirational — backend-scoped, not frontend-verifiable) |
-| AC-62 | No insider or unpublished information | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational | none (aspirational — backend-scoped, not frontend-verifiable) |
-| AC-63 | Language parity | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational | none (aspirational — localisation / `FI ↔ EN` toggle not yet built) |
-| AC-64 | Timestamp / freshness cue (recommended) | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational | none (aspirational — backend-scoped, depends on dated source metadata) |
+| AC-60 | Every factual claim is sourced | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational (externally gated) | none (externally gated — backend retrieval owns source emission) |
+| AC-61 | No forward-looking statements or advice | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational (externally gated) | none (externally gated — backend guardrails own polite-decline) |
+| AC-62 | No insider or unpublished information | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational (externally gated) | none (externally gated — backend content moderation) |
+| AC-63 | Language parity | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational (externally gated) | none (externally gated — host-site `FI ↔ EN` toggle + backend prompt locale) |
+| AC-64 | Timestamp / freshness cue (recommended) | [§4](#4-content-legal--trust-investor-critical) | active | @aspirational (externally gated) | none (externally gated — backend dated-source metadata contract) |
 | AC-65 | Clear AI labelling | [§4](#4-content-legal--trust-investor-critical) | active | @stable | Manual: expanded view shows "Siili AI-avustaja" header and any legally required disclaimer |
 | AC-70 | Figma parity | [§5](#5-visual-design--brand-award-critical) | active | @stable | Visual: `get_design_context` on each §2.5 Figma Manifest row and compare rendered output |
 | AC-71 | (deprecated) Token-only styling — moved to rule files (GOV-04) | [§5](#5-visual-design--brand-award-critical) | deprecated | @stable | n/a (deprecated — see AC body; see AC-70 + `.cursor/rules/` for live coverage) |
@@ -170,14 +192,14 @@ directly.
 | AC-93 | Textarea auto-grow | [§7](#7-responsiveness) | active | @stable | Manual: paste multi-line content — textarea grows to the §12.1 PD-06 cap then scrolls internally; send button stays visible |
 | AC-100 | Bundle budget | [§8](#8-performance) | active | @stable | Automated: `npm run verify` — parses `vite build` gzip output and fails if combined `siili-chatbot.iife.js` + `siili-chatbot.css` exceed 60 KB |
 | AC-101 | Cold-start render | [§8](#8-performance) | active | @evolving | Manual: DevTools 4× CPU throttle — compact interactive ≤150ms after script load completes |
-| AC-102 | No host-page regression | [§8](#8-performance) | active | @aspirational | none (aspirational — Lighthouse on embedded host page not yet measured) |
+| AC-102 | No host-page regression | [§8](#8-performance) | active | @aspirational (externally gated) | none (externally gated — Lighthouse on real host embed, not dev harness) |
 | AC-103 | No layout thrash | [§8](#8-performance) | active | @evolving | Manual: DevTools Performance panel — widget-attributed CLS ≤0.05 across a full session |
 | AC-110 | Browser matrix | [§9](#9-cross-browser--environment) | active | @evolving | Manual: happy-path across Chrome, Edge, Firefox, Safari (latest two each, desktop + iOS Safari / Android Chrome) |
 | AC-111 | No console errors | [§9](#9-cross-browser--environment) | active | @stable | Manual: prod build happy path (load → compact → send → expanded → follow-up → success) — zero errors / warnings |
 | AC-112 | Graceful CSS isolation | [§9](#9-cross-browser--environment) | active | @stable | Manual: embed widget under aggressive host CSS (global tag styles, `!important`) — widget layout unaffected |
-| AC-120 | Event emission — named events for key actions | [§10](#10-observability-light-touch-frontend-only) | active | @aspirational | none (aspirational — event emission not yet implemented) |
-| AC-120b | Event emission — no PII in payloads | [§10](#10-observability-light-touch-frontend-only) | active | @aspirational | none (aspirational — event emission not yet implemented) |
-| AC-120c | Event emission — `chat_closed` payload | [§10](#10-observability-light-touch-frontend-only) | active | @aspirational | none (aspirational — event emission not yet implemented) |
+| AC-120 | Event emission — named events for key actions | [§10](#10-observability-light-touch-frontend-only) | active | @aspirational (externally gated) | none (externally gated — product sign-off on event names + `dataLayer` schema) |
+| AC-120b | Event emission — no PII in payloads | [§10](#10-observability-light-touch-frontend-only) | active | @aspirational (externally gated) | none (externally gated — product sign-off on PII policy / payload shape) |
+| AC-120c | Event emission — `chat_closed` payload | [§10](#10-observability-light-touch-frontend-only) | active | @aspirational (externally gated) | none (externally gated — product schema + Lane H internal dep for close button / Esc / back-nav) |
 | AC-121 | No uncontrolled network calls | [§10](#10-observability-light-touch-frontend-only) | active | @stable | Manual: DevTools Network — no calls beyond the configured `ChatService` endpoint and host-declared fonts/CSS |
 | AC-N1 | MUST NOT render backend-provided HTML or Markdown | [§12](#12-non-goals--explicit-non-requirements) | active | @stable | Automated: `npm run verify` (grep guard — `dangerouslySetInnerHTML` forbidden in `src/`) + `npm run test -- tests/chatMessage.test.tsx` (HTML / Markdown in answers, source labels, and error messages all render as escaped text with no DOM injection) |
 | AC-N2 | MUST NOT bundle font files with the widget | [§12](#12-non-goals--explicit-non-requirements) | active | @stable | Automated: `npm run verify` — builds then scans `dist/` for `.woff` / `.woff2` / `.ttf` / `.otf` / `.eot` binaries and any `@font-face` in bundled CSS |
@@ -820,38 +842,69 @@ These criteria exist because the primary user is making regulated
 financial decisions. They apply primarily to the backend, but the
 **widget must not undermine them** through UX.
 
-- **AC-60** — *Every factual claim is sourced* · **@aspirational**
+- **AC-60** — *Every factual claim is sourced* · **@aspirational (externally gated)**
   - **Given** any answer that states a fact about Siili (revenue,
     dividend, governance, strategy, etc.),
   - **Then** the answer includes at least one source reference linking
     to a published disclosure (annual report, stock exchange release,
     IR PDF, articles of association, etc.).
+  - **Owner:** backend / retrieval — the AC cannot be satisfied from
+    inside this widget until responses carry source references; the
+    widget already renders any `sources` array it receives (see
+    AC-25 family + `src/services/apiChatService.ts`).
 
-- **AC-61** — *No forward-looking statements or advice* · **@aspirational**
+  (amended 2026-04, GOV-16 Cluster 10)
+
+- **AC-61** — *No forward-looking statements or advice* · **@aspirational (externally gated)**
   - **Given** an investor asks for a price prediction, buy/sell advice,
     or a forecast,
   - **Then** the answer politely declines and redirects to published
     guidance / financial targets (this is a backend behaviour; the
     widget must render the polite-decline response without decoration
     that makes it look like advice).
+  - **Owner:** backend / guardrails — polite-decline is emitted
+    server-side; the widget is already decoration-free (plain text
+    per AC-N1), so the widget side of this contract is satisfied
+    whenever the backend guardrail lands.
 
-- **AC-62** — *No insider or unpublished information* · **@aspirational**
+  (amended 2026-04, GOV-16 Cluster 10)
+
+- **AC-62** — *No insider or unpublished information* · **@aspirational (externally gated)**
   - **Then** answers must only reference materials already publicly
     disclosed. The widget should never hide or truncate a source link
     in a way that obscures provenance.
+  - **Owner:** backend / content moderation — moderation runs upstream
+    of response generation; the widget already surfaces source links
+    verbatim via `SourceBadge` and does not truncate `href`.
 
-- **AC-63** — *Language parity* · **@aspirational**
+  (amended 2026-04, GOV-16 Cluster 10)
+
+- **AC-63** — *Language parity* · **@aspirational (externally gated)**
   - **Given** the host site toggles `FI ↔ EN`,
   - **Then** the widget UI strings (placeholder, header, chips,
     *"Lähteet:"*, *"Haetaan tietoa..."*, error copy) and the backend
     prompt locale are both switched. A Finnish UI answering in English
     (or vice-versa) is a bug.
+  - **Owner:** product + backend — requires a host-site `FI ↔ EN`
+    toggle convention (not yet defined as a product decision) and
+    a backend prompt-locale switch; the widget string table is
+    Finnish-only today and a locale plumb would be a small,
+    self-contained change once the contract lands.
 
-- **AC-64** — *Timestamp / freshness cue (recommended)* · **@aspirational**
+  (amended 2026-04, GOV-16 Cluster 10)
+
+- **AC-64** — *Timestamp / freshness cue (recommended)* · **@aspirational (externally gated)**
   - **Given** an answer cites a dated document,
   - **Then** the reference badge includes the document's date (e.g.
     "Vuosikertomus 2025") so the investor can judge freshness without
     opening the PDF.
+  - **Owner:** backend — once responses carry dated-source metadata
+    the widget renders it via `SourceBadge`; no widget-side work
+    until the metadata schema lands. Becomes a small `@evolving`
+    bucket-(b) widget slice the moment the backend contract is
+    signed off.
+
+  (amended 2026-04, GOV-16 Cluster 10)
 
 - **AC-65** — *Clear AI labelling* · **@stable**
   - **Given** the expanded view,
@@ -1046,10 +1099,17 @@ These criteria exist to satisfy P2's competition-entry ambition.
   - **Then** the compact view is interactive within 150ms of script
     load completing.
 
-- **AC-102** — *No host-page regression* · **@aspirational**
+- **AC-102** — *No host-page regression* · **@aspirational (externally gated)**
   - **Given** the widget is embedded on the IR site,
   - **Then** Lighthouse performance score for the host page drops by
     no more than 2 points versus the same page without the widget.
+  - **Owner:** host-page integration — the measurement requires the
+    widget to be loaded on `sijoittajille.siili.com` (not the dev
+    harness) with and without the IIFE, and a Lighthouse run on the
+    real page. Gated on a staging embed; cannot be verified from
+    inside this repo.
+
+  (amended 2026-04, GOV-16 Cluster 10)
 
 - **AC-103** — *No layout thrash* · **@evolving**
   - **Given** messages are streaming in,
@@ -1083,26 +1143,43 @@ These criteria exist to satisfy P2's competition-entry ambition.
 
 ## 10. Observability (Light-Touch, Frontend Only)
 
-- **AC-120** — *Event emission — named events for key actions* · **@aspirational**
+- **AC-120** — *Event emission — named events for key actions* · **@aspirational (externally gated)**
   - **Given** these user actions — widget mounted, chip clicked,
     message sent, response received, response errored, chat closed
     (via `×` / `Esc` / back), chat reopened (via continue pill),
   - **Then** the widget emits a named event (custom event on
     `window` or calls `window.dataLayer.push` if present) so the IR
     site's existing analytics can capture them.
+  - **Owner:** product — event-name vocabulary + `dataLayer` schema
+    need to be signed off by the IR site's analytics owner before
+    the widget can emit anything. Widget-side plumbing is a small
+    slice once the schema is agreed.
 
-- **AC-120b** — *Event emission — no PII in payloads* · **@aspirational**
+  (amended 2026-04, GOV-16 Cluster 10)
+
+- **AC-120b** — *Event emission — no PII in payloads* · **@aspirational (externally gated)**
   - **Given** any event emitted per AC-120,
   - **Then** its payload contains no personally identifiable
     information (no user message text, no user-supplied free-form
     content, no identifiers that could be reverse-linked to an
     individual).
+  - **Owner:** product — same sign-off as AC-120 (the PII policy is
+    part of the schema). Widget-side enforcement becomes trivial
+    once payload shapes are defined.
 
-- **AC-120c** — *Event emission — `chat_closed` payload* · **@aspirational**
+  (amended 2026-04, GOV-16 Cluster 10)
+
+- **AC-120c** — *Event emission — `chat_closed` payload* · **@aspirational (externally gated)**
   - **Given** the `chat_closed` event is emitted,
   - **Then** its payload includes the dismiss method
     (`"close_button" | "escape_key" | "back_navigation"`) and the
     message count at dismiss time.
+  - **Owner:** product (analytics schema) + Lane H (close button +
+    `Esc` + back-nav dismiss must land before a `chat_closed` event
+    has anything to fire on). Double-gated: external schema
+    sign-off and an internal Lane H dependency.
+
+  (amended 2026-04, GOV-16 Cluster 10)
 
 - **AC-121** — *No uncontrolled network calls* · **@stable**
   - **Given** the widget is mounted,
@@ -1212,9 +1289,20 @@ the edit trail is visible in-document without requiring a git blame:
 - **Deprecated AC**: the tombstone line already encodes date and
   reason; no separate `amended` marker is needed.
 
-Use the PR number when one exists; fall back to the commit short
-hash when the change lands via direct commit on a branch with no
-PR. Hypothetical shape:
+The `<ref>` after `YYYY-MM` takes one of three shapes, in order of
+preference:
+
+- `#<number>` — a PR or issue number (canonical for PR-based
+  workflows).
+- `#<short-hash>` — a commit short hash when the change lands via
+  direct commit on a branch with no PR.
+- `GOV-xx <scope>` — a governance batch reference when a single
+  GOV task amends many ACs at once (e.g. `GOV-16 Cluster 10`). This
+  matches the precedent set by the AC-71 tombstone
+  (`[DEPRECATED 2026-04 — GOV-04]`) and is preferred over repeating
+  the same commit hash across dozens of ACs in one batch.
+
+Hypothetical shape:
 
 ```
 - **AC-40** — *Error surface is a single safe string* · **@stable**
