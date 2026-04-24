@@ -11,6 +11,10 @@
  * does not reflow the host page (AC-20f) and auto-scroll keeps the
  * latest reply and the input visible together (AC-27 / AC-28c).
  *
+ * AC-80: the textarea is auto-focused on mount so the first keyboard
+ * action lands on the primary input, regardless of whether linked
+ * source badges earlier in DOM order are focusable.
+ *
  * Used inside: `App`.
  */
 
@@ -61,7 +65,7 @@ export function ExpandedView({ messages, loading, onSend }: ExpandedViewProps) {
         ))}
       </div>
       <div ref={inputRef} className={styles.inputWrapper}>
-        <ChatInput variant="expanded" disabled={loading} onSend={onSend} />
+        <ChatInput variant="expanded" disabled={loading} autoFocus onSend={onSend} />
       </div>
     </div>
   )

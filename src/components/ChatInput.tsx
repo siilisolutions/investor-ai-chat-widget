@@ -17,7 +17,7 @@
  * Used inside: `CompactView`, `ExpandedView`.
  */
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent, MouseEvent } from 'react'
 import styles from '../styles/chatInput.module.css'
 
@@ -25,6 +25,7 @@ interface ChatInputProps {
   variant: 'compact' | 'expanded'
   placeholder?: string
   disabled?: boolean
+  autoFocus?: boolean
   onSend: (message: string) => void
 }
 
@@ -35,11 +36,18 @@ export function ChatInput({
   variant,
   placeholder = DEFAULT_PLACEHOLDER,
   disabled = false,
+  autoFocus = false,
   onSend,
 }: ChatInputProps) {
   const [value, setValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const sendButtonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (autoFocus) {
+      textareaRef.current?.focus()
+    }
+  }, [autoFocus])
 
   const submit = () => {
     const trimmed = value.trim()

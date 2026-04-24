@@ -154,7 +154,7 @@ directly.
 | AC-74 | Motion polish | [§5](#5-visual-design--brand-award-critical) | active | @stable | Manual: interact with chip / send / focus / transition — durations within §12.1 PD-07, easing matches IR site |
 | AC-75 | No generic AI aesthetic | [§5](#5-visual-design--brand-award-critical) | active | @stable | Visual: review against Figma — no default spinners, Material FAB, plain-tail bubbles, or stock AI motifs |
 | AC-76 | Dark hero compatibility | [§5](#5-visual-design--brand-award-critical) | active | @evolving | Manual: overlay on the real hero asset + axe / contrast tool over the busiest hero region |
-| AC-80 | Keyboard-only operation | [§6](#6-accessibility) | active | @evolving | Manual: Tab through widget — focus order textarea → send → chips / badges, visible focus ring |
+| AC-80 | Keyboard-only operation | [§6](#6-accessibility) | active | @stable | Automated: `npm run test -- tests/keyboardNav.test.tsx` (compact Tab order textarea → send → chips; expanded initial focus on textarea; linked badges focusable). Manual: DevTools A11y panel — focus ring visible on each interactive surface |
 | AC-81 | Screen-reader labelling — textarea | [§6](#6-accessibility) | active | @stable | Manual: DevTools Accessibility panel — textarea announces configured `aria-label` |
 | AC-81b | Screen-reader labelling — send button | [§6](#6-accessibility) | active | @stable | Manual: DevTools Accessibility panel — send button announces "Send message" (or localised equivalent) |
 | AC-81c | Screen-reader labelling — loading state | [§6](#6-accessibility) | active | @stable | Automated: `npm run test -- tests/chatMessage.test.tsx` (`role="status"` + `aria-live="polite"` + "Haetaan tietoa..." copy) |
@@ -930,12 +930,23 @@ These criteria exist to satisfy P2's competition-entry ambition.
 
 ## 6. Accessibility
 
-- **AC-80** — *Keyboard-only operation* · **@evolving**
+- **AC-80** — *Keyboard-only operation* · **@stable**
   - **Given** a keyboard-only user,
-  - **When** they Tab into the widget,
-  - **Then** focus order is: textarea → send button → each suggestion
-    chip (compact) / each source badge (expanded), with a visible
-    focus ring that contrasts against the background.
+  - **When** compact mode is mounted and the user Tabs into the widget,
+  - **Then** Tab order within the widget is: textarea → send button →
+    each suggestion chip in DOM order.
+  - **When** expanded mode is mounted (after the first send),
+  - **Then** initial keyboard focus lands on the textarea, and Tab
+    advances from the textarea to the send button.
+  - **And** every interactive surface — textarea, send button,
+    suggestion chips, and linked source badges — is keyboard-reachable
+    and renders a visible `:focus-visible` ring that contrasts against
+    the background. The relative Tab order between linked source
+    badges and the textarea is not asserted, because badges render
+    inline with their parent answer for screen-reader reading order;
+    the autofocus-on-mount contract above guarantees the user's first
+    keyboard action in expanded mode lands on the textarea regardless
+    of DOM ordering.
 
 - **AC-81** — *Screen-reader labelling — textarea* · **@stable**
   - **Given** a screen reader,
