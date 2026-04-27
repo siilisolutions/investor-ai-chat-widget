@@ -49,6 +49,10 @@
   overflow-y: auto;
 }
 
+.textarea:focus-visible {
+  outline: none;
+}
+
 .textarea::placeholder {
   color: var(--gray-900);
 }
