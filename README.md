@@ -42,10 +42,17 @@ Produces `dist/siili-chatbot.iife.js` and `dist/siili-chatbot.css`.
 
 ## Embed on Host Site
 
+The host page can either self-host the bundle (download `siili-chatbot.iife.js` + `siili-chatbot.css` from a tagged GitHub release and serve them itself) or load them straight from the **jsDelivr CDN** — the latter is the easiest path and what staging currently uses.
+
+### Option A — jsDelivr CDN (recommended for staging)
+
+Pin to an exact tag so a future release can't break the staging page without an explicit version bump:
+
 ```html
 <div id="siili-chatbot"></div>
-<link rel="stylesheet" href="path/to/siili-chatbot.css" />
-<script src="path/to/siili-chatbot.iife.js"></script>
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/siilisolutions/investor-ai-chat-widget@v0.1.0/dist/siili-chatbot.css" />
+<script src="https://cdn.jsdelivr.net/gh/siilisolutions/investor-ai-chat-widget@v0.1.0/dist/siili-chatbot.iife.js"></script>
 <script>
   SiiliChatbot.init({
     container: '#siili-chatbot',
@@ -54,9 +61,38 @@ Produces `dist/siili-chatbot.iife.js` and `dist/siili-chatbot.css`.
 </script>
 ```
 
+- jsDelivr serves any file from any tag of this public repo automatically — there's nothing to publish, just `git push --tags`.
+- The bundle is tiny (gzip ~13 KB combined) so caching is nearly free.
+- To roll forward, bump the `@v0.1.0` segment in both URLs to the new tag. To roll back, point it at the previous tag — no rebuild required on the host.
+- Avoid `@latest` on production surfaces; it auto-follows the newest tag and turns every release into a silent host-page change. `@latest` is fine for throwaway demos only.
+
+### Option B — Self-hosted
+
+If the host has its own asset pipeline (e.g. HubSpot `/hubfs/`), download the two files from the [v0.1.0 release](https://github.com/siilisolutions/investor-ai-chat-widget/releases/tag/v0.1.0) (or build locally with `npm run build`) and serve them yourself:
+
+```html
+<div id="siili-chatbot"></div>
+<link rel="stylesheet" href="path/to/siili-chatbot.css" />
+<script src="path/to/siili-chatbot.iife.js"></script>
+<script>
+  SiiliChatbot.init({ container: '#siili-chatbot', apiUrl: 'https://YOUR-BACKEND/api/chat' });
+</script>
+```
+
 `apiUrl` is optional — if omitted the widget runs against the bundled mock so local demos work offline. In production, set it to the chatbot backend endpoint **in the host page's script tag**, not in this repo.
 
 For local development against the real backend, copy the endpoint into `.env.local` as `VITE_API_URL=…` (the file is git-ignored) and run `npm run dev`.
+
+### Cutting a new CDN release
+
+1. From `main`: `npm run build` (sanity check; the release commit will rebuild too).
+2. `git checkout --detach main`
+3. `git add -f dist/siili-chatbot.iife.js dist/siili-chatbot.css`
+4. `git commit -m "release(vX.Y.Z): bundle dist/ for jsDelivr CDN"`
+5. `git tag -a vX.Y.Z -m "vX.Y.Z — release notes"`
+6. `git checkout main` (release commit is now reachable only via the tag — `main` stays free of build artifacts)
+7. `git push origin vX.Y.Z`
+8. The jsDelivr URL `https://cdn.jsdelivr.net/gh/siilisolutions/investor-ai-chat-widget@vX.Y.Z/dist/siili-chatbot.iife.js` becomes live within a minute.
 
 ## Widget Modes
 
