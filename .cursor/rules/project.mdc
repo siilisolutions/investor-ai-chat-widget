@@ -32,8 +32,7 @@ Read `AGENTS.md` at the repo root for full project context, file map, design tok
 
 ## Design Reference
 
-- Figma (screens): https://www.figma.com/design/0xXdKUlBJIolF15MjJuaMC/IR-site — `fileKey = 0xXdKUlBJIolF15MjJuaMC`. Use for screen-level composition (hero page, AI-agent page, loading state).
-- Figma (design system): https://www.figma.com/design/rlh00CEImhMWwdRNOUqW6L/IR-DS — `fileKey = rlh00CEImhMWwdRNOUqW6L`. Use for component-level work (Textarea, Question+Answer, Reference tag, etc.). Code Connect mappings live here. See `AGENTS.md` §Figma for the node-ID table of both files.
+- Figma file keys, URLs, and node-ID tables for both **IR-site** (screens) and **IR-DS** (design system) live in `AGENTS.md` §Figma. That section is authoritative; do not duplicate it here.
 - Font: Everett (Regular, Bold, Light). Assumed to be loaded by the host page.
 
 ## Figma-first workflow (visual changes)

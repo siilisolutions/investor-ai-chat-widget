@@ -1,0 +1,1035 @@
+# Acceptance Criteria — Bodies (§§1–10)
+
+> Long-form Given/When/Then prose for every `AC-xx` in §§1–10 of the
+> spec. The catalog, §2.5 Figma Manifest, §11 Definition of Done, §12
+> Non-Goals (incl. AC-N1 / AC-N2 bodies), and §13 Traceability live in
+> [`ACCEPTANCE_CRITERIA.md`](ACCEPTANCE_CRITERIA.md). Amending
+> conventions (former §10.5 / §10.6) live in
+> [`.cursor/rules/ac-amending.mdc`](.cursor/rules/ac-amending.mdc).
+>
+> AC-IDs and Markdown anchors here match the catalog row links exactly
+> — e.g. the catalog's `[§3.1](#31-embedding--initialisation)` resolves
+> to the heading below in this file. When you edit an AC body, follow
+> `.cursor/rules/ac-amending.mdc`.
+
+## 1. Personas & Primary Jobs-to-Be-Done
+
+### P1 — The Investor (primary end user)
+An existing or prospective Siili Solutions shareholder landing on
+<https://sijoittajille.siili.com/>. They are time-boxed, analytical, and
+legally protected by MAR/ESMA/Finnish securities regulation.
+
+**Job-to-be-done:** *"Help me quickly find the legally-disclosed
+information I need — financials, strategy, governance, news, share data —
+so I can decide whether to buy, hold, or sell Siili stock with
+confidence."*
+
+Implications for the widget:
+- Answers must be grounded in published, non-inside information.
+- Every factual claim must be traceable to a source the investor can
+  open and verify themselves.
+- The widget must never feel like it is giving investment advice,
+  forecasts, or selective disclosure.
+- Finnish is the default language (host site default); English must be
+  supported because the host site offers `FI / EN`.
+
+### P2 — Siili Solutions (business stakeholder)
+Siili positions itself as *the* Finnish partner for AI-assisted software
+and AI transformation. The IR site is a high-visibility billboard for
+that positioning, and this widget is the headline demonstration.
+
+**Job-to-be-done:** *"Prove — on our own investor site — that we build
+production-grade, tastefully-designed AI products. Make it award-worthy
+so we can enter it into marketing and design competitions."*
+
+Implications for the widget:
+- Visual execution must match Figma pixel-for-pixel; no generic
+  "AI chatbot" aesthetic.
+- Interactions must feel crafted (typography, motion, micro-states).
+- The experience must read as *Siili* — brand typography (Everett),
+  Siili gradient (blue → violet), restrained palette.
+- The widget must be demonstrably robust (no visible bugs, no jank)
+  when a juror tries it live.
+
+---
+
+## 2. Scope
+
+**In scope (this repo):**
+- The embeddable chatbot widget rendered inside `#siili-chatbot` on the
+  host page.
+- Compact (hero) and expanded (chat) modes and the transition between
+  them.
+- The `ChatService` interface and a mock implementation.
+- Design token system mirroring Figma.
+- Build output: `dist/siili-chatbot.iife.js` + `dist/siili-chatbot.css`.
+
+**Out of scope (tracked elsewhere):**
+- The actual LLM backend, retrieval over IR documents, guardrails, and
+  content moderation.
+- The host-site layout, hero image, and navigation around the widget.
+- Analytics pipeline wiring (events are emitted; ingestion is separate).
+
+---
+
+## 3. Functional Acceptance Criteria
+
+Format: `Given / When / Then`. Each criterion has a stable ID (`AC-xx`)
+that tests and PR descriptions can reference.
+
+### 3.1 Embedding & Initialisation
+
+- **AC-01** — *Host-site embedding* · **@stable**
+  - **Given** the host page includes `<div id="siili-chatbot"></div>`,
+    `siili-chatbot.css`, and `siili-chatbot.iife.js`,
+  - **When** the host calls `SiiliChatbot.init({ container: '#siili-chatbot' })`,
+  - **Then** the widget mounts into that container without throwing,
+    without polluting `window` beyond the `SiiliChatbot` global, and
+    without leaking CSS into the host page.
+
+- **AC-02** — *Zero host dependencies* · **@stable**
+  - **Given** a host page that loads only `siili-chatbot.css` and
+    `siili-chatbot.iife.js` and exposes `<div id="siili-chatbot"></div>`
+    (no other scripts, no shared runtime, no global libraries),
+  - **When** `SiiliChatbot.init()` runs,
+  - **Then** the widget renders and functions end-to-end. The widget
+    must not reach for any global beyond the `SiiliChatbot` namespace
+    it exports itself.
+
+- **AC-03** — *Idempotent init* · **@stable**
+  - **Given** `SiiliChatbot.init()` has already run,
+  - **When** it is called a second time on the same container,
+  - **Then** the widget is remounted cleanly (no duplicate UI, no
+    orphaned event listeners, no console errors).
+
+- **AC-04** — *`apiUrl` option selects backend* · **@evolving**
+  - **Given** `WidgetOptions` defined in `src/types/index.ts`,
+  - **Then** it carries an optional `apiUrl: string` field.
+  - **When** the host calls `SiiliChatbot.init({ container, apiUrl })`
+    with a non-empty `apiUrl`,
+  - **Then** the widget wires the real `ChatService` adapter against
+    that URL and issues no other cross-origin calls (per AC-121).
+  - **When** `apiUrl` is omitted (or empty),
+  - **Then** the widget falls back to the bundled mock
+    (`src/services/chatService.ts`) so local dev and the dev harness
+    work offline; no error is thrown and no warning is rendered in
+    production UI.
+  - The URL is **not** baked into the production bundle; it is
+    supplied by the host page at `init()` time.
+
+### 3.2 Compact (Hero) Mode
+
+Maps to the Investor hero composition and its main component; see
+§2.5 Figma Manifest for the bound nodes.
+
+- **AC-10** — *Initial state* · **@stable**
+  - **Given** the page has just loaded and `messages.length === 0`,
+  - **When** the widget renders for the first time,
+  - **Then** it shows the compact mode: one textarea plus the
+    predefined suggestion chips (count per §12.1 PD-01), overlaid on
+    the hero section in the layout defined in Figma.
+
+- **AC-10a** — *Continue-conversation pill — rendering* · **@aspirational**
+  - **Given** the user has previously been in expanded mode within the
+    current page session and `messages.length > 0`, and the widget is
+    now rendering compact mode,
+  - **Then** a single pill is rendered above the suggestion chips
+    reading *"Jatka keskustelua"* (styled per Siili tokens: Everett,
+    `--radius`, gradient or gray surface per Figma once designed).
+  - **Given** `messages.length === 0`,
+  - **Then** the pill is not rendered.
+
+- **AC-10c** — *Continue-conversation pill — activation* · **@aspirational**
+  - **Given** the continue-conversation pill is rendered (per AC-10a),
+  - **When** the user clicks or keyboard-activates the pill,
+  - **Then** the widget transitions to expanded mode with the full
+    message history intact, scrolled to the latest reply, and fires
+    no network call.
+
+- **AC-10b** — *Suggestion-chip de-duplication* · **@aspirational**
+  - **Given** the user has previously asked one of the three predefined
+    questions,
+  - **When** compact mode is rendered again in the same session,
+  - **Then** the chip matching that question is hidden; any remaining
+    chips render in their original order.
+  - **Given** all three predefined questions have been asked,
+  - **Then** no chips are rendered (only the textarea and, per AC-10a,
+    the continue pill).
+
+- **AC-11** — *Placeholder copy* · **@stable**
+  - **Given** compact mode is shown,
+  - **Then** the textarea displays the placeholder
+    *"Kysy minulta mitä vaan Siilistä sijoituskohteena tai
+    taloustiedoistamme."* styled per the textarea component
+    (see §2.5 row AC-11).
+
+- **AC-12** — *Suggestion chip content* · **@stable**
+  - **Given** compact mode is shown,
+  - **Then** the suggestion chips display the predefined investor
+    questions in Finnish (segments, dividend policy, revenue growth)
+    with the exact wording from the predefined-question component
+    (see §2.5 row AC-12) and `src/App.tsx::SUGGESTIONS`. Chip count
+    per §12.1 PD-01.
+
+- **AC-12b** — *Suggestion chip labels do not wrap* · **@stable**
+  - **Given** compact mode is shown,
+  - **Then** each chip's label renders on a single line
+    (`white-space: nowrap`) matching the predefined-question
+    component (see §2.5 row AC-12b); overflow of the chip row
+    is handled at the breakpoints defined in AC-91 / AC-92 (row
+    wrap on tablet, horizontal scroll or wrap on mobile), not by
+    breaking chip labels.
+
+- **AC-13** — *Sending from the textarea* · **@stable**
+  - **Given** the user has typed a non-empty, non-whitespace question,
+  - **When** they press `Enter` (without `Shift`) or click the send button,
+  - **Then** the widget transitions to expanded mode, the question is
+    sent to the chat service, and the textarea is cleared.
+
+- **AC-14** — *Sending from a chip* · **@stable**
+  - **Given** a suggestion chip is rendered,
+  - **When** the user clicks (or keyboard-activates) it,
+  - **Then** the chip's label is sent as the question and the widget
+    transitions to expanded mode.
+
+- **AC-15** — *Empty-submit guard* · **@stable**
+  - **Given** the textarea is empty or whitespace-only,
+  - **When** the user presses `Enter` or clicks send,
+  - **Then** nothing happens and the widget stays in compact mode.
+
+- **AC-16** — *Send-button enablement* · **@stable**
+  - **Given** the textarea is empty,
+  - **Then** the send button is visibly and functionally disabled.
+  - **When** at least one non-whitespace character is entered,
+  - **Then** the send button becomes enabled with the Active-variant
+    gradient (see §2.5 row AC-16).
+
+- **AC-17** — *Input shell — click-to-focus target with text cursor* · **@stable**
+  - **Given** the input shell is rendered in either variant (compact
+    or expanded; see the textarea component referenced in §2.5 row
+    AC-11 / AC-28),
+  - **When** the user hovers anywhere inside the shell that is not
+    the send button (the padding around the textarea, the visible
+    whitespace alongside a short single-line value),
+  - **Then** the cursor is rendered as a text caret (`cursor: text`),
+    signalling that the whole shell is a typing target.
+  - **When** the user clicks anywhere inside the shell that is not
+    the send button,
+  - **Then** the underlying `<textarea>` receives focus so typing
+    starts immediately without a second click.
+  - The send button keeps its own `cursor: pointer` and does not
+    forward clicks to the textarea.
+
+### 3.3 Expanded (Chat) Mode
+
+Maps to the Investor agent composition and its main component; see
+§2.5 Figma Manifest for the bound nodes.
+
+- **AC-20** — *Transition — no flicker* · **@stable**
+  - **Given** the widget is in compact mode and a valid message is
+    submitted,
+  - **When** the transition occurs,
+  - **Then** expanded mode mounts without a flicker (no unstyled
+    flash, no intermediate empty frame between compact and expanded).
+
+- **AC-20e** — *Transition — first Q+A pair visible immediately* · **@stable**
+  - **Given** compact mode has just transitioned to expanded per
+    AC-20,
+  - **Then** on the first rendered frame of expanded mode the first
+    Q+A pair is already visible with the user's question filled in
+    and the assistant answer in loading state (no blank list, no
+    deferred mount).
+
+- **AC-20a** — *Fill the viewport* · **@stable**
+  - **Given** the widget has entered expanded mode,
+  - **Then** the chat surface fills the entire browser viewport
+    (100vw × 100vh from the widget's root container), with an
+    opaque background matching the expanded-view composition
+    (see §2.5 row AC-20a).
+  - **Then** no host-page content behind the widget is visible through
+    it (no translucency, no gaps at the edges).
+
+- **AC-20b** — *Hero image hidden* · **@stable**
+  - **Given** the widget is in expanded mode,
+  - **Then** the hero image / hero section that was visible behind the
+    compact view is no longer visible to the user — either because
+    the widget's opaque surface fully covers it, or because the host
+    page's hero is hidden/collapsed while the widget is expanded.
+
+- **AC-20f** — *Transition — no host-page scroll or reflow* · **@stable**
+  - **Given** the widget is transitioning from compact to expanded
+    mode,
+  - **Then** the host page underneath does not scroll or reflow
+    visibly as a side-effect of the transition (the host page's
+    scroll position and layout are preserved for when the user
+    dismisses expanded mode per AC-31).
+
+- **AC-20c** — *Back navigation — history entry pushed on expand* · **@evolving**
+  - **Given** `SiiliChatbot.init({ interceptBackNavigation: true })`
+    (default `true`) and the widget is about to enter expanded mode,
+  - **When** the compact → expanded transition begins,
+  - **Then** the widget pushes a single history entry
+    (`history.pushState({ siiliExpanded: true }, '')`) so it can
+    recognise it on `popstate`.
+  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving.)
+
+- **AC-20g** — *Back navigation — popstate returns to compact* · **@evolving**
+  - **Given** the widget is in expanded mode with its own history
+    entry on the stack (per AC-20c),
+  - **When** the user triggers browser back (desktop back button,
+    Android hardware back, iOS swipe-back),
+  - **Then** the widget's `popstate` listener flips mode back to
+    compact with `messages` retained (see AC-31). The
+    pushed-history flag is cleared so a subsequent dismiss path
+    does not call `history.back()` on a non-existent entry.
+  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving.)
+
+- **AC-20h** — *Back navigation — compact-mode back is not intercepted* · **@evolving**
+  - **Given** the user is already in compact mode,
+  - **When** the user triggers browser back,
+  - **Then** the event is not intercepted — the host page's normal
+    navigation applies.
+  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving pending Figma visual confirmation.)
+
+- **AC-20i** — *Back navigation — opt-out via `interceptBackNavigation: false`* · **@evolving**
+  - **Given** `SiiliChatbot.init({ interceptBackNavigation: false })`,
+  - **Then** no history entry is pushed on compact → expanded and
+    `popstate` is not intercepted at any point in the widget
+    lifecycle. The close button (AC-20d) and `Esc` (AC-20j) still
+    dismiss the expanded mode; they just flip mode directly without
+    calling `history.back()`.
+  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving.)
+
+- **AC-20d** — *Close button — rendering* · **@evolving**
+  - **Given** the widget is in expanded mode,
+  - **Then** a close (`×`) button is rendered in the top-right of the
+    expanded view, styled per Siili tokens (not a generic Material
+    `×`), with a 44×44px minimum hit target and
+    `aria-label="Sulje keskustelu"`.
+  (amended 2026-04, Figma component drift — implementation landed against `ds:196:853`; visual styling is currently `@evolving` because Figma access for the design context (Edit-seat) is unavailable, so the implementation reuses existing tokens (`--gray-400` / `--gray-500` / `--radius-pill`) until the design is confirmed. Promote to @stable after the next Figma sync sweep.)
+
+- **AC-20j** — *Close button — activation dismisses expanded mode* · **@evolving**
+  - **Given** the widget is in expanded mode,
+  - **When** the user clicks the close button or presses `Esc`
+    anywhere inside the widget,
+  - **Then** the widget returns to compact mode with `messages`
+    retained (see AC-31) and, if `interceptBackNavigation` is on,
+    calls `history.back()` to keep the history stack in sync.
+  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving.)
+
+- **AC-20k** — *Close button — reduced motion* · **@evolving**
+  - **Given** `prefers-reduced-motion: reduce`,
+  - **When** the user dismisses expanded mode via the close button,
+    `Esc`, or browser back (AC-20j / AC-20g),
+  - **Then** the dismiss transition is instant (no fade / slide).
+    `closeButton.module.css` and `expandedView.module.css` already
+    drop their hover / mount transitions inside a
+    `prefers-reduced-motion: reduce` media query.
+  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving.)
+
+- **AC-21** — *Header* · **@stable**
+  - **Given** expanded mode is shown,
+  - **Then** the header reads *"Siili AI-avustaja"* styled per the
+    Investor agent component (see §2.5 row AC-21).
+
+- **AC-22** — *Question bubble* · **@stable**
+  - **Given** any Q+A pair,
+  - **Then** the question appears right-aligned in a bubble matching
+    the Question+Answer component (see §2.5 row AC-22).
+
+- **AC-23** — *Loading indicator — semantics and copy* · **@stable**
+  - **Given** an in-flight assistant answer,
+  - **Then** a pulsating gray blob (see §2.5 row AC-23) and the text
+    *"Haetaan tietoa..."* appear in place of the answer, with
+    `role="status"` and `aria-live="polite"`.
+
+- **AC-23b** — *Loading indicator — blob visual style* · **@stable**
+  - **Given** the loading indicator is visible (per AC-23),
+  - **Then** the blob's shape, fill, and scale/opacity pulse tempo
+    match the loading-state component (see §2.5 row AC-23b) — not a
+    spinning ring, not a bar, not a stepped dot sequence.
+
+- **AC-24** — *Answer rendering* · **@stable**
+  - **Given** the chat service resolves with an answer,
+  - **Then** the pulsating blob is replaced by the answer text,
+    preserving paragraph breaks from the backend response.
+
+- **AC-25** — *Source references — section rendered* · **@stable**
+  - **Given** an answer includes one or more `sources`,
+  - **Then** the section labelled *"Lähteet:"* is rendered below the
+    answer with one `SourceBadge` per source, matching the reference
+    tag component (see §2.5 row AC-25).
+
+- **AC-25b** — *Source references — linked badge opens in new tab* · **@stable**
+  - **Given** a source has an `href`,
+  - **Then** the badge is a link that opens in a new tab
+    (`target="_blank"`, `rel="noopener noreferrer"`).
+
+- **AC-25c** — *Source references — unlinked badge is static* · **@stable**
+  - **Given** a source has no `href`,
+  - **Then** the badge is rendered as static, non-interactive text
+    (no underline, no hover affordance).
+
+- **AC-26** — *No-sources case* · **@stable**
+  - **Given** an answer has zero sources,
+  - **Then** the "Lähteet:" section is not rendered at all (no empty
+    label, no empty container).
+
+- **AC-27** — *Auto-scroll to newest* · **@stable**
+  - **Given** expanded mode is shown and a new Q+A pair is appended,
+  - **Then** the messages container smoothly scrolls the newest pair
+    into view.
+
+- **AC-28** — *Input positioned below the latest reply* · **@stable**
+  - **Given** expanded mode is shown,
+  - **Then** the `ChatInput` is rendered immediately underneath the
+    most recent assistant reply (or its loading blob), in document
+    flow, matching the textarea placement in the Investor agent
+    composition (see §2.5 row AC-28).
+
+- **AC-28b** — *Input placement — short conversations are not bottom-pinned* · **@stable**
+  - **Given** the conversation is short enough that all Q+A pairs fit
+    in the viewport,
+  - **Then** the input sits directly below the latest reply — it is
+    **not** pinned to the bottom of the viewport with empty space
+    above it.
+
+- **AC-28c** — *Input placement — long conversations keep latest reply and input visible* · **@stable**
+  - **Given** the conversation is long enough to scroll,
+  - **Then** after the auto-scroll in AC-27, the latest reply and the
+    input beneath it are both visible together, with the input at or
+    near the bottom of the viewport.
+
+- **AC-29** — *Follow-up questions* · **@stable**
+  - **Given** the user is in expanded mode and sends another message,
+  - **Then** a new Q+A pair is appended below the previous ones
+    (existing pairs are never mutated) and the input is cleared.
+
+- **AC-30** — *Input disabled during load* · **@stable**
+  - **Given** an assistant answer is in flight,
+  - **Then** the textarea and send button are disabled (visually
+    greyed per Figma and functionally non-interactive) until the
+    response resolves.
+
+- **AC-31** — *Dismissal retains messages* · **@evolving**
+  - **Given** the widget is in expanded mode,
+  - **When** the user dismisses it via the close button (AC-20j),
+    `Esc`, or browser back (AC-20g),
+  - **Then** the widget re-renders compact mode *and* retains the full
+    `messages` array in memory for the remainder of the page session.
+  (amended 2026-04, Figma component drift — implementation landed via AC-20j routing through `dismissExpanded` in `App.tsx`, which never clears `messages` on mode flip; promoted to @evolving.)
+
+- **AC-31b** — *Compact re-entry surfaces continue-pill and hides asked chips* · **@aspirational**
+  - **Given** the user has re-entered compact mode with non-empty
+    history,
+  - **Then** compact mode shows the continue-conversation pill
+    (AC-10a) and hides already-asked chips (AC-10b); the history is
+    never rendered in full inside the compact hero.
+
+- **AC-31c** — *Tab close clears history* · **@aspirational**
+  - **Given** the user closes the browser tab,
+  - **Then** all conversations stored under PD-08 are cleared from
+    the user's machine — there is no cross-tab or cross-session
+    persistence on shared devices.
+  - **Given** the user reloads the same tab or navigates within
+    the same tab to another page on the host site,
+  - **Then** stored conversations remain available — reload is
+    explicitly **not** a reset signal under the AC-33 sidebar
+    contract; the close-tab boundary is the reset.
+  (amended 2026-04, Figma component drift — boundary moved from
+  "reload clears" to "tab close clears" so the AC-33 sidebar can
+  list past conversations within a session; PD-08 captures the
+  underlying storage choice.)
+
+- **AC-31d** — *New message from compact with history appends* · **@evolving**
+  - **Given** the user sends a new message from compact mode while
+    history exists,
+  - **Then** the widget enters expanded mode and **appends** the new
+    Q+A pair to the existing history (it does not start a new
+    conversation).
+  (amended 2026-04, Figma component drift — `App.tsx::handleSend` always appends to `messages` regardless of mode; the AC-29 follow-up test exercises the same code path; promoted to @evolving.)
+
+- **AC-32** — *Input focus — retained after send in expanded mode* · **@aspirational**
+  - **Given** the widget is in expanded mode and the user submits a
+    message either by pressing `Enter` on the textarea or by
+    clicking the send button,
+  - **When** the Q+A pair is appended and the textarea is cleared
+    (per AC-29),
+  - **Then** keyboard focus is on the textarea so the user can keep
+    typing without a separate click. For the `Enter` path this is
+    the natural outcome of not moving focus; for the send-button
+    click path the widget must explicitly return focus to the
+    textarea after dispatch.
+  - **Given** the input is temporarily disabled while the assistant
+    answer is in flight (per AC-30),
+  - **Then** focus is **not** forced onto the disabled textarea; it
+    returns to the textarea on the same frame that AC-30 re-enables
+    the input, so the follow-up flow is uninterrupted.
+  - This AC applies to expanded mode only — in compact mode the
+    first send triggers the transition to expanded and AC-28 / AC-29
+    govern where the input lands.
+
+- **AC-33** — *Previous discussion list — visibility* · **@aspirational**
+  - **Given** the widget is in expanded mode and the conversation
+    store (per PD-08) holds at least one prior conversation
+    distinct from the active one,
+  - **Then** a sidebar listing the prior conversations is rendered
+    alongside the Q+A stream, so the user can switch between them
+    without losing the active draft.
+  - **Given** the conversation store holds zero prior conversations
+    (covered fully by AC-33c),
+  - **Then** the sidebar is not rendered and the expanded view
+    falls back to the single-column layout that exists today.
+  (added 2026-04, Figma component drift)
+
+- **AC-33a** — *Previous discussion list — items render* · **@aspirational**
+  - **Given** the sidebar is rendered (per AC-33),
+  - **Then** each prior conversation is represented by a row whose
+    label identifies the conversation to the user (e.g. derived
+    from the first user question in that conversation, truncated
+    to fit the row), so the user can recognise which thread is
+    which.
+  - **Given** the active conversation is also tracked in the same
+    store,
+  - **Then** the active row is visually distinguished from the
+    inactive rows (active state).
+  (added 2026-04, Figma component drift)
+
+- **AC-33b** — *Previous discussion item — activation* · **@aspirational**
+  - **Given** the sidebar lists prior conversations (per AC-33a),
+  - **When** the user clicks or keyboard-activates a row,
+  - **Then** the widget swaps the active conversation: the Q+A
+    stream re-renders that conversation's history, the textarea
+    clears, and no network call is made on activation alone (the
+    next user message is what posts to the backend, with that
+    conversation's history per AC-52).
+  - **Given** the active conversation has unsent draft text in the
+    textarea when the user activates a different row,
+  - **Then** the draft is preserved against the previously-active
+    conversation under PD-08, so re-activating that row restores
+    the draft.
+  (added 2026-04, Figma component drift)
+
+- **AC-33c** — *Previous discussion list — empty state* · **@aspirational**
+  - **Given** the conversation store contains only the active
+    conversation (typical of the first-ever expanded session in a
+    new tab),
+  - **Then** the sidebar is not rendered — the user is not shown
+    an empty list or a placeholder, and the expanded view uses
+    the existing single-column layout. The sidebar appears only
+    once a second conversation exists.
+  (added 2026-04, Figma component drift)
+
+- **AC-33d** — *Previous discussion list — mobile responsive treatment* · **@aspirational**
+  - **Given** the viewport is below the §12.1 PD-05 mobile
+    breakpoint and the sidebar would otherwise be rendered (per
+    AC-33),
+  - **Then** the sidebar collapses behind a discoverable
+    affordance (e.g. a hamburger / overflow toggle) so it does
+    not consume primary chat real-estate on a small screen,
+    while still being reachable in one tap.
+  - This row is currently *code-authored* — IR-site does not
+    publish a mobile-band Figma frame for the sidebar yet, so the
+    affordance shape is at engineering's discretion until a frame
+    lands.
+  (added 2026-04, Figma component drift)
+
+- **AC-35** — *Start-new-conversation affordance in expanded mode* · **@aspirational**
+  - **Given** the widget is in expanded mode showing some conversation,
+  - **Then** an affordance is reachable from expanded mode that
+    starts a fresh conversation: it creates a new entry in the
+    PD-08 conversation store, sets it as the active conversation,
+    clears the rendered Q+A stream, and clears the textarea draft.
+    The previously-active conversation is preserved in the store
+    and surfaces in the AC-33 sidebar from the moment a second
+    conversation exists.
+  - **Given** no Figma anchor for this affordance exists yet (the
+    `ds:152:88` Reset button main component is in IR-DS but
+    unwired into the new layout, and the AC-33 sidebar's "Aiemmat
+    keskustelut" label is the only anchored top-of-sidebar
+    element),
+  - **Then** the affordance lives wherever Figma eventually places
+    it — sidebar header, expanded-view title bar, or alongside the
+    close button. This AC pins the *intent* (a way to start a new
+    conversation must exist) and the *side-effects* (store +
+    state-machine), not the visual placement; placement is locked
+    by AC-33 / AC-34 sweeps once a frame lands.
+  - This AC closes a gap that emerged during the Figma component
+    drift (2026-04): the AC-33 sidebar cluster only describes
+    *switching* between existing conversations; without AC-35 the
+    user has no path to grow the conversation store beyond one
+    entry, so the sidebar would never render in production
+    (AC-33c empty state would always hold).
+  (added 2026-04, Figma component drift)
+
+- **AC-34** — *Per-conversation title in expanded view* · **@aspirational**
+  - **Given** the widget is in expanded mode showing a specific
+    conversation,
+  - **Then** a per-conversation title is rendered at the top of
+    the expanded view (distinct from the static brand label
+    covered by AC-21), identifying the active conversation to
+    the user — e.g. derived from the first user question of that
+    conversation, truncated to fit the title slot.
+  - **Given** the active conversation is empty (a freshly-created
+    conversation that has no Q+A pair yet),
+  - **Then** the title falls back to a neutral default that does
+    not pretend to label the conversation prematurely.
+  - This AC sits alongside AC-21 (the static brand header) rather
+    than replacing it; once Figma confirms whether `Title` and the
+    brand header are stacked, side-by-side, or mutually exclusive
+    in the new layout, this AC may be promoted with that detail
+    or merged into AC-21 via [`.cursor/rules/ac-amending.mdc`](.cursor/rules/ac-amending.mdc) §Tombstone format.
+  (added 2026-04, Figma component drift)
+
+### 3.4 Error Handling
+
+- **AC-40** — *Service rejection* · **@stable**
+  - **Given** `sendMessage` rejects,
+  - **Then** the corresponding Q+A pair shows a human-readable error
+    message (Finnish by default, e.g. *"Pahoittelut, jokin meni pieleen."*)
+    with `role="alert"`, no loading blob, and no source list.
+
+- **AC-41** — *No crash on error* · **@stable**
+  - **Given** any error path is taken,
+  - **Then** the widget remains fully functional: the user can still
+    type and send new messages; the error state is scoped to the one
+    failed pair.
+
+- **AC-42** — *No developer leakage* · **@stable**
+  - **Given** an error occurs,
+  - **Then** stack traces, internal identifiers, or raw error payloads
+    are never rendered in the UI (they may be logged to the console in
+    dev builds only).
+
+- **AC-43** — *Network timeout* · **@evolving**
+  - **Given** a real `ChatService` adapter configured via `apiUrl`,
+  - **When** the backend does not respond within the configured
+    request timeout (§12.1 PD-04),
+  - **Then** the in-flight request is aborted and the corresponding
+    Q+A pair enters the error state per AC-40 with a user-safe
+    Finnish string (AC-44). The widget remains fully interactive per
+    AC-41, and the aborted request MUST NOT continue to mutate state
+    if it resolves after the timeout.
+
+- **AC-44** — *Safe error mapping for real backend* · **@evolving**
+  - **Given** the real `ChatService` adapter receives a non-2xx
+    response, a network failure, a non-JSON body, or a schema it
+    cannot parse,
+  - **Then** it rejects with a short, user-safe Finnish string (e.g.
+    *"Pahoittelut, en pysty juuri nyt hakemaan vastausta. Yritä
+    hetken kuluttua uudelleen."*) that AC-40 renders via
+    `role="alert"`.
+  - **Then** HTTP status codes, backend URLs, response bodies,
+    function keys, and stack traces MUST NOT appear in the DOM or in
+    the production console (per AC-42). Dev-build console logging of
+    raw errors is permitted for debugging.
+
+### 3.5 Chat Service Contract
+
+- **AC-50** — *Interface stability — components are transport-agnostic* · **@stable**
+  - **Given** the `ChatService` interface in `src/types/index.ts`,
+  - **Then** only `App.tsx` (the composition root) imports a concrete
+    `ChatService` implementation. `ExpandedView.tsx`, `ChatMessage`,
+    `CompactView`, and `ChatInput` MUST NOT import from
+    `src/services/**` directly.
+  - **Then** swapping one `ChatService` implementation for another
+    requires no changes outside `src/services/**`, `src/widget.tsx`
+    (composition wiring), and — if the interface itself changes —
+    `src/types/index.ts` plus an AC amendment here.
+
+- **AC-51** — *Mock fidelity* · **@stable**
+  - **Given** the default mock service is used (no `apiUrl` passed
+    to `init()`),
+  - **Then** it resolves after the mock latency (§12.1 PD-02) with a
+    canned Finnish answer and the mock source count (§12.1 PD-03) —
+    enough to demo the full UI without a backend — and accepts the
+    same `ChatTurn[]` history argument as the real adapter so the
+    two are drop-in interchangeable.
+
+- **AC-52** — *Threaded conversation — full history posted per request* · **@evolving**
+  - **Given** the user has had N prior successful turns in the
+    current tab session,
+  - **When** they send turn N+1,
+  - **Then** `ChatService.sendMessage` receives the chronological
+    `ChatTurn[]` `[userTurn₁, assistantTurn₁, …, userTurnₙ,
+    assistantTurnₙ, userTurnₙ₊₁]` and the real adapter posts it as
+    `{ messages: [{ role: "user" | "assistant", content: string }, …] }`
+    to `apiUrl`.
+  - **Then** turns that are still loading or that errored (per
+    AC-40) MUST be excluded from the posted history — only
+    successfully-completed turns, plus the new user message, are
+    sent.
+  - **Then** history is kept in React state only; it is not
+    persisted across reloads (AC-31c still holds) and is not
+    exposed on `window`.
+
+- **AC-53** — *Real-backend adapter — response mapping and forward-compatible schema* · **@evolving**
+  - **Given** the backend returns `{ "response": "…answer text…" }`
+    with HTTP 200,
+  - **Then** the adapter maps it to a `ChatMessage` with a
+    client-generated `id`, the `question` that was sent, `answer`
+    taken verbatim from `response` (plain text, paragraph breaks
+    via `\n`, never parsed as Markdown or HTML per AC-N1), and no
+    `sources` field.
+  - **Given** the backend later adds extra fields (e.g. `sources:
+    [{ label, href? }]`, `timestamp`, `conversationId`),
+  - **Then** the adapter MUST ignore unknown fields it does not yet
+    support and MUST surface `sources` when the field is present
+    and conforms to the `Source[]` shape, without requiring a new
+    release cycle for the bare mapping to keep working.
+
+---
+
+## 4. Content, Legal & Trust (Investor-Critical)
+
+These criteria exist because the primary user is making regulated
+financial decisions. They apply primarily to the backend, but the
+**widget must not undermine them** through UX.
+
+- **AC-60** — *Every factual claim is sourced* · **@aspirational (externally gated)**
+  - **Given** any answer that states a fact about Siili (revenue,
+    dividend, governance, strategy, etc.),
+  - **Then** the answer includes at least one source reference linking
+    to a published disclosure (annual report, stock exchange release,
+    IR PDF, articles of association, etc.).
+  - **Owner:** backend / retrieval — the AC cannot be satisfied from
+    inside this widget until responses carry source references; the
+    widget already renders any `sources` array it receives (see
+    AC-25 family + `src/services/apiChatService.ts`).
+
+  (amended 2026-04, GOV-16 Cluster 10)
+
+- **AC-61** — *No forward-looking statements or advice* · **@aspirational (externally gated)**
+  - **Given** an investor asks for a price prediction, buy/sell advice,
+    or a forecast,
+  - **Then** the answer politely declines and redirects to published
+    guidance / financial targets (this is a backend behaviour; the
+    widget must render the polite-decline response without decoration
+    that makes it look like advice).
+  - **Owner:** backend / guardrails — polite-decline is emitted
+    server-side; the widget is already decoration-free (plain text
+    per AC-N1), so the widget side of this contract is satisfied
+    whenever the backend guardrail lands.
+
+  (amended 2026-04, GOV-16 Cluster 10)
+
+- **AC-62** — *No insider or unpublished information* · **@aspirational (externally gated)**
+  - **Then** answers must only reference materials already publicly
+    disclosed. The widget should never hide or truncate a source link
+    in a way that obscures provenance.
+  - **Owner:** backend / content moderation — moderation runs upstream
+    of response generation; the widget already surfaces source links
+    verbatim via `SourceBadge` and does not truncate `href`.
+
+  (amended 2026-04, GOV-16 Cluster 10)
+
+- **AC-63** — *Language parity* · **@aspirational (externally gated)**
+  - **Given** the host site toggles `FI ↔ EN`,
+  - **Then** the widget UI strings (placeholder, header, chips,
+    *"Lähteet:"*, *"Haetaan tietoa..."*, error copy) and the backend
+    prompt locale are both switched. A Finnish UI answering in English
+    (or vice-versa) is a bug.
+  - **Owner:** product + backend — requires a host-site `FI ↔ EN`
+    toggle convention (not yet defined as a product decision) and
+    a backend prompt-locale switch; the widget string table is
+    Finnish-only today and a locale plumb would be a small,
+    self-contained change once the contract lands.
+
+  (amended 2026-04, GOV-16 Cluster 10)
+
+- **AC-64** — *Timestamp / freshness cue (recommended)* · **@aspirational (externally gated)**
+  - **Given** an answer cites a dated document,
+  - **Then** the reference badge includes the document's date (e.g.
+    "Vuosikertomus 2025") so the investor can judge freshness without
+    opening the PDF.
+  - **Owner:** backend — once responses carry dated-source metadata
+    the widget renders it via `SourceBadge`; no widget-side work
+    until the metadata schema lands. Becomes a small `@evolving`
+    bucket-(b) widget slice the moment the backend contract is
+    signed off.
+
+  (amended 2026-04, GOV-16 Cluster 10)
+
+- **AC-65** — *Clear AI labelling* · **@stable**
+  - **Given** the expanded view,
+  - **Then** it is unambiguous that the user is talking to an AI
+    assistant (the "Siili AI-avustaja" header, plus any disclaimer
+    required by legal).
+
+---
+
+## 5. Visual Design & Brand (Award-Critical)
+
+These criteria exist to satisfy P2's competition-entry ambition.
+
+- **AC-70** — *Figma parity* · **@stable**
+  - **Given** any component referenced in `AGENTS.md §Figma`,
+  - **Then** its rendered output matches the Figma frame for layout,
+    spacing, border-radius, typography, and colour within a ±1px
+    tolerance. Deltas are tracked as defects, not as acceptable drift.
+
+- **AC-71** — *(deprecated) Token-only styling* · **@stable**
+  - **[DEPRECATED 2026-04 — GOV-04]** This criterion described a
+    construction rule (component CSS must reference `var(--token)`
+    from `variables.css`; no hex / `rgb(` / hard-coded `px` radii
+    outside `variables.css`) rather than a user-visible behaviour.
+    The rule now lives in
+    [`.cursor/rules/code-governance.mdc`](.cursor/rules/code-governance.mdc)
+    (design tokens in `src/styles/variables.css`, CSS Modules per
+    component) and
+    [`.cursor/rules/project.mdc`](.cursor/rules/project.mdc)
+    §Styling. The behavioural intent — Figma parity on colours,
+    typography, radii, shadows — remains covered by AC-70 (Figma
+    parity) and the §2.5 Figma Manifest. ID retained for
+    traceability; no successor AC-ID.
+
+- **AC-72** — *Send-button states* · **@stable**
+  - **Given** the send button in either mode,
+  - **Then** the Active, Hover, and Pressed visuals match the three
+    send-button variants (see §2.5 row AC-72), with smooth CSS
+    transitions between states.
+
+- **AC-73** — *Typography — Everett via font tokens* · **@stable**
+  - **Given** the widget is rendered on a page that has loaded the
+    Everett font,
+  - **Then** all text uses the `--font-family*` tokens in
+    [`src/styles/variables.css`](src/styles/variables.css) at the
+    Everett weights (Regular, Light, Bold) used across the Figma
+    frames. Code-authored row in §2.5 — promote once a dedicated
+    typography node exists in Figma.
+
+- **AC-73b** — *Typography — graceful fallback* · **@stable**
+  - **Given** Everett fails to load,
+  - **Then** the widget falls back to `sans-serif` gracefully without
+    layout shift larger than one line-height.
+
+- **AC-74** — *Motion polish* · **@stable**
+  - **Given** any interactive element (chip, send button, textarea
+    focus, compact → expanded transition),
+  - **Then** transitions are tastefully animated (no abrupt flicker,
+    no overshoot) with durations in the motion range (§12.1 PD-07)
+    and an easing that matches the rest of the IR site.
+
+- **AC-75** — *No generic AI aesthetic* · **@stable**
+  - **Given** a juror inspects the widget,
+  - **Then** there are no generic "ChatGPT-looking" artifacts: no
+    speech bubbles with default tails, no Material-style FAB, no
+    default-looking spinners. Every interactive surface uses Siili's
+    gradient, tokens, and `--radius`.
+
+- **AC-76** — *Dark hero compatibility* · **@evolving**
+  - **Given** the compact mode is overlaid on the hero image,
+  - **Then** the translucent textarea and chips maintain WCAG AA
+    contrast against the busiest region of the hero image (tested
+    with the actual hero asset, not a mock).
+
+---
+
+## 6. Accessibility
+
+- **AC-80** — *Keyboard-only operation* · **@stable**
+  - **Given** a keyboard-only user,
+  - **When** compact mode is mounted and the user Tabs into the widget,
+  - **Then** Tab order within the widget is: textarea → send button →
+    each suggestion chip in DOM order.
+  - **When** expanded mode is mounted (after the first send),
+  - **Then** initial keyboard focus lands on the textarea, and Tab
+    advances from the textarea to the send button.
+  - **And** every interactive surface — textarea, send button,
+    suggestion chips, the close button (AC-20d), and linked source
+    badges — is keyboard-reachable and renders a visible
+    `:focus-visible` ring that contrasts against the background. The
+    relative Tab order of the close button and linked source badges
+    versus the textarea is not asserted, because the autofocus-on-
+    mount contract above guarantees the user's first keyboard action
+    in expanded mode lands on the textarea regardless of DOM
+    ordering. Shift+Tab from the textarea reaches the close button;
+    `Esc` is a redundant keyboard shortcut for the same dismiss
+    action (AC-20j).
+  (amended 2026-04, Figma component drift — close button added to the keyboard-reachable surface enumeration, no behavioural change to the textarea / send-button contract.)
+
+- **AC-81** — *Screen-reader labelling — textarea* · **@stable**
+  - **Given** a screen reader,
+  - **Then** the textarea announces its configured aria-label.
+
+- **AC-81b** — *Screen-reader labelling — send button* · **@stable**
+  - **Given** a screen reader,
+  - **Then** the send button announces "Send message" (or its
+    localised equivalent when the widget copy is localised).
+
+- **AC-81c** — *Screen-reader labelling — loading state* · **@stable**
+  - **Given** a screen reader and an in-flight assistant answer,
+  - **Then** the loading state announces *"Haetaan tietoa..."* via
+    an `aria-live="polite"` region (see AC-23).
+
+- **AC-81d** — *Screen-reader labelling — errors* · **@stable**
+  - **Given** a screen reader and an error response (per AC-40),
+  - **Then** the error message announces via `role="alert"`.
+
+- **AC-82** — *WCAG 2.1 AA contrast* · **@stable**
+  - **Given** every text/background pair defined by the tokens,
+  - **Then** contrast is at least 4.5:1 for body text and 3:1 for
+    large text and non-text UI.
+
+- **AC-83** — *Reduced motion* · **@stable**
+  - **Given** `prefers-reduced-motion: reduce`,
+  - **Then** the compact → expanded mount animation, the expanded-view
+    auto-scroll, and the loading blob's pulse animation are reduced or
+    disabled (the blob is rendered as a static gray shape alongside the
+    "Haetaan tietoa..." text, with no scale/opacity animation; the
+    auto-scroll uses `behavior: 'auto'`; the expanded surface mounts
+    with no entrance animation).
+  - **Then** interactive transitions on the input shell (focus-ring
+    outline-color), the send button (filter + outline-color), chips
+    (background + outline-color), and linked source badges (background
+    + outline-color) are disabled — the end states (visible focus ring,
+    hover background) still render immediately, only the animated
+    handover is removed.
+
+- **AC-84** — *Zoom and reflow* · **@stable**
+  - **Given** a 200% browser zoom,
+  - **Then** no content is clipped or requires horizontal scrolling
+    within the widget's container.
+
+---
+
+## 7. Responsiveness
+
+- **AC-90** — *Desktop (≥1024px)* · **@stable**
+  - The compact input and chips sit within the hero per the Investor
+    hero composition; expanded view has comfortable horizontal
+    padding matching the Investor agent composition (see §2.5 row
+    AC-90).
+
+- **AC-91** — *Tablet (640–1023px)* · **@stable**
+  - Chips wrap to two rows if needed; the textarea grows to full
+    container width; the send button stays inside the input shell.
+
+- **AC-92** — *Mobile (<640px) — compact stacks input above chips* · **@stable**
+  - **Given** a viewport narrower than the mobile breakpoint
+    (§12.1 PD-05),
+  - **Then** the compact view stacks the input above the chips (not
+    side-by-side).
+
+- **AC-92b** — *Mobile (<640px) — chips scroll or wrap without overflow* · **@stable**
+  - **Given** a viewport narrower than the mobile breakpoint
+    (§12.1 PD-05),
+  - **Then** the suggestion chips are horizontally scrollable or wrap
+    onto additional rows without overflowing the viewport width.
+
+- **AC-92c** — *Mobile (<640px) — expanded view full width with Figma padding* · **@stable**
+  - **Given** a viewport narrower than the mobile breakpoint
+    (§12.1 PD-05) and the widget is in expanded mode,
+  - **Then** the expanded view uses `100%` container width with
+    padding per Figma mobile guidance (or a tasteful scale-down of
+    the desktop frame if mobile frames are not yet designed).
+
+- **AC-93** — *Textarea auto-grow* · **@stable**
+  - **Given** the user types multi-line content,
+  - **Then** the textarea grows up to the auto-grow cap (§12.1 PD-06)
+    of content height, then scrolls internally (never pushes the
+    send button out of view).
+
+---
+
+## 8. Performance
+
+- **AC-100** — *Bundle budget* · **@stable**
+  - **Given** the production build,
+  - **Then** `dist/siili-chatbot.iife.js` + `dist/siili-chatbot.css`
+    combined gzip size is ≤ 60 KB. Any increase is justified in PR
+    description.
+
+- **AC-101** — *Cold-start render* · **@evolving**
+  - **Given** a cold cache on a simulated mid-range laptop
+    (4× CPU throttling in Chrome DevTools),
+  - **Then** the compact view is interactive within 150ms of script
+    load completing.
+
+- **AC-102** — *No host-page regression* · **@aspirational (externally gated)**
+  - **Given** the widget is embedded on the IR site,
+  - **Then** Lighthouse performance score for the host page drops by
+    no more than 2 points versus the same page without the widget.
+  - **Owner:** host-page integration — the measurement requires the
+    widget to be loaded on `sijoittajille.siili.com` (not the dev
+    harness) with and without the IIFE, and a Lighthouse run on the
+    real page. Gated on a staging embed; cannot be verified from
+    inside this repo.
+
+  (amended 2026-04, GOV-16 Cluster 10)
+
+- **AC-103** — *No layout thrash* · **@evolving**
+  - **Given** messages are streaming in,
+  - **Then** CLS (Cumulative Layout Shift) contributed by the widget
+    is ≤ 0.05 during a full conversation session.
+
+---
+
+## 9. Cross-Browser & Environment
+
+- **AC-110** — *Browser matrix* · **@evolving**
+  - The widget works on the latest two versions of Chrome, Edge,
+    Firefox, and Safari (desktop and iOS Safari / Android Chrome).
+
+- **AC-111** — *No console errors* · **@stable**
+  - **Given** a happy-path session (load → compact → send → expanded
+    → follow-up → success),
+  - **Then** there are zero errors and zero warnings in the browser
+    console in production builds.
+
+- **AC-112** — *Graceful CSS isolation* · **@stable**
+  - **Given** the host page has its own aggressive global styles,
+  - **Then** the widget's layout is not visibly affected — all widget
+    styling is scoped to the widget's own root element and does not
+    leak into or absorb from the host page. (The mechanism — CSS
+    Modules plus a scoping root class — is a construction rule
+    in [`.cursor/rules/code-governance.mdc`](.cursor/rules/code-governance.mdc)
+    and [`.cursor/rules/project.mdc`](.cursor/rules/project.mdc).)
+
+---
+
+## 10. Observability (Light-Touch, Frontend Only)
+
+- **AC-120** — *Event emission — named events for key actions* · **@aspirational (externally gated)**
+  - **Given** these user actions — widget mounted, chip clicked,
+    message sent, response received, response errored, chat closed
+    (via `×` / `Esc` / back), chat reopened (via continue pill),
+  - **Then** the widget emits a named event (custom event on
+    `window` or calls `window.dataLayer.push` if present) so the IR
+    site's existing analytics can capture them.
+  - **Owner:** product — event-name vocabulary + `dataLayer` schema
+    need to be signed off by the IR site's analytics owner before
+    the widget can emit anything. Widget-side plumbing is a small
+    slice once the schema is agreed.
+
+  (amended 2026-04, GOV-16 Cluster 10)
+
+- **AC-120b** — *Event emission — no PII in payloads* · **@aspirational (externally gated)**
+  - **Given** any event emitted per AC-120,
+  - **Then** its payload contains no personally identifiable
+    information (no user message text, no user-supplied free-form
+    content, no identifiers that could be reverse-linked to an
+    individual).
+  - **Owner:** product — same sign-off as AC-120 (the PII policy is
+    part of the schema). Widget-side enforcement becomes trivial
+    once payload shapes are defined.
+
+  (amended 2026-04, GOV-16 Cluster 10)
+
+- **AC-120c** — *Event emission — `chat_closed` payload* · **@aspirational (externally gated)**
+  - **Given** the `chat_closed` event is emitted,
+  - **Then** its payload includes the dismiss method
+    (`"close_button" | "escape_key" | "back_navigation"`) and the
+    message count at dismiss time.
+  - **Owner:** product (analytics schema) + Lane H (close button +
+    `Esc` + back-nav dismiss must land before a `chat_closed` event
+    has anything to fire on). Double-gated: external schema
+    sign-off and an internal Lane H dependency.
+
+  (amended 2026-04, GOV-16 Cluster 10)
+
+- **AC-121** — *No uncontrolled network calls* · **@stable**
+  - **Given** the widget is mounted,
+  - **Then** it makes no network requests beyond the configured
+    `ChatService` endpoint and any fonts/stylesheets declared by the
+    host page. No third-party trackers embedded in the widget.

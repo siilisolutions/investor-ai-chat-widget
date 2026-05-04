@@ -1,0 +1,100 @@
+---
+description: Rules for adding, editing, splitting, deprecating, and tombstoning ACs, and for shaping AC body specificity to match each AC's stability marker. Loaded on demand whenever the agent is editing the spec or the backlog.
+globs: ACCEPTANCE_CRITERIA.md, ACCEPTANCE_CRITERIA_BODIES.md, AGENT_BACKLOG.md
+---
+
+# AC amending and authoring
+
+The criteria in [`ACCEPTANCE_CRITERIA.md`](../../ACCEPTANCE_CRITERIA.md) (catalog + manifest + DoD + non-goals + traceability) and [`ACCEPTANCE_CRITERIA_BODIES.md`](../../ACCEPTANCE_CRITERIA_BODIES.md) (Given/When/Then bodies for §§1–10) are meant to evolve — but only through the patterns below, so AC-IDs stay stable and traceable. Agents working under [`sdd.mdc`](sdd.mdc) must propose amendments here *before* coding against behaviour that is not covered.
+
+This rule was extracted from `ACCEPTANCE_CRITERIA.md` §§10.5 + 10.6 by GOV-17. The spec body is unchanged; it just lives in a globs-scoped rule file now so agents only pay the token cost when they're touching the spec or backlog.
+
+## Amending ACs
+
+**Immutable IDs.** AC-IDs are immutable. Never renumber an existing ID and never reuse a retired one — historical commits, PR descriptions, and test names already cite those IDs, and the citations must keep resolving to the same contract (or to a tombstone pointing at the successor). When an AC's behaviour changes, either edit the body in place (the ID keeps its meaning) or tombstone the old ID and mint a new one via the patterns below. Reusing `AC-22` for unrelated behaviour later is a spec-integrity violation and is never acceptable.
+
+- **Add a new AC** when a task introduces behaviour no existing criterion covers. Pick the next free `AC-xx` in the relevant band (3.1 embedding, 3.2 compact, 3.3 expanded, 3.4 errors, 3.5 service, 4 content/legal, 5 visual, 6 a11y, 7 responsiveness, 8 performance, 9 browser, 10 observability) and write it as Given/When/Then with a short title in `ACCEPTANCE_CRITERIA_BODIES.md`. Add the matching catalog row in `ACCEPTANCE_CRITERIA.md` in the same PR. Do not reuse a retired ID. Append an inline log marker on the new AC body (see **Amendment logging** below).
+- **Edit an existing AC** when the required behaviour has changed. Keep the ID; rewrite the Given/When/Then in the same PR as the code change, note the edit in the PR description (e.g. `AC-23 loading copy updated to match §2.5 row AC-23`), and append an inline log marker on the AC body.
+- **Deprecate** instead of deleting. Prefix the AC title with `(deprecated)`, add a **Tombstone line** (format below) as the first line of the body, and link to the replacement AC-ID if one exists. Retired IDs are never reused so historical PRs keep resolving to something.
+- **Split** an AC (one ID → several) when it asserts more than one independently-testable behaviour (see GOV-05 history). Allocate the new IDs with lettered suffixes (`AC-15a`, `AC-15b`), replace the original body with a `[SPLIT …]` tombstone, and add catalog rows for each child.
+- **Visual ACs** must either cite a Figma node in §2.5 Figma Manifest (in `ACCEPTANCE_CRITERIA.md`) or mark the row `— (code-authored)` with a short justification. A new visual AC without a manifest row is incomplete.
+- **Non-goals** (§12 in `ACCEPTANCE_CRITERIA.md`) are amended the same way but require explicit human approval per [`change-boundary.mdc`](change-boundary.mdc) — relaxing a non-goal expands scope and must not be done silently by an agent.
+- **Traceability**: when a PR adds, edits, or deprecates an AC, list the affected AC-IDs in the commit / PR body the same way code PRs do. If the AC is visual, bump `Last checked` / `Checked by` in §2.5 for the bound row.
+- **§13 Traceability roll-up** is derived from §2.5 — re-derive it only when persona mapping changes, not for every AC edit.
+
+### Tombstone format
+
+When an AC is deprecated or split, the first line of its body carries a machine-readable tombstone so agents and humans can tell at a glance where the ID has moved. Canonical shapes:
+
+- **Deprecation:** `[DEPRECATED YYYY-MM — superseded by AC-<id>, reason: <one line>]`
+- **Deprecation with no successor** (rule extracted, concept dropped, etc.): `[DEPRECATED YYYY-MM — <GOV-xx or reason>, reason: <one line>]`
+- **Split:** `[SPLIT YYYY-MM — see AC-<id>a, AC-<id>b, …]`
+
+The AC title keeps the `(deprecated)` prefix defined in the Deprecate bullet above; the tombstone line lives directly below the title inside the AC body. The AC Catalog row for the retired ID moves to `Status: deprecated` (or `superseded`) — see the Stability markers legend at the top of the catalog.
+
+**Worked example (live in the spec):** AC-71 *(Token-only styling)* was retired in 2026-04 when GOV-04 extracted construction prose out of the spec. Its body opens with `[DEPRECATED 2026-04 — GOV-04]` followed by a one-line reason (the rule now lives in `.cursor/rules/code-governance.mdc` + `project.mdc`, and the behavioural intent remains covered by AC-70). The catalog row shows `Status: deprecated`. See AC-71 under §5 in `ACCEPTANCE_CRITERIA_BODIES.md` for the full shape.
+
+### Amendment logging (inline)
+
+Amendments carry a short inline marker on the affected AC body so the edit trail is visible in-document without requiring a git blame:
+
+- **New AC**: append `(added YYYY-MM, #<PR or commit>)` as the last line of the AC body.
+- **Edited AC**: append `(amended YYYY-MM, #<PR or commit>)` the same way. Multiple amendments accumulate as a comma-separated list on the same trailing line (e.g. `(added 2026-01, #12; amended 2026-04, #57)`).
+- **Deprecated AC**: the tombstone line already encodes date and reason; no separate `amended` marker is needed.
+
+The `<ref>` after `YYYY-MM` takes one of three shapes, in order of preference:
+
+- `#<number>` — a PR or issue number (canonical for PR-based workflows).
+- `#<short-hash>` — a commit short hash when the change lands via direct commit on a branch with no PR.
+- `GOV-xx <scope>` — a governance batch reference when a single GOV task amends many ACs at once (e.g. `GOV-16 Cluster 10`). This matches the precedent set by the AC-71 tombstone (`[DEPRECATED 2026-04 — GOV-04]`) and is preferred over repeating the same commit hash across dozens of ACs in one batch.
+
+Hypothetical shape:
+
+```
+- **AC-40** — *Error surface is a single safe string* · **@stable**
+  - **Given** …
+  - **Then** …
+  (added 2026-01, #12; amended 2026-04, #57)
+```
+
+**Not retroactive.** ACs ratified before GOV-10 landed are not back-filled with markers — the convention applies from GOV-10's landing forward. Gaps in the log for older ACs are expected and are not drift.
+
+When in doubt, propose the amendment in chat as a diff against this rule, the catalog row in `ACCEPTANCE_CRITERIA.md`, and the affected `AC-xx` body in `ACCEPTANCE_CRITERIA_BODIES.md`, and let the human confirm before the implementation PR lands.
+
+## AC Authoring
+
+The §Amending ACs rules tell you *how* to change an AC; these tell you how to *write* one in the first place so it survives design iteration. The guiding principle: each fact lives in exactly one place, and the specificity of an AC body is calibrated to its stability marker (see the §Stability markers legend in the AC Catalog).
+
+### One source per fact
+
+When an AC touches any of the facts below, that fact belongs in the listed home only. The AC body references the home, it does not restate the fact.
+
+| Fact | Single source | AC body should… |
+|------|---------------|-----------------|
+| Behavioural intent (what the user sees / can do) | AC body | …state it, in Given/When/Then. This is the contract. |
+| Figma node IDs (`ds:X:Y`, `site:X:Y`) | §2.5 Figma Manifest (in `ACCEPTANCE_CRITERIA.md`) | …reference "see §2.5" or name the component; never inline the node ID. |
+| Exact copy strings (Finnish / English text the user reads) | AC body, marked `e.g. "…"` unless the AC is `@stable` | …describe the role of the string and give a representative example. Promote to a pinned literal only when the marker is `@stable`. |
+| Token slots (`--gray-500`, `--radius`) | [`src/styles/variables.css`](../../src/styles/variables.css) | …name the *role* ("neutral question-bubble surface", "primary action gradient"), not the slot. |
+| Fixed counts / durations / breakpoints (three chips, ~800ms, 1024px) | §12.1 Product Decisions table (in `ACCEPTANCE_CRITERIA.md`) | …reference the `PD-xx` ID; do not embed the literal. |
+| Verification path (how to test the AC) | AC Catalog `Verification` column (in `ACCEPTANCE_CRITERIA.md`) | …not restated in the AC body. The `Verification` column itself does not re-cite node IDs that §2.5 already owns (reference "see §2.5 row AC-XX"). |
+
+Granularity smell test: if a single design iteration forces edits to more than one AC body (excluding §2.5, §12.1, and [`src/styles/variables.css`](../../src/styles/variables.css)), a fact has leaked out of its single source. Consolidate before amending.
+
+### Specificity tracks the stability marker
+
+An AC's marker is a *licence* for how much detail its body may pin. Writing below the ceiling is always fine; writing above it guarantees churn.
+
+- **`@stable`** — the body *may* pin specifics the AC is known to require: exact copy strings, exact token slots, exact pixel / count / duration values, exact Figma node via §2.5. Changes are real contract changes and require the §Amending ACs flow above.
+- **`@evolving`** — the body should describe *intent* and defer visuals to §2.5. Avoid exact token slots, exact copy (use `e.g. "…"`), exact pixel values, exact counts. The AC should survive most design iterations without an edit. Promote to `@stable` when the design locks.
+- **`@aspirational`** — the body should describe the user-visible goal and the acceptance path only. Do **not** pin interactive details, aria-labels, pixel hit-targets, or copy strings that the design has not yet produced. Promote specificity when the design and implementation land.
+
+Compound-AC smell: if a `@stable` AC has clauses you expect to edit in the next design pass, split the AC so each clause has its own marker, or demote the whole AC to `@evolving` until the volatile clauses stabilise.
+
+### GOV-05 splits share their Figma anchor
+
+When one visual component is split across sibling ACs (e.g. AC-28 / AC-28b / AC-28c all describe one input shell), the Figma node is referenced **once** via §2.5 for the group. Sibling AC bodies do not re-cite the node; the §2.5 row inherits the group's sweep via the existing `inherits AC-XX sweep (GOV-05 split)` convention.
+
+### What this rule does not govern
+
+- **Running the Figma sync** — see [`../../scripts/prompts/figma-sync.md`](../../scripts/prompts/figma-sync.md). That job refreshes §2.5 `Last checked` / `Checked by`; it does not reshape AC bodies.
+- **Deprecations** — the `(deprecated)` prefix above still applies unchanged. A deprecated AC keeps whatever specificity its body had at retirement; do not reshape retired ACs.

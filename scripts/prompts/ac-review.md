@@ -27,21 +27,30 @@ Pick one at invocation time:
     no AC IDs are cited, fall back to: every row in
     [`ACCEPTANCE_CRITERIA.md`](../../ACCEPTANCE_CRITERIA.md) §2.5
     Figma Manifest whose "Component / scope" overlaps the changed
-    path.
+    path. (AC bodies for the matched IDs live in
+    [`ACCEPTANCE_CRITERIA_BODIES.md`](../../ACCEPTANCE_CRITERIA_BODIES.md).)
   - If the change touches `src/services/**` or `src/types/index.ts`,
     add the AC-50 / AC-51 band and any AC whose Given/When/Then
     references the touched symbol.
 - **`full-sweep`** (weekly / pre-release / release gate) — classify
-  **every** AC-ID in
-  [`ACCEPTANCE_CRITERIA.md`](../../ACCEPTANCE_CRITERIA.md) §3–§10.
+  **every** AC-ID in §§3–10 of
+  [`ACCEPTANCE_CRITERIA_BODIES.md`](../../ACCEPTANCE_CRITERIA_BODIES.md)
+  (catalog index lives in
+  [`ACCEPTANCE_CRITERIA.md`](../../ACCEPTANCE_CRITERIA.md)).
 
 If the invoker does not specify a mode, assume `scoped`.
 
 ## Inputs the agent should load
 
-- [`ACCEPTANCE_CRITERIA.md`](../../ACCEPTANCE_CRITERIA.md) — the spec,
-  including §2.5 Figma Manifest, §11 Definition of Done, §12
-  Non-Goals, and §Amending ACs.
+- [`ACCEPTANCE_CRITERIA.md`](../../ACCEPTANCE_CRITERIA.md) — the spec
+  entry point: AC catalog, §2.5 Figma Manifest, §11 Definition of Done,
+  §12 Non-Goals (incl. AC-N1 / AC-N2), §13 Traceability.
+- [`ACCEPTANCE_CRITERIA_BODIES.md`](../../ACCEPTANCE_CRITERIA_BODIES.md)
+  — Given/When/Then bodies for every AC in §§1–10. Load in `full-sweep`,
+  load the IDs you need in `scoped`.
+- [`.cursor/rules/ac-amending.mdc`](../../.cursor/rules/ac-amending.mdc)
+  — amending / authoring rules (former §10.5 + §10.6). Auto-loads
+  whenever you touch the spec or backlog files.
 - [`AGENTS.md`](../../AGENTS.md) §Figma (two files — IR-site
   `0xXdKUlBJIolF15MjJuaMC` for screens, IR-DS `rlh00CEImhMWwdRNOUqW6L`
   for components) — only if the in-scope ACs are visual.
@@ -62,7 +71,8 @@ For each AC-ID in scope, assign exactly one label:
   Fine for not-yet-built ACs; flag for the backlog.
 - **`spec-drift`** — implementation is intentionally different from
   the AC and the AC should be amended (see §Amending ACs in
-  `ACCEPTANCE_CRITERIA.md`). Name the drift.
+  [`.cursor/rules/ac-amending.mdc`](../../.cursor/rules/ac-amending.mdc)).
+  Name the drift.
 - **`unknown`** — insufficient evidence in this pass (e.g. requires
   runtime check, specific browser, or host-page integration that is
   out of reach from static review).
