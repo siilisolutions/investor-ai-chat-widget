@@ -2,14 +2,20 @@
  * Tests for AC-80 "Keyboard-only operation" — the focus contract
  * across compact and expanded modes.
  *
- * Per AC-80 (amended 2026-04-23):
+ * Per AC-80 (amended 2026-04 for the close button — Figma component drift):
  *   - Compact mode Tab order within the widget is
  *     textarea → send button → chips (DOM-order).
- *   - Expanded mode auto-focuses the textarea on mount, and Tab from
- *     the textarea goes to the send button. Linked source badges are
- *     keyboard-reachable but their relative position to the textarea
- *     is intentionally not asserted (they render inline with their
- *     parent answer so screen-reader reading order stays coherent).
+ *   - Expanded mode auto-focuses the textarea on mount. From the
+ *     textarea, the next focusable inside the input wrapper is the
+ *     send button. The close button (AC-20d) is also keyboard-reachable
+ *     but its relative DOM position (it currently renders before the
+ *     title) is intentionally not asserted — Shift+Tab from the
+ *     textarea reaches it, the focus contract just requires it be
+ *     reachable.
+ *   - Linked source badges are keyboard-reachable but their relative
+ *     position to the textarea is intentionally not asserted (they
+ *     render inline with their parent answer so screen-reader reading
+ *     order stays coherent).
  *   - Every interactive surface is keyboard-reachable and renders a
  *     visible focus ring (`:focus-visible`).
  *
@@ -20,9 +26,18 @@ import { describe, expect, it } from 'vitest'
 import { fireEvent, render } from '@testing-library/preact'
 import { CompactView } from '../src/components/CompactView'
 import { ExpandedView } from '../src/components/ExpandedView'
-import type { ChatMessage as ChatMessageData } from '../src/types/index'
+import type {
+  ChatMessage as ChatMessageData,
+  Conversation,
+} from '../src/types/index'
 
 const CHIPS = ['Kysymys 1', 'Kysymys 2', 'Kysymys 3']
+
+const NOOP = () => {}
+const ACTIVE_ID = 'conv-active'
+function singleConversation(messages: ChatMessageData[]): Conversation[] {
+  return [{ id: ACTIVE_ID, messages, draft: '' }]
+}
 
 const FOCUSABLE_SELECTOR = [
   'a[href]',
@@ -74,7 +89,18 @@ describe('AC-80 — keyboard focus contract', () => {
       ],
     }
     const { container } = render(
-      <ExpandedView messages={[message]} loading={false} onSend={() => {}} />,
+      <ExpandedView
+        messages={[message]}
+        loading={false}
+        draft=""
+        onDraftChange={NOOP}
+        onSend={NOOP}
+        onClose={NOOP}
+        conversations={singleConversation([message])}
+        activeConversationId={ACTIVE_ID}
+        onActivateConversation={NOOP}
+        onStartNewConversation={NOOP}
+      />,
     )
     const textarea = container.querySelector<HTMLTextAreaElement>('textarea')!
     expect(document.activeElement).toBe(textarea)
@@ -85,17 +111,30 @@ describe('AC-80 — keyboard focus contract', () => {
     // Within the ChatInput subtree, that is the send button — so the
     // "textarea → send" half of AC-80's contract is a structural
     // guarantee rooted in ChatInput, independent of where linked
-    // badges fall in the wider ExpandedView tree.
+    // badges or the close button fall in the wider ExpandedView tree.
     const message: ChatMessageData = {
       id: 'm1',
       question: 'Mikä on yhtiön osinkopolitiikka?',
       answer: 'Siili maksaa osinkoa kerran vuodessa.',
     }
+    // Seed the controlled draft directly — the send button is gated
+    // on `value.trim().length > 0`, so we need a non-empty draft for
+    // the button to be `:not(:disabled)` and therefore in focus order.
     const { container } = render(
-      <ExpandedView messages={[message]} loading={false} onSend={() => {}} />,
+      <ExpandedView
+        messages={[message]}
+        loading={false}
+        draft="x"
+        onDraftChange={NOOP}
+        onSend={NOOP}
+        onClose={NOOP}
+        conversations={singleConversation([message])}
+        activeConversationId={ACTIVE_ID}
+        onActivateConversation={NOOP}
+        onStartNewConversation={NOOP}
+      />,
     )
     const textarea = container.querySelector<HTMLTextAreaElement>('textarea')!
-    fireEvent.input(textarea, { target: { value: 'x' } })
     const inputWrapper = textarea.closest<HTMLElement>('[class*="inputWrapper"]')
     expect(inputWrapper).toBeTruthy()
     const wrapperOrder = focusOrder(inputWrapper!).map(describeElement)
@@ -116,7 +155,18 @@ describe('AC-80 — keyboard focus contract', () => {
       ],
     }
     const { container } = render(
-      <ExpandedView messages={[message]} loading={false} onSend={() => {}} />,
+      <ExpandedView
+        messages={[message]}
+        loading={false}
+        draft=""
+        onDraftChange={NOOP}
+        onSend={NOOP}
+        onClose={NOOP}
+        conversations={singleConversation([message])}
+        activeConversationId={ACTIVE_ID}
+        onActivateConversation={NOOP}
+        onStartNewConversation={NOOP}
+      />,
     )
     const badgeAnchors = container.querySelectorAll<HTMLAnchorElement>('a[href]')
     expect(badgeAnchors).toHaveLength(2)
@@ -126,22 +176,37 @@ describe('AC-80 — keyboard focus contract', () => {
     }
   })
 
-  it('AC-80: non-linked source badges render as spans and are correctly NOT in the tab sequence', () => {
+  it('AC-80 + AC-20d: expanded-mode close button is keyboard-reachable alongside the textarea and send button', () => {
     const message: ChatMessageData = {
       id: 'm1',
       question: 'Mikä on yhtiön osinkopolitiikka?',
       answer: 'Siili maksaa osinkoa kerran vuodessa.',
       sources: [{ label: 'PDF: Vuosikertomus 2025, s.21' }],
     }
+    // Seed the controlled draft directly so the send button is enabled.
     const { container } = render(
-      <ExpandedView messages={[message]} loading={false} onSend={() => {}} />,
+      <ExpandedView
+        messages={[message]}
+        loading={false}
+        draft="x"
+        onDraftChange={NOOP}
+        onSend={NOOP}
+        onClose={NOOP}
+        conversations={singleConversation([message])}
+        activeConversationId={ACTIVE_ID}
+        onActivateConversation={NOOP}
+        onStartNewConversation={NOOP}
+      />,
     )
-    const textarea = container.querySelector<HTMLTextAreaElement>('textarea')!
-    fireEvent.input(textarea, { target: { value: 'x' } })
+    // Non-linked badges still render as spans (no extra anchor in the tree).
     const anchors = container.querySelectorAll('a[href]')
     expect(anchors).toHaveLength(0)
+    // The focus order in expanded mode includes the close button, the
+    // textarea, and the send button — and *only* those three (no
+    // anchor for the unlinked badge). Order is DOM-order.
     const order = focusOrder(container).map(describeElement)
     expect(order).toEqual([
+      'button[Sulje keskustelu]',
       'textarea[Siili investor chatbot message]',
       'button[Send message]',
     ])

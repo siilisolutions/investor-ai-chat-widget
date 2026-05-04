@@ -81,6 +81,8 @@ If the host has its own asset pipeline (e.g. HubSpot `/hubfs/`), download the tw
 
 `apiUrl` is optional — if omitted the widget runs against the bundled mock so local demos work offline. In production, set it to the chatbot backend endpoint **in the host page's script tag**, not in this repo.
 
+`interceptBackNavigation` is also optional and defaults to `true`. With it on, the compact → expanded transition pushes a synthetic history entry so the browser back button (or Android hardware back) dismisses the chat instead of navigating away from the host page; the close button (`×`) and `Esc` use the same dismiss path. Set `interceptBackNavigation: false` if the host page already manages its own history stack and would prefer the widget not touch it — the close button and `Esc` continue to dismiss, they just won't call `history.back()` to balance the stack.
+
 For local development against the real backend, copy the endpoint into `.env.local` as `VITE_API_URL=…` (the file is git-ignored) and run `npm run dev`.
 
 ### Cutting a new CDN release
@@ -93,6 +95,14 @@ For local development against the real backend, copy the endpoint into `.env.loc
 6. `git checkout main` (release commit is now reachable only via the tag — `main` stays free of build artifacts)
 7. `git push origin vX.Y.Z`
 8. The jsDelivr URL `https://cdn.jsdelivr.net/gh/siilisolutions/investor-ai-chat-widget@vX.Y.Z/dist/siili-chatbot.iife.js` becomes live within a minute.
+
+## Environments
+
+| Env | URL | Host page |
+|-----|-----|-----------|
+| Staging | <https://www-siili-com.sandbox.hs-sites-eu1.com/investors-chatbot-test> | HubSpot sandbox preview. Widget assets served from `/hubfs/investors-chatbot/siili-chatbot.iife.js` + `…/siili-chatbot.css` — or from jsDelivr (see Embed on Host Site § Option A). |
+
+The `apiUrl` is configured on the host page's `SiiliChatbot.init({ … })` call, not in this repo — so pointing staging at a different backend is a host-page change, not a widget release.
 
 ## Widget Modes
 

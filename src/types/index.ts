@@ -30,6 +30,25 @@ export interface ChatMessage {
 }
 
 /**
+ * A single stored conversation in the PD-08 conversation store. The
+ * `id` is generated when the conversation is created and never reused.
+ * `messages` is the chronological list of completed and in-flight Q+A
+ * pairs (the same shape App.tsx renders). `draft` is the textarea
+ * value at the moment the user last switched away from this
+ * conversation, so re-activating restores it (AC-33b).
+ *
+ * `label` is intentionally derived rather than stored — the UI
+ * computes it from the first user question — so the stored shape
+ * stays minimal and survives backend / copy changes without a
+ * schema migration.
+ */
+export interface Conversation {
+  id: string
+  messages: ChatMessage[]
+  draft: string
+}
+
+/**
  * Minimal on-the-wire turn posted to the backend. The widget replays
  * the full successful history on every request (see AC-52) so the LLM
  * can reason over prior turns.
@@ -61,8 +80,16 @@ export interface ChatService {
  * - `apiUrl` — optional backend endpoint. When set, the widget posts
  *   `{ messages: ChatTurn[] }` to this URL; when omitted it falls
  *   back to the bundled mock (see AC-04).
+ * - `interceptBackNavigation` — when `true` (the default), the widget
+ *   pushes a history entry on the compact → expanded transition
+ *   (AC-20c) and listens for `popstate` so the browser back button
+ *   dismisses expanded mode (AC-20g). Compact-mode back is never
+ *   intercepted (AC-20h). Set to `false` to opt out (AC-20i) — the
+ *   close button (AC-20d) and `Esc` (AC-20j) still dismiss, but the
+ *   browser back button passes through to host-page navigation.
  */
 export interface WidgetOptions {
   container: string | HTMLElement
   apiUrl?: string
+  interceptBackNavigation?: boolean
 }

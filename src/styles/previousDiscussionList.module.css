@@ -1,0 +1,94 @@
+/*
+ * Sidebar shell for the AC-33 previous-discussion list. Anchored to
+ * the left of the expanded-view content column on desktop. Below the
+ * §12.1 PD-05 mobile breakpoint the sidebar collapses to the top of
+ * the surface as a horizontal pill row (AC-33d) — code-authored
+ * because IR-site does not publish a mobile frame for this yet.
+ *
+ * Visuals reuse existing widget tokens (gray-400 surface, radius)
+ * until the IR-DS frame lands a Figma-confirmed treatment. Once
+ * that's available, update tokens and bump §2.5 row AC-33 / AC-33a.
+ */
+
+.list {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--gray-400);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  box-sizing: border-box;
+  align-self: flex-start;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.heading {
+  font-family: var(--font-family-bold);
+  font-size: 16px;
+  line-height: normal;
+  margin: 0;
+  color: var(--black-500);
+}
+
+.newButton {
+  font-family: var(--font-family);
+  font-size: 14px;
+  background: transparent;
+  color: var(--black-500);
+  border: 1px solid var(--black-500);
+  border-radius: var(--radius-pill);
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 120ms ease-out;
+}
+
+.newButton:hover {
+  background: var(--gray-500);
+}
+
+.newButton:focus-visible {
+  outline: 2px solid var(--black-500);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .newButton {
+    transition: none;
+  }
+}
+
+.items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  overflow-y: auto;
+}
+
+@media (max-width: 639px) {
+  .list {
+    width: 100%;
+    align-self: stretch;
+  }
+
+  .items {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .items > li {
+    flex-shrink: 0;
+  }
+}

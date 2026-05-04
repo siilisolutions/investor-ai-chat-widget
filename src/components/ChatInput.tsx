@@ -14,6 +14,14 @@
  * `:hover` and `:active` pseudo-classes with the same gradient tokens
  * used in Figma.
  *
+ * Value mode:
+ * - When `value` and `onValueChange` are both supplied, the input is
+ *   controlled by the parent — used in expanded mode so `App` can
+ *   persist + restore the active conversation's draft (AC-33b).
+ * - When omitted, the input falls back to local state (compact mode
+ *   path; CompactView does not need draft persistence because its
+ *   value is always empty on first render and cleared on send).
+ *
  * Used inside: `CompactView`, `ExpandedView`.
  */
 
@@ -26,6 +34,8 @@ interface ChatInputProps {
   placeholder?: string
   disabled?: boolean
   autoFocus?: boolean
+  value?: string
+  onValueChange?: (next: string) => void
   onSend: (message: string) => void
 }
 
@@ -37,17 +47,40 @@ export function ChatInput({
   placeholder = DEFAULT_PLACEHOLDER,
   disabled = false,
   autoFocus = false,
+  value: controlledValue,
+  onValueChange,
   onSend,
 }: ChatInputProps) {
-  const [value, setValue] = useState('')
+  const isControlled = controlledValue !== undefined
+  const [internalValue, setInternalValue] = useState('')
+  const value = isControlled ? controlledValue : internalValue
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const sendButtonRef = useRef<HTMLButtonElement>(null)
+
+  const setValue = (next: string) => {
+    if (!isControlled) {
+      setInternalValue(next)
+    }
+    onValueChange?.(next)
+  }
 
   useEffect(() => {
     if (autoFocus) {
       textareaRef.current?.focus()
     }
   }, [autoFocus])
+
+  // Keep textarea height synced when the controlled value changes
+  // out-of-band (e.g. activeId switch restores another conversation's
+  // draft). On mount this is a no-op for the empty-string default.
+  useEffect(() => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    if (value.length > 0) {
+      el.style.height = `${Math.min(el.scrollHeight, 240)}px`
+    }
+  }, [value])
 
   const submit = () => {
     const trimmed = value.trim()

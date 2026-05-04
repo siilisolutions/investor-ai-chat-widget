@@ -56,11 +56,15 @@ export function init(options: WidgetOptions): void {
     existing.unmount()
   }
   const chatService = resolveService(options.apiUrl)
+  const interceptBackNavigation = options.interceptBackNavigation !== false
   const root = createRoot(el)
   roots.set(el, root)
   root.render(
     <StrictMode>
-      <App chatService={chatService} />
+      <App
+        chatService={chatService}
+        interceptBackNavigation={interceptBackNavigation}
+      />
     </StrictMode>
   )
 }

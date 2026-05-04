@@ -1,0 +1,55 @@
+/*
+ * Close button styles — matches Figma node `ds:196:853` (Close discussion).
+ * The minimum hit target is 44×44px per AC-20d so it is comfortable to
+ * activate with touch / a screen-reader pointer device. The visual is a
+ * neutral × glyph on a transparent background, with a subtle gray
+ * surface on hover / press taken from existing tokens (--gray-400 /
+ * --gray-500 are reused from the reference-tag and question-bubble
+ * surfaces, so no new color enters the palette).
+ *
+ * Reduced motion: hover / focus transitions are dropped under
+ * `prefers-reduced-motion: reduce` so the dismiss path stays instant
+ * (AC-20k).
+ */
+
+.closeButton {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-pill);
+  color: var(--black-500);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 120ms ease-out;
+  font-family: var(--font-family);
+  flex-shrink: 0;
+}
+
+.closeButton:hover {
+  background: var(--gray-400);
+}
+
+.closeButton:active {
+  background: var(--gray-500);
+}
+
+.closeButton:focus-visible {
+  outline: 2px solid var(--black-500);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .closeButton {
+    transition: none;
+  }
+}
+
+.glyph {
+  font-size: 24px;
+  line-height: 1;
+  display: block;
+}

@@ -1,0 +1,45 @@
+/*
+ * Single previous-discussion row. The button fills its parent <li>
+ * and renders the conversation label clipped to a single line. Active
+ * row uses the gray-500 token (same as the question bubble) so the
+ * "you are here" cue ties to existing widget surfaces; inactive rows
+ * are transparent and reveal the sidebar's gray-400 background.
+ */
+
+.item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-family);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--black-500);
+  border-radius: var(--radius);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background-color 120ms ease-out;
+}
+
+.item:hover {
+  background: var(--white-500);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--black-500);
+  outline-offset: 2px;
+}
+
+.item.active {
+  background: var(--gray-500);
+  font-family: var(--font-family-bold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item {
+    transition: none;
+  }
+}

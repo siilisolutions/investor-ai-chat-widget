@@ -3,6 +3,8 @@
  *
  *   AC-29 — follow-ups append without mutating prior Q+A pairs.
  *   AC-30 — input and send button are disabled while a request is in flight.
+ *   AC-33b — switching between conversations restores each one's draft
+ *           and does not fire a service call.
  *   AC-42 — raw `err.message` from a ChatService throw is never forwarded
  *           to the DOM; the rendered error row shows the fixed SAFE_ERROR
  *           copy instead.
@@ -16,6 +18,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/preact'
 import { App } from '../src/App'
 import { buildHistory } from '../src/chatHistory'
 import { SAFE_ERROR } from '../src/errorCopy'
+import { saveConversation } from '../src/services/conversationStore'
 import type {
   ChatMessage,
   ChatService,
@@ -122,6 +125,92 @@ describe('App', () => {
     expect(screen.getByText('Q1')).toBeInTheDocument()
     expect(screen.getByText('first answer')).toBeInTheDocument()
     expect(screen.getByText('Q2')).toBeInTheDocument()
+  })
+
+  it('AC-33b: switching between conversations restores each one\u2019s draft and does not call the service', async () => {
+    // Seed two conversations directly into PD-08 storage so the App
+    // hydrates with both rows in the sidebar after expanding.
+    saveConversation({
+      id: 'conv-A',
+      messages: [{ id: 'mA', question: 'Question A?', answer: 'answer A' }],
+      draft: '',
+    })
+    saveConversation({
+      id: 'conv-B',
+      messages: [{ id: 'mB', question: 'Question B?', answer: 'answer B' }],
+      draft: '',
+    })
+
+    // We never want the service to fire during AC-33b activations, but
+    // a single send is required to flip from compact to expanded mode
+    // (App starts compact regardless of seeded history). The mock
+    // resolves with a fixed reply so we can detect the transition.
+    const service = makeService(async () => ({
+      id: 'kickoff',
+      question: 'q',
+      answer: 'kickoff-answer',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    const initialTextarea = screen.getByLabelText(
+      'Siili investor chatbot message',
+    ) as HTMLTextAreaElement
+    fireEvent.input(initialTextarea, { target: { value: 'kickoff' } })
+    fireEvent.keyDown(initialTextarea, { key: 'Enter' })
+    await screen.findByText('kickoff-answer')
+
+    // Now in expanded mode with the sidebar showing both rows. The
+    // active conversation is conv-A (first stored).
+    const textareaA = (await screen.findByLabelText(
+      'Siili investor chatbot message',
+    )) as HTMLTextAreaElement
+    await waitFor(() => expect(textareaA).toBeEnabled())
+
+    // Type a draft into conv-A.
+    fireEvent.input(textareaA, { target: { value: 'half-typed for A' } })
+
+    const callsAfterKickoff = (service.sendMessage as ReturnType<typeof vi.fn>).mock
+      .calls.length
+
+    // Switch to conv-B by clicking its sidebar row. conv-B's seeded
+    // draft is empty, so the textarea should clear.
+    fireEvent.click(screen.getByRole('button', { name: 'Question B?' }))
+    await waitFor(() => {
+      const ta = screen.getByLabelText(
+        'Siili investor chatbot message',
+      ) as HTMLTextAreaElement
+      expect(ta.value).toBe('')
+    })
+
+    // Type a draft for conv-B.
+    const textareaB = screen.getByLabelText(
+      'Siili investor chatbot message',
+    ) as HTMLTextAreaElement
+    fireEvent.input(textareaB, { target: { value: 'half-typed for B' } })
+
+    // Switch back to conv-A — its draft is restored verbatim.
+    fireEvent.click(screen.getByRole('button', { name: 'Question A?' }))
+    await waitFor(() => {
+      const ta = screen.getByLabelText(
+        'Siili investor chatbot message',
+      ) as HTMLTextAreaElement
+      expect(ta.value).toBe('half-typed for A')
+    })
+
+    // Switch to conv-B again — its draft survived the switch.
+    fireEvent.click(screen.getByRole('button', { name: 'Question B?' }))
+    await waitFor(() => {
+      const ta = screen.getByLabelText(
+        'Siili investor chatbot message',
+      ) as HTMLTextAreaElement
+      expect(ta.value).toBe('half-typed for B')
+    })
+
+    // No additional service calls fired during the activation cycle.
+    expect(
+      (service.sendMessage as ReturnType<typeof vi.fn>).mock.calls.length,
+    ).toBe(callsAfterKickoff)
   })
 
   it('AC-42: raw service errors never reach the rendered error row', async () => {
