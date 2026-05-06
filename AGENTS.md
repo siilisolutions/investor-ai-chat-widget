@@ -208,7 +208,9 @@ npm run dev
 |-----|-----|
 | Staging (HubSpot sandbox) | <https://www-siili-com.sandbox.hs-sites-eu1.com/investors-chatbot-test> |
 
-The host page loads `siili-chatbot.iife.js` + `siili-chatbot.css` from `/hubfs/investors-chatbot/` and configures `apiUrl` in its own `<script>` tag. Use this URL for embed-side smoke tests (mount, scoped styles, no global leakage beyond `SiiliChatbot`, AC-43 error path on a bad backend) — but remember that the **`apiUrl` value lives on the host page**, not here, so a "broken chat" on staging often means the host page's init call needs updating, not a widget change. See `README.md` § Environments for the canonical entry.
+The host page loads `siili-chatbot.iife.js` + `siili-chatbot.css` from jsDelivr via the **`@latest`** alias (see [`README.md`](README.md) § Embed on Host Site Option C) so a fresh release surfaces on staging without a host-page edit. Self-hosting from `/hubfs/investors-chatbot/` (Option B) is the fallback when the CDN is unavailable. The `apiUrl` is configured on the host page's own `<script>` tag — use this URL for embed-side smoke tests (mount, scoped styles, no global leakage beyond `SiiliChatbot`, AC-43 error path on a bad backend) — but remember that the **`apiUrl` value lives on the host page**, not here, so a "broken chat" on staging often means the host page's init call needs updating, not a widget change. Production should always pin to `@vX.Y.Z` (Option A); never use `@latest` outside staging.
+
+After cutting a new release, run step 9 of `README.md` § Cutting a new CDN release (two `curl` calls to `purge.jsdelivr.net`) so staging reflects the new tag in ~1 minute instead of ~24h. See `README.md` § Environments for the canonical entry.
 
 ### How to build for production
 ```bash

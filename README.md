@@ -42,11 +42,11 @@ Produces `dist/siili-chatbot.iife.js` and `dist/siili-chatbot.css`.
 
 ## Embed on Host Site
 
-The host page can either self-host the bundle (download `siili-chatbot.iife.js` + `siili-chatbot.css` from a tagged GitHub release and serve them itself) or load them straight from the **jsDelivr CDN** — the latter is the easiest path and what staging currently uses.
+The host page can either self-host the bundle (download `siili-chatbot.iife.js` + `siili-chatbot.css` from a tagged GitHub release and serve them itself) or load them straight from the **jsDelivr CDN** — the latter is the easiest path. There are three flavours below: **Option A** pins to a specific tag (recommended for production), **Option B** self-hosts the bundle, and **Option C** tracks `@latest` so the host page picks up every new release automatically (recommended for staging).
 
-### Option A — jsDelivr CDN (recommended for staging)
+### Option A — jsDelivr CDN (recommended for production)
 
-Pin to an exact tag so a future release can't break the staging page without an explicit version bump:
+Pin to an exact tag so a future release can't break the live page without an explicit version bump:
 
 ```html
 <div id="siili-chatbot"></div>
@@ -64,7 +64,7 @@ Pin to an exact tag so a future release can't break the staging page without an 
 - jsDelivr serves any file from any tag of this public repo automatically — there's nothing to publish, just `git push --tags`.
 - The bundle is tiny (gzip ~13 KB combined) so caching is nearly free.
 - To roll forward, bump the `@v0.1.0` segment in both URLs to the new tag. To roll back, point it at the previous tag — no rebuild required on the host.
-- Avoid `@latest` on production surfaces; it auto-follows the newest tag and turns every release into a silent host-page change. `@latest` is fine for throwaway demos only.
+- **Production should always pin** to an exact tag (the snippet above) — that's the whole point of Option A: a new release can't change the live site without a deliberate version bump in the host page. `@latest` is intentional on **staging** (Option C below) and fine for throwaway demos, but never on production.
 
 ### Option B — Self-hosted
 
@@ -85,6 +85,27 @@ If the host has its own asset pipeline (e.g. HubSpot `/hubfs/`), download the tw
 
 For local development against the real backend, copy the endpoint into `.env.local` as `VITE_API_URL=…` (the file is git-ignored) and run `npm run dev`.
 
+### Option C — Staging: auto-track latest release
+
+Staging deliberately follows whatever was tagged most recently, so a new release surfaces there without a host-page edit. Use jsDelivr's `@latest` alias:
+
+```html
+<div id="siili-chatbot"></div>
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/siilisolutions/investor-ai-chat-widget@latest/dist/siili-chatbot.css" />
+<script src="https://cdn.jsdelivr.net/gh/siilisolutions/investor-ai-chat-widget@latest/dist/siili-chatbot.iife.js"></script>
+<script>
+  SiiliChatbot.init({
+    container: '#siili-chatbot',
+    apiUrl: 'https://YOUR-BACKEND/api/chat',
+  });
+</script>
+```
+
+- jsDelivr resolves `@latest` to the **highest semver tag**, not the most recently pushed one. A hotfix tagged below the current `@latest` (e.g. `v0.1.4` after `v0.2.0` already exists) will **not** be picked up — pin staging to the hotfix tag explicitly via Option A when back-porting.
+- `@latest` resolution is cached at jsDelivr for up to ~24h. Step 9 of § Cutting a new CDN release runs a one-line `curl` to purge that cache; without it, staging may take up to a day to reflect a fresh release. Browser-side caching is independent — a hard refresh on the host page may still be needed.
+- This form is **not** for production. Production should always pin (Option A) so a new release can't silently change the live site.
+
 ### Cutting a new CDN release
 
 1. From `main`: `npm run build` (sanity check; the release commit will rebuild too).
@@ -95,12 +116,20 @@ For local development against the real backend, copy the endpoint into `.env.loc
 6. `git checkout main` (release commit is now reachable only via the tag — `main` stays free of build artifacts)
 7. `git push origin vX.Y.Z`
 8. The jsDelivr URL `https://cdn.jsdelivr.net/gh/siilisolutions/investor-ai-chat-widget@vX.Y.Z/dist/siili-chatbot.iife.js` becomes live within a minute.
+9. Bust jsDelivr's `@latest` alias cache so staging picks up the new release in ~1 minute instead of waiting up to ~24h:
+
+   ```bash
+   curl -s "https://purge.jsdelivr.net/gh/siilisolutions/investor-ai-chat-widget@latest/dist/siili-chatbot.iife.js"
+   curl -s "https://purge.jsdelivr.net/gh/siilisolutions/investor-ai-chat-widget@latest/dist/siili-chatbot.css"
+   ```
+
+   Step 9 only matters for hosts using `@latest` (i.e. staging — see § Embed on Host Site Option C). Production hosts pinned to `@vX.Y.Z` are unaffected and require no purge. Skip step 9 entirely when back-porting a hotfix tag below the current `@latest` — the alias still resolves to the higher semver tag, so there's nothing to invalidate.
 
 ## Environments
 
 | Env | URL | Host page |
 |-----|-----|-----------|
-| Staging | <https://www-siili-com.sandbox.hs-sites-eu1.com/investors-chatbot-test> | HubSpot sandbox preview. Widget assets served from `/hubfs/investors-chatbot/siili-chatbot.iife.js` + `…/siili-chatbot.css` — or from jsDelivr (see Embed on Host Site § Option A). |
+| Staging | <https://www-siili-com.sandbox.hs-sites-eu1.com/investors-chatbot-test> | HubSpot sandbox preview. Widget assets served from jsDelivr via the `@latest` alias (see § Embed on Host Site Option C) so the page auto-tracks every new release. Self-hosting from `/hubfs/investors-chatbot/` is also supported (Option B) when the CDN is unavailable. |
 
 The `apiUrl` is configured on the host page's `SiiliChatbot.init({ … })` call, not in this repo — so pointing staging at a different backend is a host-page change, not a widget release.
 
