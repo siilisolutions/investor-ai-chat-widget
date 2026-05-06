@@ -1,9 +1,10 @@
 /**
  * `App` — root component and state machine for the Siili investor
  * chatbot. Owns:
- * - `mode`: 'compact' | 'expanded' (flips to expanded on first send)
- * - `conversations`: every Q+A thread the user has had in this tab
- *   session (persisted to `sessionStorage` per PD-08)
+ * - `mode`: 'compact' | 'expanded' (flips to expanded on first send
+ *   or on continue-pill activation)
+ * - `conversations`: every Q+A thread the user has had in this
+ *   browser profile (persisted to `localStorage` per PD-08)
  * - `activeId`: id of the conversation currently being shown
  *
  * Delegates network I/O to the `ChatService` passed in by `widget.tsx`
@@ -12,20 +13,31 @@
  * turns of the *active* conversation is replayed on every send so the
  * backend LLM can reason over prior turns (AC-52).
  *
- * Multi-conversation contract (AC-33 cluster):
- * - The store is hydrated from `sessionStorage` on mount; if empty,
+ * Multi-conversation contract (AC-33 cluster + AC-31f):
+ * - The store is hydrated from `localStorage` on mount; if empty,
  *   one fresh conversation is created so the user always has a
- *   container to send into (AC-29 / AC-31d).
+ *   container to send into. The most-recent stored conversation is
+ *   chosen as the initial `activeId` so the AC-10c continue-pill
+ *   activation and the AC-31f auto-mint precondition both target
+ *   the right thread.
+ * - Compact-mode sends mint a fresh conversation when the active
+ *   conversation already has Q+A pairs (AC-31f). Sending into an
+ *   empty active conversation appends to it rather than minting a
+ *   duplicate (typical for the first-ever send in a new browser
+ *   profile).
+ * - The hero continue-pill (AC-10a / AC-10c, Figma `site:395:5439`)
+ *   re-enters expanded mode pointing at the most-recent stored
+ *   conversation; subsequent sends append under AC-29.
  * - Activating a row in the sidebar (AC-33b) flips `activeId` only —
  *   no network call is made until the next send. Each conversation
  *   carries its own `draft` (the textarea value at the moment the
  *   user last switched away), and the controlled `ChatInput` reads
  *   the active conversation's draft on every render so re-activation
  *   restores it.
- * - Starting a new conversation (AC-35) mints an id, saves an empty
- *   entry, and sets it as active. Previous conversations remain in
- *   the store and surface in the sidebar from the moment a second
- *   conversation exists.
+ * - Starting a new conversation from inside expanded mode (AC-35)
+ *   mints an id, saves an empty entry, and sets it as active.
+ *   Previous conversations remain in the store and surface in the
+ *   sidebar from the moment a second conversation exists.
  *
  * Back-navigation contract (AC-20c / AC-20g / AC-20h / AC-20i):
  * when `interceptBackNavigation` is on (default), the compact →
@@ -37,9 +49,9 @@
  * leaked. Compact-mode back is never intercepted (AC-20h).
  *
  * Conversation contents are intentionally never cleared on dismissal
- * (AC-31). AC-31c (tab close clears history) is satisfied by the
- * sessionStorage choice in PD-08; reload preserves, tab close
- * clears.
+ * (AC-31). Persistence across tab close and browser restart is
+ * satisfied by the `localStorage` choice in PD-08 (AC-31e); the
+ * earlier "tab close clears" contract (AC-31c) is tombstoned.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -81,7 +93,13 @@ interface ConversationState {
 function initializeStore(): ConversationState {
   const stored = listConversations()
   if (stored.length > 0) {
-    return { conversations: stored, activeId: stored[0].id }
+    // AC-31f / AC-10c — land on the most-recent conversation so the
+    // continue-pill re-enters the right thread and auto-mint sees the
+    // expected `messages.length > 0` state on the next compact send.
+    return {
+      conversations: stored,
+      activeId: stored[stored.length - 1].id,
+    }
   }
   const initial = createConversation()
   return { conversations: [initial], activeId: initial.id }
@@ -177,8 +195,23 @@ export function App({ chatService, interceptBackNavigation = true }: AppProps) {
   const handleSend = useCallback(
     async (question: string) => {
       const turnId = nextMessageId()
-      const targetId = activeId
-      const turnHistory = buildHistory(messages, question)
+      // AC-31f — compact-mode send mints a fresh conversation when
+      // the active one already holds Q+A pairs, so each hero-initiated
+      // chat starts a new thread. Sending into an empty active
+      // conversation (typical of the very first send in a new browser
+      // profile) appends rather than minting a duplicate.
+      let targetId = activeId
+      let baseMessages = messages
+      if (mode === 'compact' && messages.length > 0) {
+        const fresh = createConversation()
+        setStore((prev) => ({
+          conversations: [...prev.conversations, fresh],
+          activeId: fresh.id,
+        }))
+        targetId = fresh.id
+        baseMessages = []
+      }
+      const turnHistory = buildHistory(baseMessages, question)
       setMode('expanded')
       // Append the loading placeholder and clear the draft for this
       // conversation (the user just submitted the value the textarea
@@ -220,7 +253,29 @@ export function App({ chatService, interceptBackNavigation = true }: AppProps) {
         }))
       }
     },
-    [activeId, chatService, messages, updateConversation],
+    [activeId, chatService, messages, mode, updateConversation],
+  )
+
+  // AC-10c — activate the continue-pill: re-enter expanded mode
+  // pointing at the most-recent conversation that has Q+A pairs. No
+  // network call; subsequent sends append under AC-29 because mode
+  // is now 'expanded' before the AC-31f auto-mint precondition is
+  // checked.
+  const handleContinue = useCallback(() => {
+    setStore((prev) => {
+      for (let i = prev.conversations.length - 1; i >= 0; i -= 1) {
+        if (prev.conversations[i].messages.length > 0) {
+          return { ...prev, activeId: prev.conversations[i].id }
+        }
+      }
+      return prev
+    })
+    setMode('expanded')
+  }, [])
+
+  const hasHistory = useMemo(
+    () => conversations.some((c) => c.messages.length > 0),
+    [conversations],
   )
 
   // AC-33b — activate a previous conversation. State only; no
@@ -246,7 +301,12 @@ export function App({ chatService, interceptBackNavigation = true }: AppProps) {
   return (
     <div className={`siiliChatbot ${styles.root}`}>
       {mode === 'compact' ? (
-        <CompactView suggestions={SUGGESTIONS} onSend={handleSend} />
+        <CompactView
+          suggestions={SUGGESTIONS}
+          onSend={handleSend}
+          hasHistory={hasHistory}
+          onContinue={handleContinue}
+        />
       ) : (
         <ExpandedView
           messages={messages}

@@ -26,7 +26,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react'
-import type { KeyboardEvent, MouseEvent } from 'react'
+import type { KeyboardEvent, MouseEvent, ReactNode } from 'react'
 import styles from '../styles/chatInput.module.css'
 
 interface ChatInputProps {
@@ -37,6 +37,12 @@ interface ChatInputProps {
   value?: string
   onValueChange?: (next: string) => void
   onSend: (message: string) => void
+  /**
+   * Optional trailing slot rendered inside the shell, after the send
+   * button. Used in compact mode for the AC-10a continue-pill (Figma
+   * `site:395:5439` Continue discussion button container).
+   */
+  continueAffordance?: ReactNode
 }
 
 const DEFAULT_PLACEHOLDER =
@@ -50,6 +56,7 @@ export function ChatInput({
   value: controlledValue,
   onValueChange,
   onSend,
+  continueAffordance,
 }: ChatInputProps) {
   const isControlled = controlledValue !== undefined
   const [internalValue, setInternalValue] = useState('')
@@ -158,6 +165,7 @@ export function ChatInput({
           </svg>
         </button>
       </div>
+      {continueAffordance}
     </div>
   )
 }

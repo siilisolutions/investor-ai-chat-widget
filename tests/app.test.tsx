@@ -1,8 +1,12 @@
 /**
  * Tests for `App` and the `buildHistory` helper. Covers:
  *
+ *   AC-10c — clicking the continue-pill flips to expanded with the
+ *           most-recent conversation as active and fires no network call.
  *   AC-29 — follow-ups append without mutating prior Q+A pairs.
  *   AC-30 — input and send button are disabled while a request is in flight.
+ *   AC-31f — compact-mode send with prior messages mints a fresh conversation;
+ *           compact-mode send into an empty active conversation appends.
  *   AC-33b — switching between conversations restores each one's draft
  *           and does not fire a service call.
  *   AC-42 — raw `err.message` from a ChatService throw is never forwarded
@@ -129,7 +133,7 @@ describe('App', () => {
 
   it('AC-33b: switching between conversations restores each one\u2019s draft and does not call the service', async () => {
     // Seed two conversations directly into PD-08 storage so the App
-    // hydrates with both rows in the sidebar after expanding.
+    // hydrates with both rows in the sidebar after entering expanded.
     saveConversation({
       id: 'conv-A',
       messages: [{ id: 'mA', question: 'Question A?', answer: 'answer A' }],
@@ -141,41 +145,32 @@ describe('App', () => {
       draft: '',
     })
 
-    // We never want the service to fire during AC-33b activations, but
-    // a single send is required to flip from compact to expanded mode
-    // (App starts compact regardless of seeded history). The mock
-    // resolves with a fixed reply so we can detect the transition.
+    // The continue-pill (AC-10c) flips to expanded without a service
+    // call and lands on the most-recent stored conversation
+    // (conv-B). Using it instead of a kickoff-send avoids triggering
+    // AC-31f's auto-mint, so the sidebar shows exactly the two
+    // seeded rows.
     const service = makeService(async () => ({
-      id: 'kickoff',
+      id: 'never',
       question: 'q',
-      answer: 'kickoff-answer',
+      answer: 'never',
       loading: false,
     }))
     render(<App chatService={service} />)
 
-    const initialTextarea = screen.getByLabelText(
-      'Siili investor chatbot message',
-    ) as HTMLTextAreaElement
-    fireEvent.input(initialTextarea, { target: { value: 'kickoff' } })
-    fireEvent.keyDown(initialTextarea, { key: 'Enter' })
-    await screen.findByText('kickoff-answer')
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Jatka edellistä keskustelua' }),
+    )
 
-    // Now in expanded mode with the sidebar showing both rows. The
-    // active conversation is conv-A (first stored).
-    const textareaA = (await screen.findByLabelText(
+    // Active conversation is conv-B (most recent). Type a draft.
+    const textareaB = (await screen.findByLabelText(
       'Siili investor chatbot message',
     )) as HTMLTextAreaElement
-    await waitFor(() => expect(textareaA).toBeEnabled())
+    fireEvent.input(textareaB, { target: { value: 'half-typed for B' } })
 
-    // Type a draft into conv-A.
-    fireEvent.input(textareaA, { target: { value: 'half-typed for A' } })
-
-    const callsAfterKickoff = (service.sendMessage as ReturnType<typeof vi.fn>).mock
-      .calls.length
-
-    // Switch to conv-B by clicking its sidebar row. conv-B's seeded
+    // Switch to conv-A by clicking its sidebar row. conv-A's seeded
     // draft is empty, so the textarea should clear.
-    fireEvent.click(screen.getByRole('button', { name: 'Question B?' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Question A?' }))
     await waitFor(() => {
       const ta = screen.getByLabelText(
         'Siili investor chatbot message',
@@ -183,22 +178,13 @@ describe('App', () => {
       expect(ta.value).toBe('')
     })
 
-    // Type a draft for conv-B.
-    const textareaB = screen.getByLabelText(
+    // Type a draft for conv-A.
+    const textareaA = screen.getByLabelText(
       'Siili investor chatbot message',
     ) as HTMLTextAreaElement
-    fireEvent.input(textareaB, { target: { value: 'half-typed for B' } })
+    fireEvent.input(textareaA, { target: { value: 'half-typed for A' } })
 
-    // Switch back to conv-A — its draft is restored verbatim.
-    fireEvent.click(screen.getByRole('button', { name: 'Question A?' }))
-    await waitFor(() => {
-      const ta = screen.getByLabelText(
-        'Siili investor chatbot message',
-      ) as HTMLTextAreaElement
-      expect(ta.value).toBe('half-typed for A')
-    })
-
-    // Switch to conv-B again — its draft survived the switch.
+    // Switch back to conv-B — its draft is restored verbatim.
     fireEvent.click(screen.getByRole('button', { name: 'Question B?' }))
     await waitFor(() => {
       const ta = screen.getByLabelText(
@@ -207,10 +193,149 @@ describe('App', () => {
       expect(ta.value).toBe('half-typed for B')
     })
 
-    // No additional service calls fired during the activation cycle.
+    // Switch to conv-A again — its draft survived the switch.
+    fireEvent.click(screen.getByRole('button', { name: 'Question A?' }))
+    await waitFor(() => {
+      const ta = screen.getByLabelText(
+        'Siili investor chatbot message',
+      ) as HTMLTextAreaElement
+      expect(ta.value).toBe('half-typed for A')
+    })
+
+    // No service calls fired across the entire pill-activation +
+    // sidebar-switching cycle.
     expect(
       (service.sendMessage as ReturnType<typeof vi.fn>).mock.calls.length,
-    ).toBe(callsAfterKickoff)
+    ).toBe(0)
+  })
+
+  it('AC-10c: clicking the continue-pill enters expanded with the most-recent conversation and fires no network call', async () => {
+    saveConversation({
+      id: 'older',
+      messages: [{ id: 'm-old', question: 'older question?', answer: 'older' }],
+      draft: '',
+    })
+    saveConversation({
+      id: 'newer',
+      messages: [{ id: 'm-new', question: 'newer question?', answer: 'newer' }],
+      draft: '',
+    })
+
+    const service = makeService(async () => ({
+      id: 'never',
+      question: 'q',
+      answer: 'never',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Jatka edellistä keskustelua' }),
+    )
+
+    // Expanded view renders the newer conversation's answer (the
+    // question text shows up twice — once in the Q+A bubble and
+    // once as the sidebar row label — so the answer is the cleaner
+    // signal that the right conversation is active).
+    expect(await screen.findByText('newer')).toBeInTheDocument()
+    // The older conversation's answer is NOT in the active stream.
+    expect(screen.queryByText('older')).not.toBeInTheDocument()
+    // Both conversations surface in the sidebar (≥ 2 conversations
+    // → AC-33 visibility threshold met).
+    expect(
+      screen.getByRole('button', { name: 'older question?' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'newer question?' }),
+    ).toBeInTheDocument()
+
+    // No service call was triggered by the pill activation itself.
+    expect(
+      (service.sendMessage as ReturnType<typeof vi.fn>).mock.calls.length,
+    ).toBe(0)
+  })
+
+  it('AC-31f: compact-mode send with prior messages mints a fresh conversation rather than appending', async () => {
+    saveConversation({
+      id: 'prior',
+      messages: [
+        {
+          id: 'm-prior',
+          question: 'prior question?',
+          answer: 'prior answer',
+        },
+      ],
+      draft: '',
+    })
+
+    const service = makeService(async (history) => ({
+      id: 'fresh',
+      question: history[history.length - 1].content,
+      answer: 'fresh answer',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    const textarea = screen.getByLabelText(
+      'Siili investor chatbot message',
+    ) as HTMLTextAreaElement
+    fireEvent.input(textarea, { target: { value: 'a brand-new question' } })
+    fireEvent.keyDown(textarea, { key: 'Enter' })
+
+    await screen.findByText('fresh answer')
+
+    // The fresh conversation contains only the new Q+A — the prior
+    // conversation's answer is NOT in the active stream (we use the
+    // answer text as the disambiguator because the question text
+    // shows up twice — once in the Q+A bubble and once as the
+    // sidebar row label).
+    expect(screen.queryByText('prior answer')).not.toBeInTheDocument()
+
+    // The prior conversation surfaces in the sidebar (sidebar appears
+    // as soon as a second conversation exists).
+    expect(
+      screen.getByRole('button', { name: 'prior question?' }),
+    ).toBeInTheDocument()
+
+    // The history posted to the service contains only the new turn —
+    // the prior conversation's history is not replayed (each
+    // conversation is its own thread per AC-52).
+    const sendCalls = (
+      service.sendMessage as ReturnType<typeof vi.fn>
+    ).mock.calls
+    expect(sendCalls).toHaveLength(1)
+    expect(sendCalls[0][0]).toEqual([
+      { role: 'user', content: 'a brand-new question' },
+    ])
+  })
+
+  it('AC-31f: compact-mode send into an empty active conversation appends instead of minting a duplicate', async () => {
+    // No seeded conversations — App.initializeStore creates one
+    // empty fresh conversation on mount. The first send should
+    // append into it, not mint a second one.
+    const service = makeService(async (history) => ({
+      id: 'first',
+      question: history[history.length - 1].content,
+      answer: 'first answer',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    const textarea = screen.getByLabelText(
+      'Siili investor chatbot message',
+    ) as HTMLTextAreaElement
+    fireEvent.input(textarea, { target: { value: 'first question' } })
+    fireEvent.keyDown(textarea, { key: 'Enter' })
+
+    await screen.findByText('first answer')
+
+    // Sidebar's visibility threshold is conversations.length > 1.
+    // If the send had spuriously minted a second conversation, the
+    // sidebar would render and the new conversation's empty label
+    // would surface. Confirm it does not.
+    expect(
+      screen.queryByRole('complementary', { name: 'Aiemmat keskustelut' }),
+    ).not.toBeInTheDocument()
   })
 
   it('AC-42: raw service errors never reach the rendered error row', async () => {

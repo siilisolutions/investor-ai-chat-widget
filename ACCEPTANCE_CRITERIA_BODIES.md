@@ -129,22 +129,33 @@ Maps to the Investor hero composition and its main component; see
     predefined suggestion chips (count per §12.1 PD-01), overlaid on
     the hero section in the layout defined in Figma.
 
-- **AC-10a** — *Continue-conversation pill — rendering* · **@aspirational**
-  - **Given** the user has previously been in expanded mode within the
-    current page session and `messages.length > 0`, and the widget is
-    now rendering compact mode,
+- **AC-10a** — *Continue-conversation pill — rendering* · **@evolving**
+  - **Given** the PD-08 conversation store contains at least one
+    conversation with `messages.length > 0`, and the widget is
+    rendering compact mode,
   - **Then** a single pill is rendered above the suggestion chips
-    reading *"Jatka keskustelua"* (styled per Siili tokens: Everett,
-    `--radius`, gradient or gray surface per Figma once designed).
-  - **Given** `messages.length === 0`,
-  - **Then** the pill is not rendered.
+    labelled *"Jatka edellistä keskustelua"* (Figma `site:395:5439`,
+    styled per Siili tokens: Everett, `--radius`, surface per the
+    referenced frame).
+  - **Given** the store is empty or every conversation in the store
+    has zero Q+A pairs,
+  - **Then** the pill is not rendered and compact mode falls back to
+    the textarea-plus-chips layout (AC-10).
+  (added 2026-04, Figma component drift; amended 2026-05, multi-discussion flow rework — graduated from @aspirational to @evolving with the continue-pill implementation; copy pinned to "Jatka edellistä keskustelua" per `site:395:5439`.)
 
-- **AC-10c** — *Continue-conversation pill — activation* · **@aspirational**
+- **AC-10c** — *Continue-conversation pill — activation* · **@evolving**
   - **Given** the continue-conversation pill is rendered (per AC-10a),
   - **When** the user clicks or keyboard-activates the pill,
-  - **Then** the widget transitions to expanded mode with the full
-    message history intact, scrolled to the latest reply, and fires
-    no network call.
+  - **Then** the widget sets the most-recent conversation in the
+    PD-08 store as active and transitions to expanded mode with that
+    conversation's Q+A stream rendered and the latest reply scrolled
+    into view. No network call is fired by the activation itself.
+  - **Given** the user subsequently sends a new message in expanded
+    mode after activating the pill,
+  - **Then** the message appends to the resumed conversation under
+    AC-29 — it does **not** mint a new conversation, because AC-31f
+    only mints on sends that originate in compact mode.
+  (added 2026-04, Figma component drift; amended 2026-05, multi-discussion flow rework — graduated from @aspirational to @evolving; clarified the post-activation send path against AC-31f.)
 
 - **AC-10b** — *Suggestion-chip de-duplication* · **@aspirational**
   - **Given** the user has previously asked one of the three predefined
@@ -426,28 +437,58 @@ Maps to the Investor agent composition and its main component; see
     (AC-10a) and hides already-asked chips (AC-10b); the history is
     never rendered in full inside the compact hero.
 
-- **AC-31c** — *Tab close clears history* · **@aspirational**
-  - **Given** the user closes the browser tab,
-  - **Then** all conversations stored under PD-08 are cleared from
-    the user's machine — there is no cross-tab or cross-session
-    persistence on shared devices.
-  - **Given** the user reloads the same tab or navigates within
-    the same tab to another page on the host site,
-  - **Then** stored conversations remain available — reload is
-    explicitly **not** a reset signal under the AC-33 sidebar
-    contract; the close-tab boundary is the reset.
+- **AC-31c** — *(deprecated) Tab close clears history* · **@aspirational**
+  - [DEPRECATED 2026-05 — superseded by AC-31e, reason: PD-08 storage moved from `sessionStorage` to `localStorage`; tab close is no longer a reset signal.]
   (amended 2026-04, Figma component drift — boundary moved from
   "reload clears" to "tab close clears" so the AC-33 sidebar can
   list past conversations within a session; PD-08 captures the
-  underlying storage choice.)
+  underlying storage choice; deprecated 2026-05, multi-discussion flow rework.)
 
-- **AC-31d** — *New message from compact with history appends* · **@evolving**
-  - **Given** the user sends a new message from compact mode while
-    history exists,
-  - **Then** the widget enters expanded mode and **appends** the new
-    Q+A pair to the existing history (it does not start a new
-    conversation).
-  (amended 2026-04, Figma component drift — `App.tsx::handleSend` always appends to `messages` regardless of mode; the AC-29 follow-up test exercises the same code path; promoted to @evolving.)
+- **AC-31e** — *History persists across tab close and browser restart* · **@evolving**
+  - **Given** the user has one or more conversations in the PD-08 store,
+  - **When** the user closes the tab, closes the browser, or reloads
+    the page within the same browser profile,
+  - **Then** the conversations remain available — none of those
+    boundaries are reset signals. The user re-enters the host page
+    with the continue-pill (AC-10a) reachable on the hero and the
+    sidebar (AC-33) populated as soon as the store holds more than
+    one conversation.
+  - **Given** the user clears site storage via browser tooling (or
+    a different browser profile loads the host page),
+  - **Then** the store is empty and the widget mounts in its
+    first-visit state.
+  (added 2026-05, multi-discussion flow rework — replaces AC-31c after PD-08 storage move from `sessionStorage` to `localStorage`.)
+
+- **AC-31d** — *(deprecated) New message from compact with history appends* · **@evolving**
+  - [DEPRECATED 2026-05 — superseded by AC-31f, reason: compact-mode sends now mint a fresh conversation when history exists; the appending contract moved to expanded-mode sends only.]
+  (amended 2026-04, Figma component drift — `App.tsx::handleSend` always appends to `messages` regardless of mode; the AC-29 follow-up test exercises the same code path; promoted to @evolving; deprecated 2026-05, multi-discussion flow rework.)
+
+- **AC-31f** — *Compact-mode send mints a new conversation when history exists* · **@evolving**
+  - **Given** the widget is in compact mode and the active
+    conversation already contains at least one Q+A pair,
+  - **When** the user sends a new message (Enter on the textarea, a
+    chip click, or the send button),
+  - **Then** the widget mints a fresh conversation in the PD-08
+    store, sets it as the active conversation, transitions to
+    expanded mode, and the new Q+A pair is the first entry in that
+    fresh conversation. Earlier conversations are preserved in the
+    store and surface in the AC-33 sidebar from the moment a second
+    conversation exists.
+  - **Given** the widget is in compact mode and the active
+    conversation has no Q+A pairs (typical of the first-ever send
+    in a new browser profile),
+  - **Then** the send appends to the empty active conversation
+    rather than minting a duplicate — a fresh-on-mount conversation
+    is the natural target for the first message.
+  - **Given** the widget is already in expanded mode,
+  - **Then** sends append to the active conversation — AC-29
+    governs that path. The "mint on send" rule applies only to
+    sends that originate in compact mode.
+  - The user can still re-enter a prior conversation from compact
+    mode via the continue-pill (AC-10a / AC-10c); that path flips
+    to expanded **before** any send, so subsequent sends append to
+    the resumed conversation under AC-29.
+  (added 2026-05, multi-discussion flow rework — replaces AC-31d after the conversation-store contract changed from "single thread, dismiss-and-resume" to "multi-thread, hero-initiated chats start fresh".)
 
 - **AC-32** — *Input focus — retained after send in expanded mode* · **@aspirational**
   - **Given** the widget is in expanded mode and the user submits a
@@ -659,9 +700,11 @@ Maps to the Investor agent composition and its main component; see
     AC-40) MUST be excluded from the posted history — only
     successfully-completed turns, plus the new user message, are
     sent.
-  - **Then** history is kept in React state only; it is not
-    persisted across reloads (AC-31c still holds) and is not
-    exposed on `window`.
+  - **Then** history is kept in React state for in-flight rendering
+    plus the PD-08 `localStorage` store for cross-session
+    persistence (AC-31e); it is not exposed on `window` and is
+    not shared with any server beyond the explicit POST to
+    `apiUrl`.
 
 - **AC-53** — *Real-backend adapter — response mapping and forward-compatible schema* · **@evolving**
   - **Given** the backend returns `{ "response": "…answer text…" }`

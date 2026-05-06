@@ -1,0 +1,56 @@
+/*
+ * Continue-conversation pill — divider + right-aligned text link
+ * inside the compact-mode textarea shell. Figma `site:395:5439`
+ * "Continue discussion button container".
+ *
+ * Layout matches the Figma `flex flex-col gap-[16px]` container:
+ * a 1px gray divider followed by the link text. The shell already
+ * provides 16px gap between rows, so we only need to control the
+ * intra-pill spacing.
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  width: 100%;
+}
+
+.divider {
+  height: 1px;
+  width: 100%;
+  background: var(--gray-500);
+}
+
+.link {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  text-align: right;
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 16px;
+  color: var(--blue-700);
+  cursor: pointer;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  border-radius: var(--space-xs);
+  transition: outline-color 150ms ease;
+}
+
+.link:focus-visible {
+  outline-color: var(--blue-500);
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link {
+    transition: none;
+  }
+}

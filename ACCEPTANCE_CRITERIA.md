@@ -125,9 +125,9 @@ directly.
 | AC-03 | Idempotent init | [§3.1](ACCEPTANCE_CRITERIA_BODIES.md#31-embedding--initialisation) | active | @stable | Automated: tests/widget.test.tsx — two `init()` calls yield a single clean mount, no console errors |
 | AC-04 | `apiUrl` option selects backend | [§3.1](ACCEPTANCE_CRITERIA_BODIES.md#31-embedding--initialisation) | active | @evolving | Manual: init without `apiUrl` — mock responds per §12.1 PD-02; init with `apiUrl` — DevTools Network shows a POST to that URL and no other |
 | AC-10 | Initial state | [§3.2](ACCEPTANCE_CRITERIA_BODIES.md#32-compact-hero-mode) | active | @stable | Visual: see §2.5 row AC-10 vs rendered compact view (one textarea + chips per §12.1 PD-01) |
-| AC-10a | Continue-conversation pill — rendering | [§3.2](ACCEPTANCE_CRITERIA_BODIES.md#32-compact-hero-mode) | active | @aspirational | Manual: dev harness with seeded history — pill renders above chips (aspirational) |
+| AC-10a | Continue-conversation pill — rendering | [§3.2](ACCEPTANCE_CRITERIA_BODIES.md#32-compact-hero-mode) | active | @evolving | Automated: tests/continuePill.test.tsx — pill renders only when at least one stored conversation has messages. Visual: see §2.5 row AC-10a — Figma `site:395:5439` |
 | AC-10b | Suggestion-chip de-duplication | [§3.2](ACCEPTANCE_CRITERIA_BODIES.md#32-compact-hero-mode) | active | @aspirational | Manual: ask a chip, re-enter compact — that chip is hidden, order preserved (aspirational) |
-| AC-10c | Continue-conversation pill — activation | [§3.2](ACCEPTANCE_CRITERIA_BODIES.md#32-compact-hero-mode) | active | @aspirational | Manual: activate pill — returns to expanded with history, no network call (aspirational) |
+| AC-10c | Continue-conversation pill — activation | [§3.2](ACCEPTANCE_CRITERIA_BODIES.md#32-compact-hero-mode) | active | @evolving | Automated: tests/app.test.tsx — clicking the continue-pill flips to expanded with the most-recent conversation as active and fires no network call |
 | AC-11 | Placeholder copy | [§3.2](ACCEPTANCE_CRITERIA_BODIES.md#32-compact-hero-mode) | active | @stable | Automated: tests/compactView.test.tsx — exact Finnish placeholder string; Visual: Figma `146:1015` for `--gray-900` treatment |
 | AC-12 | Suggestion chip content | [§3.2](ACCEPTANCE_CRITERIA_BODIES.md#32-compact-hero-mode) | active | @stable | Visual: see §2.5 row AC-12 — chip wording matches `src/App.tsx::SUGGESTIONS` |
 | AC-12b | Suggestion chip labels do not wrap | [§3.2](ACCEPTANCE_CRITERIA_BODIES.md#32-compact-hero-mode) | active | @stable | Manual: shrink chip container — labels stay on one line (`white-space: nowrap`) |
@@ -165,8 +165,10 @@ directly.
 | AC-30 | Input disabled during load | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/app.test.tsx — textarea + send button both `disabled` until the in-flight promise resolves |
 | AC-31 | Dismissal retains messages | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @evolving | Automated: tests/widget.test.tsx — popstate-driven dismiss preserves the in-memory state (the textarea remains and a follow-up send re-renders the prior pair) |
 | AC-31b | Compact re-entry surfaces continue-pill and hides asked chips | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @aspirational | Manual: compact re-entry with history — continue pill visible, asked chips hidden (aspirational; depends on AC-10a continue-pill implementation) |
-| AC-31c | Tab close clears history | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @aspirational | Manual: close + reopen tab mid-convo — store empty on reopen; reload mid-convo — store retained (aspirational; needs the PD-08 sessionStorage-backed `conversationStore` to land before this can be exercised end-to-end) |
-| AC-31d | New message from compact with history appends | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @evolving | Automated: tests/app.test.tsx (AC-29) — second send appends to the existing `messages` rather than resetting; covers the post-dismiss compact-re-entry path because `messages` is preserved across mode flips |
+| AC-31c | (deprecated) Tab close clears history — superseded by AC-31e (PD-08 storage moved to `localStorage`) | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | deprecated | @aspirational | n/a (deprecated — see AC-31e) |
+| AC-31e | History persists across tab close and browser restart | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @evolving | Automated: tests/conversationStore.test.ts — store survives a fresh `read()` after a simulated tab-close (storage key still present and parseable). Manual: close + reopen tab mid-convo — continue-pill reachable on the hero; close browser + reopen — same. |
+| AC-31d | (deprecated) New message from compact with history appends — superseded by AC-31f (compact-send now mints a fresh conversation) | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | deprecated | @evolving | n/a (deprecated — see AC-31f) |
+| AC-31f | Compact-mode send mints a new conversation when history exists | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @evolving | Automated: tests/app.test.tsx — compact-mode send with prior messages mints a new conversation (sidebar visibility threshold ≥ 2 hits naturally); compact-mode send into an empty active conversation appends rather than duplicating |
 | AC-32 | Input focus — retained after send in expanded mode | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @aspirational | Manual: send via Enter and via send-button click in expanded — focus is on the textarea after the pair renders and once the input re-enables (aspirational) |
 | AC-33 | Previous discussion list — visibility | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @aspirational | Manual: dev harness with two seeded conversations under PD-08 — sidebar renders alongside Q+A stream; harness with one conversation — sidebar hidden (aspirational) |
 | AC-33a | Previous discussion list — items render | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @aspirational | Manual: dev harness with seeded multi-conversation store — each row carries a label derived from its first user question; the active row is visually distinct (aspirational) |
@@ -280,6 +282,35 @@ PR.
   [`AGENTS.md`](AGENTS.md) § Code Connect for the matching mapping
   state.
 
+> **2026-05-05 — Lane E-1 partial-sweep (IR-site frame rename, follow-up to Lane E).** The
+> IR-site frames previously cited as `site:143:601` (AI-agentti) and
+> `site:201:2273` (AI-agentti, haetaan tietoa) have been renamed in
+> Figma to `site:434:2424` and `site:434:2696` respectively; the old
+> IDs now return "node ID invalid" via `get_metadata`. The 12 `site:`
+> rows in the table below have been updated to cite the new IDs, and
+> the corresponding component JSDocs in
+> [`src/components/ExpandedView.tsx`](src/components/ExpandedView.tsx)
+> and [`src/components/ChatMessage.tsx`](src/components/ChatMessage.tsx)
+> were bumped in the same PR. No AC body changes — the visual content
+> the frames present is unchanged from Lane E's 2026-04-22 sweep,
+> verified structurally via `get_metadata` (top-bar title + close
+> button + 2-column body with sidebar / divider / Q+A stream /
+> textarea match the Lane E findings). Three IR-DS Code Connect
+> mappings orphaned during the same Figma reorganisation (`ds:152:86`
+> chip, `ds:196:853` close button, `ds:191:268` previous-discussion
+> item — each moved under new component-set parents) were
+> re-registered against the parent sets `ds:230:725` / `ds:223:739` /
+> `ds:230:452` in this lane; see [`AGENTS.md`](AGENTS.md) § Code
+> Connect for the updated state. Lane E-1 also surfaced candidate
+> anchors for two `— (code-authored)` rows (`AC-33d`, `AC-92c`) on
+> new IR-site mobile frames `site:435:2904` and `site:435:2914`;
+> promotion is deferred to a separate AC-amend turn per
+> [`.cursor/rules/ac-amending.mdc`](.cursor/rules/ac-amending.mdc).
+> The label "Lane E-1" mirrors the existing "Lane B-1" follow-up
+> convention (see `docs/governance-history/completion-log.md`); Lane G
+> proper is taken by the GOV-16 Cluster 9 graduation on 2026-04-22,
+> and Lanes H / I are reserved for upcoming GOV-16 work.
+>
 > **2026-04-22 — Lane E full-sweep completed.** Every `ds:` / `site:`
 > row below was re-validated against the two live Figma files: `site:`
 > rows point at **IR-site** (`fileKey = 0xXdKUlBJIolF15MjJuaMC`);
@@ -315,33 +346,35 @@ PR.
 | AC ID   | Figma node(s)                                 | Component / scope                                | Last checked | Checked by |
 | ------- | --------------------------------------------- | ------------------------------------------------ | ------------ | ---------- |
 | AC-10   | `site:13:527`                                 | Compact view layout (hero overlay)               | 2026-04-22   | Lane E full-sweep |
+| AC-10a  | `site:395:5439`                               | Continue-conversation pill — rendering on hero (Etusivu — jatka edellistä keskustelua) | 2026-05-06   | Multi-discussion flow rework |
+| AC-10c  | `site:395:5439`                               | Continue-conversation pill — activation handoff to expanded | 2026-05-06   | Multi-discussion flow rework |
 | AC-11   | `ds:152:121`                                  | Textarea placeholder copy & colour               | 2026-04-22   | Lane E full-sweep |
 | AC-12   | `ds:152:86`                                   | Suggestion chip wording & wrap                   | 2026-04-22   | Lane E full-sweep |
 | AC-12b  | `ds:152:86`                                   | Suggestion chip labels — single-line (nowrap)    | 2026-04-22   | Lane E full-sweep |
 | AC-16   | `ds:152:129`                                  | Send button — Active (gradient)                  | 2026-04-22   | Lane E full-sweep |
-| AC-20   | `site:143:601`                                | Expanded view mount / first-frame layout         | 2026-04-22   | Lane E full-sweep |
-| AC-20a  | `site:143:601`                                | Expanded surface fills viewport                  | 2026-04-22   | Lane C graduation |
-| AC-20d  | `site:143:601`, `ds:196:853`                  | Close (×) button styling & placement             | 2026-04-22   | Lane E full-sweep |
-| AC-20e  | `site:143:601`, `ds:152:116`                  | First Q+A pair visible on first expanded frame   | 2026-04-22   | Lane E full-sweep |
+| AC-20   | `site:434:2424`                               | Expanded view mount / first-frame layout         | 2026-05-05   | Lane E full-sweep + Lane E-1 ID rename |
+| AC-20a  | `site:434:2424`                               | Expanded surface fills viewport                  | 2026-05-05   | Lane C graduation + Lane E-1 ID rename |
+| AC-20d  | `site:434:2424`, `ds:196:853`                 | Close (×) button styling & placement             | 2026-05-05   | Lane E full-sweep + Lane E-1 ID rename |
+| AC-20e  | `site:434:2424`, `ds:152:116`                 | First Q+A pair visible on first expanded frame   | 2026-05-05   | Lane E full-sweep + Lane E-1 ID rename |
 | AC-21   | `ds:152:97`                                   | Expanded header ("Siili AI-avustaja")            | 2026-04-22   | Lane E full-sweep |
 | AC-22   | `ds:152:116`                                  | Question bubble (Q+A pair)                       | 2026-04-22   | Lane E full-sweep |
-| AC-23   | `ds:152:137`, `site:201:2273`                 | Loading blob / loading state                     | 2026-04-22   | Lane A graduation |
-| AC-23b  | `ds:152:137`, `site:201:2273`                 | Loading blob — rounded gray shape, pulse tempo   | 2026-04-22   | Lane A graduation |
+| AC-23   | `ds:152:137`, `site:434:2696`                 | Loading blob / loading state                     | 2026-05-05   | Lane A graduation + Lane E-1 ID rename |
+| AC-23b  | `ds:152:137`, `site:434:2696`                 | Loading blob — rounded gray shape, pulse tempo   | 2026-05-05   | Lane A graduation + Lane E-1 ID rename |
 | AC-25   | `ds:152:135`                                  | Source reference badge                           | 2026-04-22   | Lane E full-sweep |
 | AC-25b  | `ds:152:135`                                  | Source reference — linked (opens in new tab)     | 2026-04-22   | Lane E full-sweep |
 | AC-25c  | `ds:152:135`                                  | Source reference — static unlinked badge         | 2026-04-22   | Lane E full-sweep |
-| AC-28   | `site:143:601`, `ds:152:121`                  | ChatInput placement + textarea shadow            | 2026-04-22   | Lane C graduation |
-| AC-28b  | `site:143:601`, `ds:152:121`                  | ChatInput — short conversation, not bottom-pinned| 2026-04-22   | Lane C graduation |
-| AC-28c  | `site:143:601`, `ds:152:121`                  | ChatInput — long conversation, reply+input visible| 2026-04-22  | Lane C graduation |
-| AC-33   | `ds:191:258`, `site:143:601`                  | Previous discussion list — sidebar visibility & layout | —            | — |
+| AC-28   | `site:434:2424`, `ds:152:121`                 | ChatInput placement + textarea shadow            | 2026-05-05   | Lane C graduation + Lane E-1 ID rename |
+| AC-28b  | `site:434:2424`, `ds:152:121`                 | ChatInput — short conversation, not bottom-pinned| 2026-05-05   | Lane C graduation + Lane E-1 ID rename |
+| AC-28c  | `site:434:2424`, `ds:152:121`                 | ChatInput — long conversation, reply+input visible| 2026-05-05  | Lane C graduation + Lane E-1 ID rename |
+| AC-33   | `ds:191:258`, `site:434:2424`                 | Previous discussion list — sidebar visibility & layout | —            | — |
 | AC-33a  | `ds:191:268`                                  | Previous discussion item — row content & active state | —            | — |
-| AC-33d  | — (code-authored)                             | Sidebar mobile collapse / discoverable affordance (no IR-site mobile frame yet) | —            | — |
-| AC-34   | `site:143:601`, `site:201:2273`               | Per-conversation title text element above the Q+A stream | —            | — |
+| AC-33d  | — (code-authored)                             | Sidebar mobile collapse / discoverable affordance (Lane E-1 surfaced candidate anchor `site:435:2914` AI-agentti - Menu open - Mobile; promotion deferred to AC-amend turn) | —            | — |
+| AC-34   | `site:434:2424`, `site:434:2696`              | Per-conversation title text element above the Q+A stream | —            | — |
 | AC-35   | — (code-authored)                             | Start-new-conversation affordance — placement code-authored until Figma confirms (`ds:152:88` Reset button is published but not wired into the new layout) | —            | — |
 | AC-72   | `ds:152:129`, `ds:152:131`, `ds:152:133`      | Send button Active / Hover / Pressed             | 2026-04-22   | Lane E full-sweep |
 | AC-73   | — (code-authored)                             | Typography — Everett weights (via `--font-family*` tokens) | 2026-04-22   | Lane E full-sweep (code-authored watch) |
 | AC-73b  | — (code-authored)                             | Typography — sans-serif fallback, no large CLS   | 2026-04-22   | Lane E full-sweep (code-authored watch) |
-| AC-90   | `site:13:527`, `site:143:601`                 | Desktop (≥1024px) layout                         | 2026-04-22   | Lane E full-sweep |
+| AC-90   | `site:13:527`, `site:434:2424`                | Desktop (≥1024px) layout                         | 2026-05-05   | Lane E full-sweep + Lane E-1 ID rename |
 | AC-91   | — (code-authored)                             | Tablet (640–1023px) layout                       | 2026-04-22   | Lane F graduation (code-authored, designer delegation) |
 | AC-92   | — (code-authored)                             | Mobile (<640px) layout — compact stacks input    | 2026-04-22   | Lane F graduation (code-authored, designer delegation) |
 | AC-92b  | — (code-authored)                             | Mobile (<640px) — chips scroll or wrap           | 2026-04-22   | Lane F graduation (code-authored, designer delegation) |
@@ -394,14 +427,17 @@ Spelled out to prevent scope creep. Two classes of items live here:
 **v1-scope exclusions** (no `PD-xx` ID — these are things we chose
 not to do, not values to reference):
 
-- The widget does **not** persist conversation history beyond the
-  current browser tab session — see PD-08 below for the storage
-  contract. Closing the tab is the intentional full-reset
-  mechanism. (amended 2026-04, Figma component drift — IR-DS now
-  ships `ds:191:258` Previous discussion list, requiring in-session
-  multi-conversation history; the previous "no persistence across
-  page loads" / "no dedicated new-conversation button" exclusions
-  were tombstoned in the same edit.)
+- The widget persists conversation history per browser profile via
+  `localStorage` — see PD-08 below for the storage contract. There
+  is no in-widget "clear history" affordance in v1; the user clears
+  history through the browser. (amended 2026-04, Figma component
+  drift — IR-DS now ships `ds:191:258` Previous discussion list,
+  requiring in-session multi-conversation history; the previous "no
+  persistence across page loads" / "no dedicated new-conversation
+  button" exclusions were tombstoned in the same edit; amended
+  2026-05, multi-discussion flow rework — storage moved from
+  `sessionStorage` to `localStorage` so conversations survive tab
+  close and browser restart per explicit product decision.)
 - The widget does **not** stream tokens (current contract is
   request/response). Streaming is a future extension of
   `ChatService`, not a v1 requirement.
@@ -419,7 +455,7 @@ AC bodies reference the `PD-ID` instead of restating the literal.
 | PD-05 | Responsive breakpoints            | ≥1024 / 640–1023 / <640 px       | AC-90, AC-91, AC-92, AC-92b, AC-92c | AC titles carry these as identifiers; renaming a title is an Amending-ACs event (see [`ac-amending.mdc`](.cursor/rules/ac-amending.mdc)). |
 | PD-06 | Textarea auto-grow cap            | 240 px                           | AC-93                        | — |
 | PD-07 | Motion duration range             | 120–300 ms                       | AC-74                        | — |
-| PD-08 | Conversation-history storage      | `sessionStorage`, scoped per browser tab | AC-31, AC-31c, AC-31d, AC-33, AC-33a, AC-33b, AC-33c, AC-33d | Survives reloads inside the same tab; cleared automatically on tab close. Privacy-friendly default for a public investor site (no cross-session footprint, no GDPR cookie consent surface). `localStorage` was rejected because cross-session persistence on shared devices is a privacy regression; server-side storage is out of scope per [`.cursor/rules/change-boundary.mdc`](.cursor/rules/change-boundary.mdc) (would change the backend contract). Storage-layer details (key shape, schema versioning, quota handling) live in `src/services/conversationStore.ts` once it lands. (added 2026-04, Figma component drift) |
+| PD-08 | Conversation-history storage      | `localStorage`, scoped per browser profile | AC-31, AC-31e, AC-31f, AC-33, AC-33a, AC-33b, AC-33c, AC-33d | Survives reloads, tab close, and browser restart inside the same browser profile; cleared only when the user wipes site storage via browser tooling. Explicit product decision to persist across sessions so investors can re-enter prior conversations from the hero (AC-10a / AC-10c continue-pill). Trade-off accepted: cross-session footprint on shared devices, and a likely future cookie-consent surface obligation when the host site's consent contract is finalised. Server-side storage remains out of scope per [`.cursor/rules/change-boundary.mdc`](.cursor/rules/change-boundary.mdc) (would change the backend contract). Storage-layer details (key shape, schema versioning, quota handling) live in `src/services/conversationStore.ts`. (added 2026-04, Figma component drift; amended 2026-05, multi-discussion flow rework) |
 
 Amending these values follows [`.cursor/rules/ac-amending.mdc`](.cursor/rules/ac-amending.mdc) §Amending ACs:
 edit the row here, then confirm every AC in the `Referenced by` column still

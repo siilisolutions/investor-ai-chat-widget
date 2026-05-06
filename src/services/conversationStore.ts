@@ -1,15 +1,20 @@
 /**
- * `conversationStore` — sessionStorage-backed multi-conversation
+ * `conversationStore` — localStorage-backed multi-conversation
  * persistence layer for the AC-33 sidebar cluster (Figma node
  * `ds:191:258` Previous discussion list, `ds:191:268` Previous
- * discussion item) and the AC-35 start-new-conversation affordance.
+ * discussion item), the AC-35 start-new-conversation affordance,
+ * and the AC-10a / AC-10c continue-pill on the hero
+ * (Figma `site:395:5439`).
  *
- * Storage choice (PD-08): `sessionStorage`, scoped per browser tab.
- * Reloading the same tab preserves the store; closing the tab
- * clears it (AC-31c). `localStorage` was rejected because
- * cross-session persistence on shared devices is a privacy
- * regression for a public investor site, and server-side storage
- * is out of scope per `.cursor/rules/change-boundary.mdc`.
+ * Storage choice (PD-08, amended 2026-05): `localStorage`, scoped
+ * per browser profile. Reloads, tab close, and browser restart all
+ * preserve the store; only an explicit browser-side site-storage
+ * wipe (or a different browser profile) resets it (AC-31e). The
+ * earlier `sessionStorage` contract was retired (AC-31c
+ * tombstoned) so investors can re-enter prior conversations from
+ * the hero across sessions. Cross-session footprint on shared
+ * devices is the accepted trade-off; server-side storage remains
+ * out of scope per `.cursor/rules/change-boundary.mdc`.
  *
  * Schema:
  * ```
@@ -28,6 +33,12 @@
  * store degrades to in-memory-only behaviour rather than crashing
  * the widget. AC-N1 / AC-42 still apply to any error copy this
  * module surfaces; today no error copy reaches the DOM.
+ *
+ * Conversations are stored in append order: `saveConversation`
+ * pushes a new entry to the end of the array, so
+ * `list[list.length - 1]` is the most recently created — the
+ * natural target for the AC-10c continue-pill activation and for
+ * the AC-31f auto-mint precondition check.
  *
  * Public API matches the AC-33 cluster's needs:
  * - `listConversations()` — read all stored conversations
@@ -54,7 +65,7 @@ interface StoredShape {
 function safeStorage(): Storage | null {
   try {
     if (typeof window === 'undefined') return null
-    return window.sessionStorage
+    return window.localStorage
   } catch {
     return null
   }
@@ -102,9 +113,12 @@ function generateId(): string {
   ) {
     return crypto.randomUUID()
   }
-  // Deterministic fallback — sessionStorage is per-tab so collisions
-  // would only matter inside one tab, and the timestamp + counter are
-  // monotonic per tab session.
+  // Deterministic fallback — localStorage is per browser profile, so
+  // the timestamp + monotonic counter combination is unique enough
+  // for a single profile's lifetime. Collisions would only matter if
+  // two distinct tabs minted ids in the same millisecond AND both
+  // landed on the same counter value, which is structurally
+  // prevented by the monotonic counter.
   idCounter += 1
   return `conv-${Date.now().toString(36)}-${idCounter.toString(36)}`
 }

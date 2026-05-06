@@ -14,6 +14,8 @@ Host page (siili.com)
        └─ SiiliChatbot.init({ container, apiUrl?, interceptBackNavigation? })
             └─ App (state machine: compact | expanded; multi-conversation store per PD-08)
                  ├─ CompactView (hero input + chips)
+                 │    └─ ChatInput
+                 │         └─ ContinuePill (AC-10a / site:395:5439 — rendered when prior history exists)
                  └─ ExpandedView (chat messages + input + close button + optional sidebar)
                       ├─ CloseButton (× top-right, AC-20d / ds:196:853)
                       ├─ PreviousDiscussionList (sidebar, AC-33 / ds:191:258 — rendered when >1 conversation)
@@ -24,11 +26,11 @@ Host page (siili.com)
 ```
 
 **State transitions:**
-- `compact → expanded`: user sends a message or clicks a suggestion chip; a synthetic history entry is pushed when `interceptBackNavigation` is on (AC-20c).
+- `compact → expanded`: user sends a message or clicks a suggestion chip (AC-31f auto-mints a fresh conversation when the active one already has Q+A pairs), or clicks the continue-pill (AC-10c — re-enters expanded with the most-recent stored conversation, no network call). A synthetic history entry is pushed when `interceptBackNavigation` is on (AC-20c).
 - `expanded → compact`: user clicks the close button, presses `Esc`, or triggers browser back. `messages` is preserved (AC-31).
 - The widget stays in expanded mode once a conversation starts unless dismissed.
 
-**Conversation store (PD-08):** `App` owns an array of `Conversation` objects keyed by id plus an `activeId`. The store is hydrated from `sessionStorage` on mount (so a tab reload preserves history) and persisted on every message append. Closing the tab clears the store (AC-31c). Activating a sidebar row swaps `activeId` only — no network call (AC-33b). Starting a new conversation mints a fresh id and appends to the store (AC-35).
+**Conversation store (PD-08, amended 2026-05):** `App` owns an array of `Conversation` objects keyed by id plus an `activeId`. The store is hydrated from `localStorage` on mount and persisted on every message append; reloads, tab close, and browser restart all preserve history (AC-31e). The store is reset only when the user clears site storage via browser tooling. Activating a sidebar row swaps `activeId` only — no network call (AC-33b). Compact-mode sends mint a fresh conversation when the active one already holds Q+A pairs (AC-31f); the continue-pill (AC-10a / AC-10c, Figma `site:395:5439`) re-enters the most-recent stored conversation. Starting a new conversation from inside expanded mode (AC-35) mints a fresh id and appends to the store.
 
 ## Figma — The Source of Truth for All Visual Work
 
@@ -53,10 +55,12 @@ Rule of thumb: use **IR-DS** when working on a component in isolation (matching 
 |---------|-------------|
 | `13:527` | Etusivu — hero screen composition (compact mode in context) |
 | `395:5439` | Etusivu — *jatka edellistä keskustelua* (compact mode rendered for a returning user with prior conversations — anchors AC-10a / AC-10c continue-pill) |
-| `143:601` | AI-agentti — expanded chat screen composition |
-| `201:2273` | AI-agentti, haetaan tietoa — loading-state screen composition |
+| `434:2424` | AI-agentti — expanded chat screen composition (renamed from `143:601` in 2026-05; the old ID now returns "node ID invalid") |
+| `434:2696` | AI-agentti, haetaan tietoa — loading-state screen composition (renamed from `201:2273` in 2026-05) |
+| `435:2904` | AI-agentti - Mobile — full mobile expanded layout (390×844): hamburger + title + close + Q+A pairs + sticky textarea. Candidate anchor for `AC-92c`; promotion deferred per `.cursor/rules/ac-amending.mdc`. |
+| `435:2914` | AI-agentti - Menu open - Mobile — same mobile frame with the `Mobile menu` overlay (`ds:214:1214`) revealing the sidebar via a slide-in drawer. Candidate anchor for `AC-33d`; promotion deferred. |
 
-> **Layout update versus the original implementation (2026-04).** `143:601` and `201:2273` have been redesigned since the widget was first built. The current Figma layout for the AI-agent screen now contains a top-bar title, a Close-discussion (`×`) button (`ds:196:853`) at the top-right, and a two-column body with a Previous-discussion-list sidebar (`ds:191:258` / `ds:191:268`) on the left, divider, and the Q+A stream + sticky textarea on the right. `src/components/ExpandedView.tsx` now renders the close button and optional sidebar; new visual work on the expanded view should consult these IR-site frames first and slot into the AC-20d cluster (close button) and AC-33 cluster (sidebar).
+> **Layout update versus the original implementation (2026-04, IR-site frame rename 2026-05).** `434:2424` and `434:2696` (formerly `143:601` and `201:2273`) have been redesigned since the widget was first built and were renamed during a Figma reorganisation in early May 2026. The current Figma layout for the AI-agent screen now contains a top-bar title, a Close-discussion (`×`) button (`ds:196:853`) at the top-right, and a two-column body with a Previous-discussion-list sidebar (`ds:191:258` / `ds:191:268`) on the left, divider, and the Q+A stream + sticky textarea on the right. `src/components/ExpandedView.tsx` now renders the close button and optional sidebar; new visual work on the expanded view should consult these IR-site frames first and slot into the AC-20d cluster (close button) and AC-33 cluster (sidebar). The two new mobile frames `435:2904` / `435:2914` cover the same surface at 390×844 with a hamburger-revealed sidebar drawer (`ds:214:1214` Mobile menu, `ds:230:656` 24×24 Menu button) — they are not yet implemented in the React tree.
 
 #### IR-DS — main components (`fileKey = rlh00CEImhMWwdRNOUqW6L`)
 
@@ -134,7 +138,8 @@ All tokens live in `src/styles/variables.css` as CSS custom properties. These va
 | `--gray-400` | `#efefef` | Reference tag bg |
 | `--gray-500` | `#e5e5e5` | Question bubble bg |
 | `--gray-900` | `#575757` | Placeholder text |
-| `--blue-500` | `rgb(50, 50, 255)` | Send button gradient start |
+| `--blue-500` | `rgb(50, 50, 255)` | Send button gradient start, focus-ring colour |
+| `--blue-700` | `#2323b2` | Continue-pill text link (Figma `site:395:5439`) |
 | `--violet-500` | `rgb(170, 50, 255)` | Send button gradient end |
 | `--font-family` | `'Everett', sans-serif` | All text |
 | `--radius` | `20px` | All interactive elements |
@@ -149,7 +154,8 @@ All tokens live in `src/styles/variables.css` as CSS custom properties. These va
 | `src/widget.tsx` | Library entry point — exports `init()` for embedding |
 | `src/main.tsx` | Dev entry point — calls `init()` for local development |
 | `src/App.tsx` | Root component — manages compact/expanded mode, the multi-conversation store (per PD-08), back-navigation interceptor (AC-20c / AC-20g / AC-20i), and dismiss flow (AC-20j / AC-31) |
-| `src/components/CompactView.tsx` | Hero mode: input + suggestion chips |
+| `src/components/CompactView.tsx` | Hero mode: input + suggestion chips + optional continue-pill |
+| `src/components/ContinuePill.tsx` | "Jatka edellistä keskustelua" affordance inside the compact textarea shell (AC-10a / AC-10c, Figma `site:395:5439`) |
 | `src/components/ExpandedView.tsx` | Chat mode: messages list + input + close button + optional sidebar (2-column layout) |
 | `src/components/ChatInput.tsx` | Shared textarea + send button (compact/expanded variants) |
 | `src/components/ChatMessage.tsx` | Single Q&A pair with optional sources and loading state |
@@ -160,7 +166,7 @@ All tokens live in `src/styles/variables.css` as CSS custom properties. These va
 | `src/components/PreviousDiscussionItem.tsx` | Single sidebar row (AC-33a, Figma `ds:191:268`) — label derived from first user question of the conversation |
 | `src/services/chatService.ts` | **MOCK** chat service — used when `WidgetOptions.apiUrl` is omitted (dev default) |
 | `src/services/apiChatService.ts` | Real `ChatService` adapter — posts `{ messages }` to `WidgetOptions.apiUrl`, maps `{ response }` back into a `ChatMessage`, handles timeout + error mapping (AC-43 / AC-44 / AC-52 / AC-53) |
-| `src/services/conversationStore.ts` | sessionStorage-backed multi-conversation persistence layer (PD-08) — `listConversations` / `loadConversation` / `saveConversation` / `createConversation` / `clearAll`. Survives reloads, cleared on tab close. |
+| `src/services/conversationStore.ts` | localStorage-backed multi-conversation persistence layer (PD-08) — `listConversations` / `loadConversation` / `saveConversation` / `createConversation` / `clearAll`. Survives reloads, tab close, and browser restart per AC-31e (the earlier sessionStorage / tab-close-clears contract is tombstoned with AC-31c). |
 | `src/types/index.ts` | TypeScript interfaces (ChatMessage, Source, ChatService, WidgetOptions, Conversation) |
 | `src/styles/variables.css` | CSS custom properties (design tokens) |
 | `src/styles/*.module.css` | Component-scoped CSS modules |
@@ -280,14 +286,16 @@ All reusable main components and shipped expanded-view support components are ma
 | `181:143` Textarea component set — variants `152:121` Default / `181:144` Hero | — (variants) | `src/components/ChatInput.tsx` |
 | `152:116` | Question + Answer | `src/components/ChatMessage.tsx` |
 | `152:135` | Reference tag | `src/components/SourceBadge.tsx` |
-| `152:86` | Predefined question | `src/components/SuggestionChip.tsx` |
+| `230:725` Predefined question — component set → stored per-variant on `152:86` Default / `230:726` Hover / `230:728` Pressed | — (variants) | `src/components/SuggestionChip.tsx` |
 | `152:128` Send button — component set → stored per-variant on `152:129` Active / `152:131` Hover / `152:133` Pressed | — (variants) | `src/components/ChatInput.tsx` (the send button is part of `ChatInput`) |
 | `152:137` Loading spinner animation — component set → stored per-variant on `152:138` Start / `152:140` End | — (variants) | `src/components/ChatMessage.tsx` (loading state) |
-| `196:853` | Close discussion | `src/components/CloseButton.tsx` |
+| `223:739` Close discussion — component set → stored per-variant on `196:853` Default / `223:740` Hover / `224:820` Pressed | — (variants) | `src/components/CloseButton.tsx` |
 | `191:258` | Previous discussion list | `src/components/PreviousDiscussionList.tsx` |
-| `191:268` | Previous discussion item | `src/components/PreviousDiscussionItem.tsx` |
+| `230:452` Previous discussion item — component set → stored per-variant on `191:268` Default / `230:453` Hover / `230:459` Pressed | — (variants) | `src/components/PreviousDiscussionItem.tsx` |
 
-**Textarea remap completed (2026-04).** `152:121` Textarea is now the `Property 1=Default` variant of the parent component set `181:143` Textarea, whose other variant is `181:144` Hero. Live `get_code_connect_map` checks on `181:143`, `152:121`, and `181:144` all resolve to `ChatInput.tsx`.
+**Textarea remap completed (2026-04).** `152:121` Textarea is now the `Property 1=Default` variant of the parent component set `181:143` Textarea, whose other variant is `181:144` Hero. Live `get_code_connect_map` checks on `181:143`, `152:121`, and `181:144` all resolve to `ChatInput.tsx`, but the response keys come back as the inner-snippet wrapper IDs `152:127` (Default) and `181:150` (Hero) rather than the variant IDs themselves — functionally equivalent for inspect-panel lookups.
+
+**Chip / close / sidebar-item remap to parent component sets (2026-05).** `152:86` Predefined question, `196:853` Close discussion, and `191:268` Previous discussion item each became `Property 1=Default` variants of newly-introduced parent component sets — `230:725`, `223:739`, and `230:452` respectively, each with `Hover` and `Pressed` siblings — during a Figma reorganisation. Pre-existing single-node Code Connect mappings were orphaned in the move; Lane E-1 (2026-05-05, follow-up to Lane E's 2026-04-22 figma-sync) re-registered each component against all three variants of its parent set via `send_code_connect_mappings`. Read-side: `get_code_connect_map` does not yet surface these new mappings through direct main-component queries (the response is empty `{}` for every variant ID), but the write path confirms persistence — repeating the `add_code_connect_map` call returns the canonical "Component is already mapped to code" rejection that known-good mappings (e.g. `152:128` Send button) also produce. Inspect-panel lookups in Figma resolve correctly. The visual states themselves (Hover / Pressed CSS for `SuggestionChip`, `CloseButton`, `PreviousDiscussionItem`) are not yet implemented in the React tree — see § Known Gaps / TODOs.
 
 A note on how component-set rows are stored: `152:128` and `152:137` are Figma component sets. `send_code_connect_mappings` accepts the parent node ID but Figma persists the mapping on each child variant, so a `get_code_connect_map` on `152:128` returns entries for `152:129/131/133` (not `152:128` itself). Either ID resolves correctly from an instance lookup in Figma's inspect panel.
 
@@ -328,13 +336,15 @@ When you add a new React component that has a corresponding main component in IR
 - [x] **Code Connect — Textarea remap to `181:143` parent set** — live checks confirm the parent set plus `152:121` Default and `181:144` Hero variants resolve to `ChatInput.tsx`.
 - [x] **Close discussion button (`ds:196:853`)** — `src/components/CloseButton.tsx` ships in `ExpandedView` and is connected in Figma. Visual confirmation against Figma is still pending; ACs AC-20d / AC-20j / AC-20k are now `@evolving`.
 - [x] **Back-navigation interception** — browser-back dismisses expanded mode via `App.tsx` push/popstate logic. `WidgetOptions.interceptBackNavigation` (default `true`) opts in. ACs AC-20c / AC-20g / AC-20h / AC-20i are `@evolving`.
-- [ ] **Continue-conversation pill (compact)** — *"Jatka keskustelua"* affordance above chips when prior history exists. Anchored to `site:395:5439`. Aspirational ACs drafted (AC-10a / AC-10c / AC-31b kept @aspirational because it depends on this).
-- [x] **Previous discussion sidebar (`ds:191:258` / `ds:191:268`)** — `PreviousDiscussionList` + `PreviousDiscussionItem` ship in `ExpandedView`'s 2-column layout, are connected in Figma, and are backed by `src/services/conversationStore.ts` (PD-08 sessionStorage). AC-33 / AC-33a / AC-33b / AC-33c / AC-33d remain `@aspirational` until Figma confirms the visual; AC-35 (start-new affordance) is also `@aspirational`.
+- [x] **Continue-conversation pill (compact)** — `src/components/ContinuePill.tsx` renders *"Jatka edellistä keskustelua"* inside the compact textarea shell whenever prior history exists. AC-10a / AC-10c are `@evolving` (graduated from `@aspirational` in the 2026-05 multi-discussion flow rework). AC-31b (compact re-entry surfaces continue-pill and hides asked chips) is still `@aspirational` — its rendering half is now satisfied; the chip-de-duplication half (AC-10b) is not yet implemented.
+- [x] **Previous discussion sidebar (`ds:191:258` / `ds:191:268`)** — `PreviousDiscussionList` + `PreviousDiscussionItem` ship in `ExpandedView`'s 2-column layout, are connected in Figma, and are backed by `src/services/conversationStore.ts` (PD-08 localStorage). AC-33 / AC-33a / AC-33b / AC-33c / AC-33d remain `@aspirational` until Figma confirms the visual; AC-35 (start-new affordance) is also `@aspirational`.
 - [x] **Hero textarea variant (`ds:181:144`)** — the widget renders both variants via `ChatInput`'s `compact` prop and the variant resolves through the `181:143` Code Connect parent set.
 - [ ] **Everett font loading** — assumes host page loads the font; may need `@font-face` fallback
 - [ ] **Streaming responses** — current interface is request/response; add SSE/WebSocket support
-- [ ] **Reset / new conversation** — no UI to start a fresh chat from expanded mode (`ds:152:88` Reset button is still in IR-DS but has no React component yet; will become moot if the AC-33 sidebar lands and exposes a "new conversation" affordance)
+- [x] **Reset / new conversation** — three paths exist: (1) every compact-mode send mints a fresh conversation when prior history exists (AC-31f); (2) the AC-33 sidebar's `+ Uusi keskustelu` button starts a new thread without leaving expanded mode (AC-35); (3) clearing site storage in browser tooling wipes the PD-08 store (AC-31e). The `ds:152:88` Reset button is still unmapped; if the designer wants a single-button reset surface inside expanded mode, that needs a separate AC.
+- [ ] **Hover / Pressed states for chip / close / sidebar item** — the parent component sets `ds:230:725` (Predefined question), `ds:223:739` (Close discussion), and `ds:230:452` (Previous discussion item) each ship `Default` / `Hover` / `Pressed` variants in IR-DS. The React tree currently only renders the Default state. Each state cluster needs an AC-amend turn before implementation per [`.cursor/rules/ac-amending.mdc`](.cursor/rules/ac-amending.mdc) (likely a new `AC-12c` for chip and extensions of `AC-20d` / `AC-33a` for close button / item).
+- [ ] **Per-row × dismiss affordance on `PreviousDiscussionItem`** — the live `get_code_connect_map` snippet for `ds:191:258` shows each `Previous discussion item` containing a `ResetButton` (× icon) at the trailing edge. Not yet rendered in `src/components/PreviousDiscussionItem.tsx`. Needs a new AC (likely `AC-33e`) before implementation; first confirm with the designer whether this is product intent vs decorative.
 - [ ] **Accessibility** — basic ARIA labels present, needs full audit
-- [ ] **Mobile responsiveness** — basic flex layout, needs breakpoint testing
+- [ ] **Mobile responsiveness** — basic flex layout, needs breakpoint testing. Lane E-1 (2026-05-05) surfaced two new IR-site mobile frames `site:435:2904` (AI-agentti - Mobile) and `site:435:2914` (AI-agentti - Menu open - Mobile, drawer-revealed sidebar) plus `ds:214:1214` Mobile menu and `ds:230:656` 24×24 Menu button — anchoring `AC-33d` / `AC-92c` to these frames (graduating both rows out of `— (code-authored)`) needs an AC-amend turn first; a future `MenuButton.tsx` component will pair with the drawer.
 - [ ] **Error handling UX** — shows generic error text; could be improved
 - [ ] **Analytics / tracking** — no events emitted yet

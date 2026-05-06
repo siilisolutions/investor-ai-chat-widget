@@ -1,8 +1,12 @@
 /**
  * Tests for `src/services/conversationStore.ts` — the PD-08
- * sessionStorage-backed multi-conversation persistence layer that
- * underpins the AC-33 sidebar cluster and AC-35 start-new-
- * conversation affordance.
+ * localStorage-backed multi-conversation persistence layer that
+ * underpins the AC-33 sidebar cluster, the AC-35 start-new-
+ * conversation affordance, and the AC-10a / AC-10c continue-pill.
+ *
+ * PD-08 was amended in 2026-05 to move from `sessionStorage` to
+ * `localStorage` so prior conversations survive tab close and
+ * browser restart (AC-31e, replacing the tombstoned AC-31c).
  *
  * Per GOV-13 every test name quotes the AC's intent.
  */
@@ -17,7 +21,7 @@ import {
 
 describe('conversationStore — PD-08 storage', () => {
   beforeEach(() => {
-    // Setup file already clears sessionStorage; double-call here so a
+    // Setup file already clears localStorage; double-call here so a
     // failing earlier test in the same file can't leak.
     clearAll()
   })
@@ -79,14 +83,25 @@ describe('conversationStore — PD-08 storage', () => {
     expect(loadConversation(b.id)?.draft).toBe('draft for B')
   })
 
-  it('AC-31c: state survives across listConversations calls within a tab session', () => {
+  it('AC-31e: history persists across reloads and a simulated tab close (storage key remains parseable)', () => {
     const a = createConversation()
     const b = createConversation()
     expect(listConversations().map((c) => c.id)).toEqual([a.id, b.id])
 
-    // Simulate "page reload" inside the same tab — sessionStorage
+    // Simulate "page reload" inside the same tab — localStorage
     // persists, so listConversations should return the same ids.
     const afterReload = listConversations()
     expect(afterReload.map((c) => c.id)).toEqual([a.id, b.id])
+
+    // Simulate "close tab + reopen URL in the same browser profile"
+    // — under PD-08's localStorage contract this is NOT a reset
+    // signal. The storage key stays present and parseable, so a
+    // fresh `read()` (modelled here by a fresh listConversations
+    // call after consulting the underlying storage) returns the
+    // same conversations.
+    const raw = window.localStorage.getItem('siili.conversationStore.v1')
+    expect(raw).not.toBeNull()
+    expect(() => JSON.parse(raw as string)).not.toThrow()
+    expect(listConversations().map((c) => c.id)).toEqual([a.id, b.id])
   })
 })
