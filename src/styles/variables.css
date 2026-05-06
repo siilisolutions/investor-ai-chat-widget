@@ -22,6 +22,7 @@
   --blue-500: rgb(50, 50, 255);
   --blue-700: #2323b2;
   --violet-500: rgb(170, 50, 255);
+  --red-600: #d20000;
 
   /* Translucent surfaces (compact mode on hero image) */
   --surface-translucent: rgba(255, 255, 255, 0.3);

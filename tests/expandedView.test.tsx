@@ -82,6 +82,7 @@ describe('ExpandedView — AC-83 reduced motion', () => {
         activeConversationId={ACTIVE_ID}
         onActivateConversation={NOOP}
         onStartNewConversation={NOOP}
+        onDeleteConversation={NOOP}
       />,
     )
   }
@@ -131,6 +132,7 @@ describe('ExpandedView — AC-20d close button', () => {
         activeConversationId={ACTIVE_ID}
         onActivateConversation={NOOP}
         onStartNewConversation={NOOP}
+        onDeleteConversation={NOOP}
       />,
     )
     expect(
@@ -166,6 +168,7 @@ describe('ExpandedView — AC-20j dismissal', () => {
         activeConversationId={ACTIVE_ID}
         onActivateConversation={NOOP}
         onStartNewConversation={NOOP}
+        onDeleteConversation={NOOP}
       />,
     )
     fireEvent.click(screen.getByRole('button', { name: 'Sulje keskustelu' }))
@@ -186,6 +189,7 @@ describe('ExpandedView — AC-20j dismissal', () => {
         activeConversationId={ACTIVE_ID}
         onActivateConversation={NOOP}
         onStartNewConversation={NOOP}
+        onDeleteConversation={NOOP}
       />,
     )
     const textarea = screen.getByLabelText('Siili investor chatbot message')
@@ -220,6 +224,7 @@ describe('ExpandedView — AC-33 sidebar visibility', () => {
         activeConversationId={ACTIVE_ID}
         onActivateConversation={NOOP}
         onStartNewConversation={NOOP}
+        onDeleteConversation={NOOP}
       />,
     )
     expect(screen.queryByRole('complementary')).toBeNull()
@@ -255,6 +260,7 @@ describe('ExpandedView — AC-33 sidebar visibility', () => {
         activeConversationId="conv-2"
         onActivateConversation={NOOP}
         onStartNewConversation={NOOP}
+        onDeleteConversation={NOOP}
       />,
     )
     const sidebar = screen.getByRole('complementary', {
@@ -299,6 +305,7 @@ describe('ExpandedView — AC-33 sidebar visibility', () => {
         activeConversationId="conv-2"
         onActivateConversation={onActivate}
         onStartNewConversation={NOOP}
+        onDeleteConversation={NOOP}
       />,
     )
     fireEvent.click(
@@ -307,6 +314,55 @@ describe('ExpandedView — AC-33 sidebar visibility', () => {
       }),
     )
     expect(onActivate).toHaveBeenCalledWith('conv-1')
+  })
+
+  it('AC-33e: clicking the × on a row calls onDeleteConversation with that row\u2019s id and label', () => {
+    const conversations: Conversation[] = [
+      { id: 'conv-1', messages: [MESSAGE], draft: '' },
+      {
+        id: 'conv-2',
+        messages: [
+          {
+            id: 'm2',
+            question: 'Mikä on liikevaihdon kasvu?',
+            answer: '12 %',
+          },
+        ],
+        draft: '',
+      },
+    ]
+    const onDelete = vi.fn()
+    const onActivate = vi.fn()
+    render(
+      <ExpandedView
+        messages={conversations[1].messages}
+        loading={false}
+        draft=""
+        onDraftChange={NOOP}
+        onSend={NOOP}
+        onClose={NOOP}
+        conversations={conversations}
+        activeConversationId="conv-2"
+        onActivateConversation={onActivate}
+        onStartNewConversation={NOOP}
+        onDeleteConversation={onDelete}
+      />,
+    )
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Poista keskustelu — Mikä on yhtiön osinkopolitiikka?',
+      }),
+    )
+    // The × passes the inactive row's id and derived label up to
+    // the parent so the modal copy can render the bolded label
+    // without re-deriving.
+    expect(onDelete).toHaveBeenCalledWith(
+      'conv-1',
+      'Mikä on yhtiön osinkopolitiikka?',
+    )
+    // The × is a sibling of the activate button (not nested), so a
+    // click on × does not also fire the row's activate handler.
+    expect(onActivate).not.toHaveBeenCalled()
   })
 
   it('AC-35: activating the start-new-conversation button mints a fresh conversation', () => {
@@ -337,6 +393,7 @@ describe('ExpandedView — AC-33 sidebar visibility', () => {
         activeConversationId="conv-2"
         onActivateConversation={NOOP}
         onStartNewConversation={onStartNew}
+        onDeleteConversation={NOOP}
       />,
     )
     fireEvent.click(

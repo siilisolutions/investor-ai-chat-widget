@@ -45,6 +45,9 @@
  * - `loadConversation(id)` — read a single conversation
  * - `saveConversation(conversation)` — full upsert
  * - `createConversation()` — mint a new id and persist an empty entry
+ * - `clearConversation(id)` — remove a single conversation by id
+ *   (AC-33e per-row delete; idempotent on a missing id, schema
+ *   unchanged, no migration needed)
  * - `clearAll()` — wipe the store (test convenience, not user-facing)
  *
  * The store does **not** know which conversation is "active" — that
@@ -154,6 +157,13 @@ export function createConversation(): Conversation {
   return conversation
 }
 
+export function clearConversation(id: string): void {
+  const shape = read()
+  const next = shape.conversations.filter((c) => c.id !== id)
+  if (next.length === shape.conversations.length) return
+  write({ ...shape, conversations: next })
+}
+
 export function clearAll(): void {
   const storage = safeStorage()
   if (!storage) return
@@ -169,6 +179,7 @@ const conversationStore = {
   loadConversation,
   saveConversation,
   createConversation,
+  clearConversation,
   clearAll,
 }
 

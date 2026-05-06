@@ -42,7 +42,6 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-md);
-  width: 184px;
   max-width: 100%;
   padding: var(--space-sm) 20px;
   border: none;
@@ -52,6 +51,7 @@
   font-family: var(--font-family);
   font-size: 14px;
   line-height: 24px;
+  white-space: nowrap;
   cursor: pointer;
   outline: 2px solid transparent;
   outline-offset: 2px;

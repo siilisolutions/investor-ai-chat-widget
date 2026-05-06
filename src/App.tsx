@@ -56,10 +56,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CompactView } from './components/CompactView.tsx'
+import { ConfirmDialog } from './components/ConfirmDialog.tsx'
 import { ExpandedView } from './components/ExpandedView.tsx'
 import { buildHistory } from './chatHistory.ts'
 import { SAFE_ERROR } from './errorCopy.ts'
 import {
+  clearConversation,
   createConversation,
   listConversations,
   saveConversation,
@@ -105,10 +107,16 @@ function initializeStore(): ConversationState {
   return { conversations: [initial], activeId: initial.id }
 }
 
+interface PendingDelete {
+  id: string
+  label: string
+}
+
 export function App({ chatService, interceptBackNavigation = true }: AppProps) {
   const [mode, setMode] = useState<Mode>('compact')
   const [{ conversations, activeId }, setStore] =
     useState<ConversationState>(initializeStore)
+  const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null)
   const pushedRef = useRef(false)
 
   // Memoized so each derived reference is stable when neither the
@@ -298,6 +306,61 @@ export function App({ chatService, interceptBackNavigation = true }: AppProps) {
     }))
   }, [])
 
+  // AC-33e — open the confirmation modal for a row's `×` activation.
+  // The label is captured at click time so the modal copy doesn't
+  // need to re-derive it from the conversation array.
+  const handleDeleteConversation = useCallback(
+    (id: string, label: string) => {
+      setPendingDelete({ id, label })
+    },
+    [],
+  )
+
+  const handleCancelDelete = useCallback(() => {
+    setPendingDelete(null)
+  }, [])
+
+  // AC-33e — confirm deletion: remove the row from PD-08 and update
+  // the in-memory store. If the removed row was active, switch the
+  // active conversation to the next-most-recent remaining row
+  // (mirrors AC-33b activation semantics — state-only, no service
+  // call). The "store ends empty" branch is defensive only — the
+  // sidebar (and therefore the × affordance) requires
+  // conversations.length > 1 per AC-33c, so this is unreachable
+  // through normal UI flow; we mint a fresh empty conversation
+  // up-front (so the side effect lives outside the setStore updater
+  // and doesn't double-fire under StrictMode) and drop the user
+  // back to compact mode in the same render.
+  const handleConfirmDelete = useCallback(() => {
+    if (!pendingDelete) return
+    const removedId = pendingDelete.id
+    const willBeEmpty =
+      conversations.length === 1 && conversations[0].id === removedId
+    const replacement = willBeEmpty ? createConversation() : null
+
+    clearConversation(removedId)
+    setPendingDelete(null)
+
+    setStore((prev) => {
+      const remaining = prev.conversations.filter((c) => c.id !== removedId)
+      if (remaining.length === 0 && replacement) {
+        return { conversations: [replacement], activeId: replacement.id }
+      }
+      if (remaining.length === 0) {
+        return prev
+      }
+      return {
+        conversations: remaining,
+        activeId:
+          prev.activeId === removedId
+            ? remaining[remaining.length - 1].id
+            : prev.activeId,
+      }
+    })
+
+    if (willBeEmpty) setMode('compact')
+  }, [pendingDelete, conversations])
+
   return (
     <div className={`siiliChatbot ${styles.root}`}>
       {mode === 'compact' ? (
@@ -319,8 +382,23 @@ export function App({ chatService, interceptBackNavigation = true }: AppProps) {
           activeConversationId={activeId}
           onActivateConversation={handleActivateConversation}
           onStartNewConversation={handleStartNewConversation}
+          onDeleteConversation={handleDeleteConversation}
         />
       )}
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Poista keskustelu"
+        description={
+          <>
+            Haluatko varmasti poistaa keskustelun{' '}
+            <strong>{pendingDelete?.label}</strong>?
+          </>
+        }
+        cancelLabel="Peruuta"
+        confirmLabel="Poista"
+        onCancel={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   )
 }

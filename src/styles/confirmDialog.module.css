@@ -1,0 +1,148 @@
+/*
+ * `confirmDialog.module.css` — scoped styles for the AC-33e
+ * confirmation modal. The card mirrors Figma `ds:242:490` (white
+ * surface, widget radius + textarea-shadow, 32 px padding, 32 px
+ * section gap, 520 px max-width, bold title `ds:242:431`, body
+ * `ds:242:550` → `ds:242:433`, cancel `ds:242:438`, destructive
+ * confirm `ds:242:444` on `--red-600`). The surrounding overlay
+ * + blurred backdrop are code-authored — Figma spec's the card in
+ * isolation; the embed-safety + viewport-fill behaviour is
+ * engineering's responsibility.
+ *
+ * Z-index sits one above `.expanded` (which uses 2147483000) so
+ * the modal is always over the chat surface but below the
+ * absolute-max int (some host pages reserve that for their own
+ * top-level UI).
+ */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  z-index: 2147483646;
+  animation: confirmDialogFadeIn 200ms ease;
+}
+
+.card {
+  background: var(--white-500);
+  border-radius: var(--radius);
+  box-shadow: var(--textarea-shadow);
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  max-width: 520px;
+  width: 100%;
+  box-sizing: border-box;
+  animation: confirmDialogScaleIn 200ms ease;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-family-bold);
+  font-size: 24px;
+  line-height: 24px;
+  letter-spacing: 0.216px;
+  color: var(--black-500);
+  text-align: center;
+}
+
+.description {
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 22px;
+  letter-spacing: 0.144px;
+  color: var(--black-500);
+  width: 100%;
+  word-break: break-word;
+}
+
+.description strong {
+  font-family: var(--font-family-bold);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-lg);
+  width: 100%;
+}
+
+.cancel,
+.confirm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm) 20px;
+  border-radius: var(--radius);
+  font-family: var(--font-family);
+  font-size: 14px;
+  line-height: 24px;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color 150ms ease, filter 120ms ease;
+}
+
+.cancel {
+  background: transparent;
+  border: 1px solid var(--black-500);
+  color: var(--black-500);
+}
+
+.confirm {
+  background: var(--red-600);
+  border: none;
+  color: var(--white-500);
+}
+
+.cancel:focus-visible,
+.confirm:focus-visible {
+  outline-color: var(--blue-500);
+}
+
+.confirm:hover {
+  filter: brightness(0.92);
+}
+
+.confirm:active {
+  filter: brightness(0.84);
+}
+
+@keyframes confirmDialogFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes confirmDialogScaleIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .card {
+    animation: none;
+  }
+  .cancel,
+  .confirm {
+    transition: none;
+  }
+}

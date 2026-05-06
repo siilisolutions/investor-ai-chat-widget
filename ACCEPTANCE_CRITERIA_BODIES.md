@@ -575,6 +575,62 @@ Maps to the Investor agent composition and its main component; see
     lands.
   (added 2026-04, Figma component drift)
 
+- **AC-33e** — *Previous discussion item — per-row delete with confirmation* · **@evolving**
+  - **Given** the AC-33 sidebar is rendered (PD-08 store holds
+    more than the active conversation per AC-33c),
+  - **Then** each `PreviousDiscussionItem` row carries a trailing
+    dismiss (`×`) affordance scoped to that row's conversation
+    id. The glyph is the `ResetButton` already surfaced by the
+    live `get_code_connect_map` snippet on `ds:191:258`,
+    rendered at the trailing edge of the row inside `ds:191:268`.
+  - **When** the user activates the `×` (click or keyboard),
+  - **Then** an in-widget confirmation modal opens, centered in
+    the viewport over a blurred backdrop covering the rest of
+    the widget surface so the dismiss prompt is the unambiguous
+    focal point and the user cannot interact with the underlying
+    chat until they choose. The modal *card itself* matches the
+    Figma component referenced in §2.5 row AC-33e: a
+    brand-tokenized white surface with the widget radius and
+    shadow, a bold title (e.g. *"Poista keskustelu"*), a body
+    that names the conversation being deleted with the row's
+    derived label rendered in bold (e.g. *"Haluatko varmasti
+    poistaa keskustelun **{label}**?"*) — falling back to the
+    same neutral label the sidebar row uses when the conversation
+    has no derived label yet — a cancel button (e.g. *"Peruuta"*)
+    on a tokenized outline, and a destructive confirm button
+    (e.g. *"Poista"*) on a destructive-red action surface (named
+    token in [`src/styles/variables.css`](../src/styles/variables.css)).
+    The widget already fills `100vw × 100vh` in expanded mode per
+    AC-20a, so "rest of the widget surface" is equivalent to
+    "rest of the screen" from the user's perspective on every
+    viewport that can reach this affordance. The blurred-backdrop
+    treatment around the card is *code-authored* — the §2.5
+    Figma anchor pins the card in isolation; the surrounding
+    overlay is engineering's responsibility.
+  - **When** the user confirms,
+  - **Then** the row is removed from the PD-08 store; if the
+    removed conversation was the active one, the active
+    conversation switches to the next-most-recent remaining row
+    (mirrors AC-33b activation semantics — state-only, no network
+    call). Removing the *only* remaining conversation drops the
+    user back to compact mode with a fresh empty conversation as
+    the new active (consistent with the "expanded always has an
+    active conversation" invariant).
+  - **When** the user cancels — by activating the cancel button,
+    pressing `Esc`, or clicking the blurred backdrop outside the
+    modal card —
+  - **Then** the modal closes and no state changes; focus returns
+    to the row's `×` button so keyboard users can resume.
+  - **Open product questions** (the visual surface for the modal
+    card is now anchored via §2.5; the items below are the
+    residual gaps): the modal's animation curves on open / close
+    (Figma does not show motion). These remain open without
+    blocking the AC because the marker is `@evolving`; per
+    [`.cursor/rules/ac-amending.mdc`](.cursor/rules/ac-amending.mdc)
+    §AC Authoring an `@evolving` body describes intent and defers
+    visuals to §2.5.
+  (added 2026-05, #PR — Multi-discussion delete flow; amended 2026-05, #PR — Figma `ds:242:490` confirmation modal landed; graduated @aspirational → @evolving; amended 2026-05, #PR — backdrop click resolved as cancel + neutral-label fallback confirmed)
+
 - **AC-35** — *Start-new-conversation affordance in expanded mode* · **@stable**
   - **Given** the widget is in expanded mode and the AC-33 sidebar
     is rendered (per AC-33 / AC-33c — i.e. the PD-08 store holds

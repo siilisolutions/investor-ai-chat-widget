@@ -55,6 +55,7 @@ interface ExpandedViewProps {
   activeConversationId: string
   onActivateConversation: (id: string) => void
   onStartNewConversation: () => void
+  onDeleteConversation: (id: string, label: string) => void
 }
 
 export function ExpandedView({
@@ -68,6 +69,7 @@ export function ExpandedView({
   activeConversationId,
   onActivateConversation,
   onStartNewConversation,
+  onDeleteConversation,
 }: ExpandedViewProps) {
   const inputRef = useRef<HTMLDivElement>(null)
 
@@ -114,6 +116,7 @@ export function ExpandedView({
             activeConversationId={activeConversationId}
             onActivate={onActivateConversation}
             onStartNew={onStartNewConversation}
+            onDelete={onDeleteConversation}
           />
         )}
         <div className={styles.contentColumn}>

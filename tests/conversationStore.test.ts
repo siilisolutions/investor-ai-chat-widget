@@ -13,6 +13,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import {
   clearAll,
+  clearConversation,
   createConversation,
   listConversations,
   loadConversation,
@@ -81,6 +82,42 @@ describe('conversationStore — PD-08 storage', () => {
     saveConversation({ ...a, draft: 'draft for A — edited' })
     expect(loadConversation(a.id)?.draft).toBe('draft for A — edited')
     expect(loadConversation(b.id)?.draft).toBe('draft for B')
+  })
+
+  it('AC-33e: clearConversation removes the row by id and leaves siblings untouched', () => {
+    const a = createConversation()
+    const b = createConversation()
+    const c = createConversation()
+    saveConversation({
+      ...a,
+      messages: [{ id: 'm1', question: 'q-a', answer: 'a-a' }],
+    })
+    saveConversation({
+      ...c,
+      messages: [{ id: 'm3', question: 'q-c', answer: 'a-c' }],
+    })
+
+    clearConversation(b.id)
+
+    const remaining = listConversations()
+    expect(remaining.map((conv) => conv.id)).toEqual([a.id, c.id])
+    // Siblings keep their persisted shape — clearConversation must
+    // not rewrite or reorder the rows it doesn't touch.
+    expect(remaining.find((conv) => conv.id === a.id)?.messages).toHaveLength(1)
+    expect(remaining.find((conv) => conv.id === c.id)?.messages).toHaveLength(1)
+  })
+
+  it('AC-33e: clearConversation is a no-op when the id does not exist', () => {
+    const a = createConversation()
+    const b = createConversation()
+    const before = listConversations().map((conv) => conv.id)
+
+    clearConversation('conv-does-not-exist')
+
+    expect(listConversations().map((conv) => conv.id)).toEqual(before)
+    // The two real conversations remain reachable individually too.
+    expect(loadConversation(a.id)?.id).toBe(a.id)
+    expect(loadConversation(b.id)?.id).toBe(b.id)
   })
 
   it('AC-31e: history persists across reloads and a simulated tab close (storage key remains parseable)', () => {

@@ -20,13 +20,16 @@
  * AC-35 — the "Luo uusi keskustelu" primary CTA at the top of the
  * sidebar maps to Figma component set `ds:237:398` with `Default` /
  * `Hover` / `Pressed` variants (`237:323` / `237:399` / `237:411`).
- * Visual contract: 184×40 violet→blue gradient pill, 8×20 px padding,
- * 20 px border-radius, 12 px gap between the leading 11×11 plus icon
- * (Figma `ds:237:332`) and the label, white Everett 14 px / 24 px.
- * Hover and Pressed darken the gradient by overlaying 20 % / 40 %
- * black, matching the send-button family. The plus icon is inlined as
- * SVG so AC-N2 (no font/binary assets) and AC-100 (60 KB gzip budget)
- * stay clean.
+ * Visual contract: content-sized violet→blue gradient pill with
+ * `white-space: nowrap` label (matches Figma's `whitespace-nowrap`
+ * intent — earlier `width: 184 px` constraint was a measurement of
+ * the rendered instance, not a Figma-pinned dimension, and forced the
+ * label to wrap onto two lines), 8×20 px padding, 20 px border-radius,
+ * 12 px gap between the leading 11×11 plus icon (Figma `ds:237:332`)
+ * and the label, white Everett 14 px / 24 px. Hover and Pressed darken
+ * the gradient by overlaying 20 % / 40 % black, matching the
+ * send-button family. The plus icon is inlined as SVG so AC-N2 (no
+ * font/binary assets) and AC-100 (60 KB gzip budget) stay clean.
  *
  * Mobile responsive treatment (AC-33d) is the parent's
  * responsibility — `ExpandedView` decides whether to render this
@@ -44,6 +47,7 @@ interface PreviousDiscussionListProps {
   activeConversationId: string
   onActivate: (id: string) => void
   onStartNew: () => void
+  onDelete: (id: string, label: string) => void
 }
 
 const NEUTRAL_LABEL = 'Uusi keskustelu'
@@ -64,6 +68,7 @@ export function PreviousDiscussionList({
   activeConversationId,
   onActivate,
   onStartNew,
+  onDelete,
 }: PreviousDiscussionListProps) {
   return (
     <aside className={styles.list} aria-label="Aiemmat keskustelut">
@@ -94,6 +99,7 @@ export function PreviousDiscussionList({
               label={deriveLabel(c)}
               active={c.id === activeConversationId}
               onActivate={onActivate}
+              onDelete={onDelete}
             />
           </li>
         ))}

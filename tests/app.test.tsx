@@ -338,6 +338,264 @@ describe('App', () => {
     ).not.toBeInTheDocument()
   })
 
+  it('AC-33e: × on a row opens the confirmation dialog showing the row\u2019s label and a cancel does nothing', async () => {
+    saveConversation({
+      id: 'conv-A',
+      messages: [{ id: 'mA', question: 'Question A?', answer: 'answer A' }],
+      draft: '',
+    })
+    saveConversation({
+      id: 'conv-B',
+      messages: [{ id: 'mB', question: 'Question B?', answer: 'answer B' }],
+      draft: '',
+    })
+
+    const service = makeService(async () => ({
+      id: 'never',
+      question: 'q',
+      answer: 'never',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Jatka edellistä keskustelua' }),
+    )
+
+    // Sidebar visible (>1 conversation). Click × on the inactive
+    // row — conv-A.
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Poista keskustelu — Question A?' }),
+    )
+
+    // Dialog renders with the AC-33e copy and the bolded row label.
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).toHaveTextContent('Poista keskustelu')
+    expect(dialog).toHaveTextContent('Haluatko varmasti poistaa keskustelun')
+    expect(dialog).toHaveTextContent('Question A?')
+
+    // Cancel — dialog closes, both rows still in the sidebar.
+    fireEvent.click(screen.getByRole('button', { name: 'Peruuta' }))
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+    )
+    expect(
+      screen.getByRole('button', { name: 'Question A?' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Question B?' }),
+    ).toBeInTheDocument()
+    // No service call fired — cancel is state-only.
+    expect(
+      (service.sendMessage as ReturnType<typeof vi.fn>).mock.calls.length,
+    ).toBe(0)
+  })
+
+  it('AC-33e: confirming the dialog removes the row from the sidebar and the PD-08 store', async () => {
+    saveConversation({
+      id: 'conv-A',
+      messages: [{ id: 'mA', question: 'Question A?', answer: 'answer A' }],
+      draft: '',
+    })
+    saveConversation({
+      id: 'conv-B',
+      messages: [{ id: 'mB', question: 'Question B?', answer: 'answer B' }],
+      draft: '',
+    })
+
+    const service = makeService(async () => ({
+      id: 'never',
+      question: 'q',
+      answer: 'never',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Jatka edellistä keskustelua' }),
+    )
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Poista keskustelu — Question A?' }),
+    )
+    fireEvent.click(await screen.findByRole('button', { name: 'Poista' }))
+
+    // Dialog closes, the row is gone from the in-memory tree.
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+    )
+    expect(
+      screen.queryByRole('button', { name: 'Question A?' }),
+    ).not.toBeInTheDocument()
+
+    // The PD-08 store reflects the removal too — only conv-B left
+    // under the canonical storage key.
+    const raw = window.localStorage.getItem('siili.conversationStore.v1')
+    const parsed = JSON.parse(raw as string) as {
+      conversations: { id: string }[]
+    }
+    expect(parsed.conversations.map((c) => c.id)).toEqual(['conv-B'])
+
+    // With only one conversation left the sidebar disappears
+    // (AC-33c invariant survives the removal).
+    expect(
+      screen.queryByRole('complementary', { name: 'Aiemmat keskustelut' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('AC-33e: removing the active conversation switches the active stream to the next-most-recent remaining row', async () => {
+    saveConversation({
+      id: 'conv-older',
+      messages: [
+        { id: 'mO', question: 'older question?', answer: 'older answer' },
+      ],
+      draft: '',
+    })
+    saveConversation({
+      id: 'conv-active',
+      messages: [
+        {
+          id: 'mA',
+          question: 'active question?',
+          answer: 'active answer',
+        },
+      ],
+      draft: '',
+    })
+    saveConversation({
+      id: 'conv-newer',
+      messages: [
+        { id: 'mN', question: 'newer question?', answer: 'newer answer' },
+      ],
+      draft: '',
+    })
+
+    const service = makeService(async () => ({
+      id: 'never',
+      question: 'q',
+      answer: 'never',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Jatka edellistä keskustelua' }),
+    )
+    // Most-recent stored conversation becomes active. Switch to
+    // conv-active so we can prove the active-removed switch lands
+    // on the next-most-recent remaining row (conv-older after we
+    // delete conv-active — conv-newer was created after but the
+    // append-order rule picks the highest-index remaining row).
+    fireEvent.click(
+      screen.getByRole('button', { name: 'active question?' }),
+    )
+    await screen.findByText('active answer')
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Poista keskustelu — active question?',
+      }),
+    )
+    fireEvent.click(await screen.findByRole('button', { name: 'Poista' }))
+
+    // After the active row is removed, the most-recent remaining
+    // row (conv-newer — last in append order) becomes active and
+    // its answer renders in the stream.
+    await waitFor(() =>
+      expect(screen.getByText('newer answer')).toBeInTheDocument(),
+    )
+    expect(screen.queryByText('active answer')).not.toBeInTheDocument()
+    // older still present in the sidebar
+    expect(
+      screen.getByRole('button', { name: 'older question?' }),
+    ).toBeInTheDocument()
+    // No service call across the entire delete + active-switch path
+    expect(
+      (service.sendMessage as ReturnType<typeof vi.fn>).mock.calls.length,
+    ).toBe(0)
+  })
+
+  it('AC-33e: Escape inside the dialog cancels without removing the row', async () => {
+    saveConversation({
+      id: 'conv-A',
+      messages: [{ id: 'mA', question: 'Question A?', answer: 'answer A' }],
+      draft: '',
+    })
+    saveConversation({
+      id: 'conv-B',
+      messages: [{ id: 'mB', question: 'Question B?', answer: 'answer B' }],
+      draft: '',
+    })
+
+    const service = makeService(async () => ({
+      id: 'never',
+      question: 'q',
+      answer: 'never',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Jatka edellistä keskustelua' }),
+    )
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Poista keskustelu — Question A?' }),
+    )
+
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.keyDown(dialog, { key: 'Escape' })
+
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+    )
+    expect(
+      screen.getByRole('button', { name: 'Question A?' }),
+    ).toBeInTheDocument()
+  })
+
+  it('AC-33e: clicking the blurred backdrop outside the modal card cancels without removing the row', async () => {
+    saveConversation({
+      id: 'conv-A',
+      messages: [{ id: 'mA', question: 'Question A?', answer: 'answer A' }],
+      draft: '',
+    })
+    saveConversation({
+      id: 'conv-B',
+      messages: [{ id: 'mB', question: 'Question B?', answer: 'answer B' }],
+      draft: '',
+    })
+
+    const service = makeService(async () => ({
+      id: 'never',
+      question: 'q',
+      answer: 'never',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Jatka edellistä keskustelua' }),
+    )
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Poista keskustelu — Question A?' }),
+    )
+
+    const dialog = await screen.findByRole('dialog')
+    // The backdrop is the dialog's parent (`role="presentation"`,
+    // not in the a11y tree). Synthesize the click with the
+    // backdrop as both target and currentTarget — that's the
+    // discriminator the component uses to distinguish "click on
+    // the backdrop itself" from "click bubbled from the card".
+    const backdrop = dialog.parentElement as HTMLElement
+    fireEvent.click(backdrop)
+
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+    )
+    expect(
+      screen.getByRole('button', { name: 'Question A?' }),
+    ).toBeInTheDocument()
+  })
+
   it('AC-42: raw service errors never reach the rendered error row', async () => {
     const leakyMessage = 'boom from /internal/v1/whoami 500'
     const service = makeService(() => Promise.reject(new Error(leakyMessage)))

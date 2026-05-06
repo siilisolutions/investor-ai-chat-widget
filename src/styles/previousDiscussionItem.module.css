@@ -1,13 +1,34 @@
 /*
- * Single previous-discussion row. The button fills its parent <li>
- * and renders the conversation label clipped to a single line. Active
- * row uses the gray-500 token (same as the question bubble) so the
- * "you are here" cue ties to existing widget surfaces; inactive rows
- * are transparent and reveal the sidebar's gray-400 background.
+ * Single previous-discussion row. The row is now a flex container
+ * holding two sibling buttons: the activation button (carries the
+ * label, fills available width, ellipsis-on-overflow) and the AC-33e
+ * × delete button (fixed trailing slot). Active row uses the
+ * gray-500 token (same as the question bubble) so the "you are here"
+ * cue ties to existing widget surfaces; inactive rows are
+ * transparent and reveal the sidebar's gray-400 background.
  */
 
-.item {
+.row {
+  position: relative;
+  display: flex;
+  align-items: stretch;
   width: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: background-color 120ms ease-out;
+}
+
+.row:hover {
+  background: var(--white-500);
+}
+
+.row.active {
+  background: var(--gray-500);
+}
+
+.activate {
+  flex: 1 1 auto;
+  min-width: 0;
   text-align: left;
   background: transparent;
   border: none;
@@ -16,30 +37,43 @@
   font-size: 14px;
   line-height: 1.4;
   color: var(--black-500);
-  border-radius: var(--radius);
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: background-color 120ms ease-out;
 }
 
-.item:hover {
-  background: var(--white-500);
-}
-
-.item:focus-visible {
-  outline: 2px solid var(--black-500);
-  outline-offset: 2px;
-}
-
-.item.active {
-  background: var(--gray-500);
+.row.active .activate {
   font-family: var(--font-family-bold);
 }
 
+.activate:focus-visible,
+.delete:focus-visible {
+  outline: 2px solid var(--black-500);
+  outline-offset: -2px;
+}
+
+.delete {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0 var(--space-sm);
+  min-width: 32px;
+  cursor: pointer;
+  color: var(--black-500);
+}
+
+.deleteGlyph {
+  display: block;
+  font-size: 18px;
+  line-height: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .item {
+  .row {
     transition: none;
   }
 }
