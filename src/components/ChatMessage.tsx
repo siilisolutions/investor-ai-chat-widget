@@ -1,7 +1,7 @@
 /**
  * `ChatMessage` — a single Q+A pair rendered in the expanded chat
  * view. Maps to Figma nodes `ds:152:116` ("Question + Answer"),
- * `ds:152:137` (loading blob animation) and `site:201:2273` (loading
+ * `ds:152:137` (loading blob animation) and `site:434:2696` (loading
  * state with "Haetaan tietoa...").
  *
  * Renders:
