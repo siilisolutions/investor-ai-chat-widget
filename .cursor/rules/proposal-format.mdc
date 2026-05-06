@@ -1,0 +1,26 @@
+---
+description: Response format — lead with TL;DR, then alternatives and why they were rejected
+alwaysApply: true
+---
+
+# Proposal format — TL;DR first
+
+When proposing a resolution, fix, plan, or implementation approach for a **non-trivial** task, structure the response so the human can decide in one scroll, not five:
+
+1. **TL;DR** — one or two sentences naming the proposed resolution and the single strongest reason it wins. Render it visibly (a `**TL;DR:**` lead-in, a heading, or a short callout) so it cannot be missed when skimming.
+2. **Alternatives considered** — a short bullet list of the other plausible options that were genuinely on the table. Two to four is usually right; if you can only name one, you probably haven't thought about it long enough.
+3. **Why they were left out** — one line per alternative, naming the actual trade-off you weighed: AC fit, [`change-boundary.mdc`](change-boundary.mdc) cost, [AC-100](../../ACCEPTANCE_CRITERIA.md) bundle impact, regression risk, scope creep, ergonomics. Avoid generic phrases like "doesn't fit" or "less clean".
+
+After those three blocks, proceed with the actual work / detail / tool calls. The TL;DR is a header for the turn, not a replacement for it.
+
+## When to skip the structure
+
+- The task is **trivial** (single file edit, one command, a lookup question) and only one reasonable approach exists.
+- The user explicitly asks for a fast answer, a one-liner, or "just do it".
+- You are **mid-execution** and reporting progress on a previously-agreed plan — not proposing a new direction.
+- Pure information queries with no proposed change ("where is X defined?", "what does Y do?").
+
+## Interaction with other rules
+
+- If the task is large or ambiguous enough that you would otherwise call `SwitchMode` to Plan, you should also be using this format — the TL;DR + alternatives block is exactly the artefact Plan mode produces.
+- This rule governs **how** you present a proposal. It does not relax [`sdd.mdc`](sdd.mdc) (cite `AC-xx`), [`change-boundary.mdc`](change-boundary.mdc) (stop-and-ask gates), or [`verification.mdc`](verification.mdc) (run `npm run verify` after non-trivial changes). The TL;DR is the lede; the AC-IDs, gates, and verification still belong in the turn.
