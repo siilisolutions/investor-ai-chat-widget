@@ -309,7 +309,7 @@ describe('ExpandedView — AC-33 sidebar visibility', () => {
     expect(onActivate).toHaveBeenCalledWith('conv-1')
   })
 
-  it('AC-35: clicking "+ Uusi keskustelu" calls onStartNewConversation', () => {
+  it('AC-35: activating the start-new-conversation button mints a fresh conversation', () => {
     const conversations: Conversation[] = [
       { id: 'conv-1', messages: [MESSAGE], draft: '' },
       {
@@ -339,7 +339,9 @@ describe('ExpandedView — AC-33 sidebar visibility', () => {
         onStartNewConversation={onStartNew}
       />,
     )
-    fireEvent.click(screen.getByRole('button', { name: '+ Uusi keskustelu' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Luo uusi keskustelu' }),
+    )
     expect(onStartNew).toHaveBeenCalledTimes(1)
   })
 })

@@ -575,33 +575,49 @@ Maps to the Investor agent composition and its main component; see
     lands.
   (added 2026-04, Figma component drift)
 
-- **AC-35** — *Start-new-conversation affordance in expanded mode* · **@aspirational**
-  - **Given** the widget is in expanded mode showing some conversation,
-  - **Then** an affordance is reachable from expanded mode that
-    starts a fresh conversation: it creates a new entry in the
-    PD-08 conversation store, sets it as the active conversation,
-    clears the rendered Q+A stream, and clears the textarea draft.
-    The previously-active conversation is preserved in the store
-    and surfaces in the AC-33 sidebar from the moment a second
-    conversation exists.
-  - **Given** no Figma anchor for this affordance exists yet (the
-    `ds:152:88` Reset button main component is in IR-DS but
-    unwired into the new layout, and the AC-33 sidebar's "Aiemmat
-    keskustelut" label is the only anchored top-of-sidebar
-    element),
-  - **Then** the affordance lives wherever Figma eventually places
-    it — sidebar header, expanded-view title bar, or alongside the
-    close button. This AC pins the *intent* (a way to start a new
-    conversation must exist) and the *side-effects* (store +
-    state-machine), not the visual placement; placement is locked
-    by AC-33 / AC-34 sweeps once a frame lands.
+- **AC-35** — *Start-new-conversation affordance in expanded mode* · **@stable**
+  - **Given** the widget is in expanded mode and the AC-33 sidebar
+    is rendered (per AC-33 / AC-33c — i.e. the PD-08 store holds
+    more than the active conversation, or the equivalent mobile
+    drawer is open per AC-33d),
+  - **Then** a primary-CTA affordance sits at the top of the
+    sidebar — above the "Aiemmat keskustelut" heading — labelled
+    "Luo uusi keskustelu" and styled as a brand-gradient pill
+    matching the send-button family (Figma component set
+    `ds:237:398` with `Default` / `Hover` / `Pressed` variants
+    `ds:237:323` / `ds:237:399` / `ds:237:411`; see §2.5 row AC-35
+    for the manifest entry and the screen anchors in
+    `site:434:2424` / `site:434:2696` / `site:435:2914`). Hover and
+    Pressed darken the gradient via the shared `--send-overlay-*`
+    tokens used by the send button so the brand gradient and its
+    state-overlay rules live in one place.
+  - **When** the user activates it (click or keyboard),
+  - **Then** the widget creates a new entry in the PD-08
+    conversation store, sets it as the active conversation,
+    clears the rendered Q+A stream, and clears the textarea
+    draft. The previously-active conversation is preserved in the
+    store and remains a row in the same sidebar; no network call
+    is made on activation alone (per the same contract as AC-33b).
+  - **Given** the PD-08 store holds only the active conversation
+    (the AC-33c empty-sidebar state),
+  - **Then** the in-expanded affordance is not directly reachable
+    by design — the path to grow the store from one entry is the
+    AC-31f compact-mode flow (dismiss via close / Esc / back-nav,
+    then send a new message from compact). Once a second
+    conversation exists, the sidebar — and this affordance with
+    it — surfaces from then on.
   - This AC closes a gap that emerged during the Figma component
     drift (2026-04): the AC-33 sidebar cluster only describes
     *switching* between existing conversations; without AC-35 the
-    user has no path to grow the conversation store beyond one
-    entry, so the sidebar would never render in production
-    (AC-33c empty state would always hold).
-  (added 2026-04, Figma component drift)
+    user would have no in-sidebar path to grow the conversation
+    store. The 2026-05 Figma update added the `ds:237:398` Button
+    component set and placed it inside the IR-site sidebar
+    instances, anchoring the placement and visual contract; the
+    React-side parity (label, gradient, leading inline-SVG plus
+    icon, Hover / Pressed) and the Code Connect mapping landed in
+    the same week, graduating the AC `@aspirational` →
+    `@evolving` → `@stable`.
+  (added 2026-04, Figma component drift; amended 2026-05, multi-discussion flow rework; amended 2026-05, parity landed + Code Connect mapped)
 
 - **AC-34** — *Per-conversation title in expanded view* · **@aspirational**
   - **Given** the widget is in expanded mode showing a specific

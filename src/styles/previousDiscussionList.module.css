@@ -8,6 +8,12 @@
  * Visuals reuse existing widget tokens (gray-400 surface, radius)
  * until the IR-DS frame lands a Figma-confirmed treatment. Once
  * that's available, update tokens and bump §2.5 row AC-33 / AC-33a.
+ *
+ * AC-35 — `.newButton` mirrors Figma `ds:237:398` (component set
+ * with Default / Hover / Pressed variants). It reuses the
+ * send-button family's `--send-gradient` plus the shared overlay
+ * tokens so the brand gradient stays in one place per
+ * `code-governance.mdc`.
  */
 
 .list {
@@ -18,15 +24,9 @@
   padding: var(--space-lg);
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-lg);
   box-sizing: border-box;
   align-self: flex-start;
-}
-
-.header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
 }
 
 .heading {
@@ -38,25 +38,53 @@
 }
 
 .newButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  width: 184px;
+  max-width: 100%;
+  padding: var(--space-sm) 20px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--send-gradient);
+  color: var(--white-500);
   font-family: var(--font-family);
   font-size: 14px;
-  background: transparent;
-  color: var(--black-500);
-  border: 1px solid var(--black-500);
-  border-radius: var(--radius-pill);
-  padding: var(--space-sm) var(--space-md);
+  line-height: 24px;
   cursor: pointer;
-  text-align: center;
-  transition: background-color 120ms ease-out;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: filter 120ms ease, outline-color 150ms ease;
+  margin-bottom: var(--space-xl);
 }
 
 .newButton:hover {
-  background: var(--gray-500);
+  background: linear-gradient(
+      90deg,
+      var(--send-overlay-hover) 0%,
+      var(--send-overlay-hover) 100%
+    ),
+    var(--send-gradient);
+}
+
+.newButton:active {
+  background: linear-gradient(
+      90deg,
+      var(--send-overlay-pressed) 0%,
+      var(--send-overlay-pressed) 100%
+    ),
+    var(--send-gradient);
 }
 
 .newButton:focus-visible {
-  outline: 2px solid var(--black-500);
-  outline-offset: 2px;
+  outline-color: var(--blue-500);
+}
+
+.newButtonIcon {
+  flex-shrink: 0;
+  display: block;
+  color: var(--white-500);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -79,6 +107,10 @@
   .list {
     width: 100%;
     align-self: stretch;
+  }
+
+  .newButton {
+    width: 100%;
   }
 
   .items {
