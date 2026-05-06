@@ -275,16 +275,16 @@ Maps to the Investor agent composition and its main component; see
     scroll position and layout are preserved for when the user
     dismisses expanded mode per AC-31).
 
-- **AC-20c** — *Back navigation — history entry pushed on expand* · **@evolving**
+- **AC-20c** — *Back navigation — history entry pushed on expand* · **@stable**
   - **Given** `SiiliChatbot.init({ interceptBackNavigation: true })`
     (default `true`) and the widget is about to enter expanded mode,
   - **When** the compact → expanded transition begins,
   - **Then** the widget pushes a single history entry
     (`history.pushState({ siiliExpanded: true }, '')`) so it can
     recognise it on `popstate`.
-  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving.)
+  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving; amended 2026-05, Lane H — graduated to @stable.)
 
-- **AC-20g** — *Back navigation — popstate returns to compact* · **@evolving**
+- **AC-20g** — *Back navigation — popstate returns to compact* · **@stable**
   - **Given** the widget is in expanded mode with its own history
     entry on the stack (per AC-20c),
   - **When** the user triggers browser back (desktop back button,
@@ -293,23 +293,23 @@ Maps to the Investor agent composition and its main component; see
     compact with `messages` retained (see AC-31). The
     pushed-history flag is cleared so a subsequent dismiss path
     does not call `history.back()` on a non-existent entry.
-  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving.)
+  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving; amended 2026-05, Lane H — graduated to @stable.)
 
-- **AC-20h** — *Back navigation — compact-mode back is not intercepted* · **@evolving**
+- **AC-20h** — *Back navigation — compact-mode back is not intercepted* · **@stable**
   - **Given** the user is already in compact mode,
   - **When** the user triggers browser back,
   - **Then** the event is not intercepted — the host page's normal
     navigation applies.
-  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving pending Figma visual confirmation.)
+  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving pending Figma visual confirmation; amended 2026-05, Lane H — graduated to @stable. AC-20h is purely behavioural and never depended on the deferred Figma visual confirmation; the gating note carried over from a sibling AC at the time.)
 
-- **AC-20i** — *Back navigation — opt-out via `interceptBackNavigation: false`* · **@evolving**
+- **AC-20i** — *Back navigation — opt-out via `interceptBackNavigation: false`* · **@stable**
   - **Given** `SiiliChatbot.init({ interceptBackNavigation: false })`,
   - **Then** no history entry is pushed on compact → expanded and
     `popstate` is not intercepted at any point in the widget
     lifecycle. The close button (AC-20d) and `Esc` (AC-20j) still
     dismiss the expanded mode; they just flip mode directly without
     calling `history.back()`.
-  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving.)
+  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving; amended 2026-05, Lane H — graduated to @stable.)
 
 - **AC-20d** — *Close button — rendering* · **@evolving**
   - **Given** the widget is in expanded mode,
@@ -319,14 +319,14 @@ Maps to the Investor agent composition and its main component; see
     `aria-label="Sulje keskustelu"`.
   (amended 2026-04, Figma component drift — implementation landed against `ds:196:853`; visual styling is currently `@evolving` because Figma access for the design context (Edit-seat) is unavailable, so the implementation reuses existing tokens (`--gray-400` / `--gray-500` / `--radius-pill`) until the design is confirmed. Promote to @stable after the next Figma sync sweep.)
 
-- **AC-20j** — *Close button — activation dismisses expanded mode* · **@evolving**
+- **AC-20j** — *Close button — activation dismisses expanded mode* · **@stable**
   - **Given** the widget is in expanded mode,
   - **When** the user clicks the close button or presses `Esc`
     anywhere inside the widget,
   - **Then** the widget returns to compact mode with `messages`
     retained (see AC-31) and, if `interceptBackNavigation` is on,
     calls `history.back()` to keep the history stack in sync.
-  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving.)
+  (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving; amended 2026-05, Lane H — graduated to @stable. AC-20d's visual rendering still defers to a future figma-sync turn; that gate is on AC-20d only and does not block AC-20j's behavioural contract.)
 
 - **AC-20k** — *Close button — reduced motion* · **@evolving**
   - **Given** `prefers-reduced-motion: reduce`,
@@ -422,13 +422,13 @@ Maps to the Investor agent composition and its main component; see
     greyed per Figma and functionally non-interactive) until the
     response resolves.
 
-- **AC-31** — *Dismissal retains messages* · **@evolving**
+- **AC-31** — *Dismissal retains messages* · **@stable**
   - **Given** the widget is in expanded mode,
   - **When** the user dismisses it via the close button (AC-20j),
     `Esc`, or browser back (AC-20g),
   - **Then** the widget re-renders compact mode *and* retains the full
     `messages` array in memory for the remainder of the page session.
-  (amended 2026-04, Figma component drift — implementation landed via AC-20j routing through `dismissExpanded` in `App.tsx`, which never clears `messages` on mode flip; promoted to @evolving.)
+  (amended 2026-04, Figma component drift — implementation landed via AC-20j routing through `dismissExpanded` in `App.tsx`, which never clears `messages` on mode flip; promoted to @evolving; amended 2026-05, Lane H — graduated to @stable. The `messages` array now lives inside the active `Conversation` in the PD-08 store and the dismiss path only flips `mode`; cross-session persistence is owned separately by AC-31e.)
 
 - **AC-31b** — *Compact re-entry surfaces continue-pill and hides asked chips* · **@aspirational**
   - **Given** the user has re-entered compact mode with non-empty
@@ -463,7 +463,7 @@ Maps to the Investor agent composition and its main component; see
   - [DEPRECATED 2026-05 — superseded by AC-31f, reason: compact-mode sends now mint a fresh conversation when history exists; the appending contract moved to expanded-mode sends only.]
   (amended 2026-04, Figma component drift — `App.tsx::handleSend` always appends to `messages` regardless of mode; the AC-29 follow-up test exercises the same code path; promoted to @evolving; deprecated 2026-05, multi-discussion flow rework.)
 
-- **AC-31f** — *Compact-mode send mints a new conversation when history exists* · **@evolving**
+- **AC-31f** — *Compact-mode send mints a new conversation when history exists* · **@stable**
   - **Given** the widget is in compact mode and the active
     conversation already contains at least one Q+A pair,
   - **When** the user sends a new message (Enter on the textarea, a
@@ -488,7 +488,7 @@ Maps to the Investor agent composition and its main component; see
     mode via the continue-pill (AC-10a / AC-10c); that path flips
     to expanded **before** any send, so subsequent sends append to
     the resumed conversation under AC-29.
-  (added 2026-05, multi-discussion flow rework — replaces AC-31d after the conversation-store contract changed from "single thread, dismiss-and-resume" to "multi-thread, hero-initiated chats start fresh".)
+  (added 2026-05, multi-discussion flow rework — replaces AC-31d after the conversation-store contract changed from "single thread, dismiss-and-resume" to "multi-thread, hero-initiated chats start fresh"; amended 2026-05, Lane H — graduated to @stable.)
 
 - **AC-32** — *Input focus — retained after send in expanded mode* · **@aspirational**
   - **Given** the widget is in expanded mode and the user submits a
