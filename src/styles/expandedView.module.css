@@ -1,14 +1,45 @@
-.expanded {
+/*
+ * Expanded-view layout (amended 2026-05, Lane J — Figma re-align).
+ *
+ * Outer chrome
+ * ------------
+ * `.backdrop` is the full-viewport overlay (AC-20a). On mobile / tablet
+ * (<1024 px) it sits flush against the viewport edges and the inner
+ * `.surface` fills it edge-to-edge, satisfying AC-92c. At or above the
+ * §12.1 PD-05 desktop breakpoint (≥1024 px) the backdrop adds padding
+ * (becoming the visible "blurred backdrop sibling" band around the
+ * inset white card per `site:434:2424`) and applies
+ * `backdrop-filter: blur(...)` over a slightly translucent white wash.
+ * Browsers that do not support `backdrop-filter` fall back to a solid
+ * `rgba(255, 255, 255, 0.7)` translucent wash so the host page is
+ * still visibly defocused (AC-20a body, Lane J).
+ *
+ * Internal layout
+ * ---------------
+ * `.surface` is the white card. It is itself a flex column holding
+ * the absolute `.closeButton` (AC-20d) plus a centred `.layout`
+ * wrapper that bounds the title row + body to a comfortable max-width.
+ * `.body` is a flex row of `PreviousDiscussionList` (transparent
+ * shell, AC-33), a 1 px `.divider`, and `.contentColumn`. The content
+ * column is itself a flex column holding `.messages` (own overflow
+ * container with `scrollbar-gutter: stable` + a bottom mask-image
+ * opacity fade per AC-28c) and `.inputWrapper` (bottom-pinned per
+ * AC-28). `AC-27` auto-scroll lands the latest pair just above the
+ * input via a sentinel inside `.messages`.
+ *
+ * The host-page scroll lock (`html` / `body` `overflow: hidden`) lives
+ * in the component (`useEffect`) and stays — only the *internal*
+ * scroll surface moved from `.expanded` to `.messages` / `.items`.
+ */
+
+.backdrop {
   position: fixed;
   inset: 0;
   z-index: var(--expanded-z, 2147483000);
-  overflow-y: auto;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-2xl);
-  padding: var(--space-3xl) var(--space-2xl);
-  background: var(--white-500);
+  align-items: stretch;
+  justify-content: stretch;
+  background: rgba(255, 255, 255, 0.7);
   box-sizing: border-box;
   animation: expandedMount 200ms ease-out;
 }
@@ -25,34 +56,36 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .expanded {
+  .backdrop {
     animation: none;
   }
 }
 
-/*
- * AC-92c (mobile <640px, PD-05) — tighter padding so the Q+A column isn't
- * starved on narrow viewports. Designer delegated responsive judgment (no
- * mobile Figma frame); this breakpoint is code-authored using existing
- * spacing tokens.
- */
-@media (max-width: 639px) {
-  .expanded {
-    padding: var(--space-xl) var(--space-lg);
-  }
+.surface {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  background: var(--white-500);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 /*
  * AC-20d — close button anchored to the top-right corner of the
- * expanded surface. The expanded surface is `position: fixed; inset: 0`
- * already, so absolute positioning here pins the button to the same
- * viewport corner regardless of scroll. The 44×44 hit target lives on
- * the button itself in `closeButton.module.css`.
+ * surface (the white card). On desktop the surface has margin via
+ * the backdrop's padding, so absolute positioning here sits the
+ * button at the card corner; on mobile the surface fills the
+ * viewport, so the button sits at the viewport corner — same intent
+ * either way.
  */
 .closeButton {
   position: absolute;
   top: var(--space-lg);
   right: var(--space-lg);
+  z-index: 1;
 }
 
 @media (max-width: 639px) {
@@ -62,36 +95,56 @@
   }
 }
 
+/*
+ * `.layout` bounds title + body to a comfortable max-width and
+ * centres them inside the surface. Both rows share the same wrapper
+ * so the title's left edge aligns with the sidebar's left edge per
+ * AC-21 / Lane J.
+ */
+.layout {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+  padding: var(--space-3xl) var(--space-2xl) 0;
+  width: 100%;
+  max-width: calc(var(--content-width) + 240px + var(--space-2xl) + 1px);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/*
+ * AC-92c (mobile <640px, PD-05) — tighter padding so the Q+A column
+ * isn't starved on narrow viewports. The bottom of the surface is
+ * owned by `.inputWrapper`, hence `0` bottom padding here.
+ */
+@media (max-width: 639px) {
+  .layout {
+    padding: var(--space-xl) var(--space-lg) 0;
+    gap: var(--space-lg);
+  }
+}
+
 .title {
   font-family: var(--font-family-bold);
   font-weight: 700;
   font-size: 20px;
   line-height: normal;
   color: var(--black-500);
-  width: 100%;
   margin: 0;
-  max-width: var(--content-width);
+  align-self: flex-start;
   flex-shrink: 0;
 }
 
-/*
- * AC-33 (amended 2026-05) — `.body` hosts the sidebar to the left
- * of the content column whenever expanded mode is open, regardless
- * of how many conversations the PD-08 store holds (the earlier
- * "single-conversation hides the sidebar" rule, AC-33c, is
- * tombstoned). Below the §12.1 PD-05 mobile breakpoint the body
- * stacks vertically — sidebar collapses to a horizontal pill row
- * above the messages (AC-33d, code-authored).
- */
 .body {
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  justify-content: center;
+  align-items: stretch;
   gap: var(--space-2xl);
   width: 100%;
-  max-width: calc(var(--content-width) + 240px + var(--space-2xl));
-  flex-shrink: 0;
 }
 
 @media (max-width: 639px) {
@@ -101,28 +154,122 @@
   }
 }
 
+/*
+ * AC-33 (Lane J) — 1 px vertical divider between the sidebar column
+ * and the conversation column. Hidden when the body stacks vertically
+ * on mobile.
+ */
+.divider {
+  flex: 0 0 1px;
+  align-self: stretch;
+  background: var(--gray-500);
+}
+
+@media (max-width: 639px) {
+  .divider {
+    display: none;
+  }
+}
+
 .contentColumn {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xl);
   flex: 1 1 auto;
   min-width: 0;
+  min-height: 0;
   max-width: var(--content-width);
-  width: 100%;
-}
-
-.messages {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-3xl);
-  width: 100%;
-  max-width: 100%;
-  flex-shrink: 0;
+  align-self: stretch;
 }
 
-.inputWrapper {
+/*
+ * AC-28 / AC-28c — `.messages` is its own overflow container.
+ * `scrollbar-gutter: stable` reserves the scrollbar slot so showing /
+ * hiding the scrollbar mid-session does not shift the divider, the
+ * sidebar, the title, or the inset card's margin. The bottom
+ * `mask-image` is the AC-28c "vertical opacity fade" between the
+ * conversation stream and the input — content scrolling into the last
+ * 32 px fades into transparency, so the conversation reads as if it
+ * scrolls behind the input shell.
+ */
+.messages {
+  flex: 1 1 auto;
+  min-height: 0;
   width: 100%;
-  max-width: 100%;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xl);
+  align-items: flex-start;
+  padding-bottom: var(--space-lg);
+  mask-image: linear-gradient(
+    to bottom,
+    black 0,
+    black calc(100% - 32px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 0,
+    black calc(100% - 32px),
+    transparent 100%
+  );
+}
+
+.messagesEnd {
   flex-shrink: 0;
+  width: 100%;
+  height: 1px;
+}
+
+/*
+ * AC-28 — `.inputWrapper` is the bottom-pinned input slot inside the
+ * conversation column. It sits as a normal flex item below
+ * `.messages`; the column's flex layout pins it to the bottom because
+ * `.messages` flexes (`flex: 1 1 auto`). Solid white background so
+ * the band under the mask-image fade reads as a clean surface.
+ */
+.inputWrapper {
+  flex: 0 0 auto;
+  width: 100%;
+  padding: var(--space-lg) 0 var(--space-3xl);
+  background: var(--white-500);
+  box-sizing: border-box;
+}
+
+@media (max-width: 639px) {
+  .inputWrapper {
+    padding: var(--space-sm) 0 var(--space-xl);
+  }
+}
+
+/*
+ * Desktop band (PD-05 ≥ 1024 px) — inset white card + visible
+ * blurred backdrop sibling per AC-20a / AC-90 (Lane J).
+ */
+@media (min-width: 1024px) {
+  .backdrop {
+    padding: var(--space-xl);
+  }
+
+  .surface {
+    border-radius: var(--radius);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  /*
+   * Where supported, the visible backdrop band blurs the host page
+   * and adopts a slightly more translucent wash so the blur does the
+   * defocusing work. The non-`@supports` rule above is the AC-20a
+   * fallback (translucent white wash, no blur) for older browsers.
+   */
+  @supports (
+    (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+  ) {
+    .backdrop {
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+  }
 }

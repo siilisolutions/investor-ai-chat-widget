@@ -5,28 +5,31 @@
  * the surface as a horizontal pill row (AC-33d) — code-authored
  * because IR-site does not publish a mobile frame for this yet.
  *
- * Visuals reuse existing widget tokens (gray-400 surface, radius)
- * until the IR-DS frame lands a Figma-confirmed treatment. Once
- * that's available, update tokens and bump §2.5 row AC-33 / AC-33a.
+ * Lane J (2026-05) — the sidebar's outer container is now
+ * transparent: the gray-400 surface treatment lives on each
+ * `PreviousDiscussionItem` row rather than the shell, and a 1 px
+ * vertical divider (rendered by `expandedView.module.css`) separates
+ * the sidebar column from the conversation column. `.items` is its
+ * own overflow container with `scrollbar-gutter: stable`, so the
+ * sidebar's scrollbar consumes sidebar space only and does not push
+ * the divider, conversation column, or desktop margin (AC-33).
  *
  * AC-35 — `.newButton` mirrors Figma `ds:237:398` (component set
- * with Default / Hover / Pressed variants). It reuses the
- * send-button family's `--send-gradient` plus the shared overlay
- * tokens so the brand gradient stays in one place per
- * `code-governance.mdc`.
+ * with Default / Hover / Pressed variants). Lane J switched the
+ * background from `--send-gradient` to `--cta-gradient` so the
+ * pill runs diagonally violet (top-left) → blue (bottom-right)
+ * per `ds:237:323`, distinct from the Send button family which
+ * still uses `--send-gradient` (AC-72).
  */
 
 .list {
-  width: 240px;
-  flex-shrink: 0;
-  background: var(--gray-400);
-  border-radius: var(--radius);
-  padding: var(--space-lg);
+  flex: 0 0 240px;
+  align-self: stretch;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
   box-sizing: border-box;
-  align-self: flex-start;
 }
 
 .heading {
@@ -46,7 +49,7 @@
   padding: var(--space-sm) 20px;
   border: none;
   border-radius: var(--radius);
-  background: var(--send-gradient);
+  background: var(--cta-gradient);
   color: var(--white-500);
   font-family: var(--font-family);
   font-size: 14px;
@@ -56,7 +59,7 @@
   outline: 2px solid transparent;
   outline-offset: 2px;
   transition: filter 120ms ease, outline-color 150ms ease;
-  margin-bottom: var(--space-xl);
+  flex-shrink: 0;
 }
 
 .newButton:hover {
@@ -65,7 +68,7 @@
       var(--send-overlay-hover) 0%,
       var(--send-overlay-hover) 100%
     ),
-    var(--send-gradient);
+    var(--cta-gradient);
 }
 
 .newButton:active {
@@ -74,7 +77,7 @@
       var(--send-overlay-pressed) 0%,
       var(--send-overlay-pressed) 100%
     ),
-    var(--send-gradient);
+    var(--cta-gradient);
 }
 
 .newButton:focus-visible {
@@ -97,14 +100,18 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
   overflow-y: auto;
+  scrollbar-gutter: stable;
 }
 
 @media (max-width: 639px) {
   .list {
+    flex: 0 0 auto;
     width: 100%;
     align-self: stretch;
   }
@@ -118,6 +125,7 @@
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
+    scrollbar-gutter: auto;
   }
 
   .items > li {

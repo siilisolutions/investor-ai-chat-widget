@@ -137,7 +137,7 @@ directly.
 | AC-16 | Send-button enablement | [§3.2](ACCEPTANCE_CRITERIA_BODIES.md#32-compact-hero-mode) | active | @stable | Automated: tests/compactView.test.tsx — disabled / enabled state by textarea content; Visual: see §2.5 row AC-16 for Active gradient |
 | AC-17 | Input shell — click-to-focus target with text cursor | [§3.2](ACCEPTANCE_CRITERIA_BODIES.md#32-compact-hero-mode) | active | @stable | Automated: tests/compactView.test.tsx — mousedown on shell focuses textarea; mousedown on send button does not. Manual: hover the input shell padding — cursor is text caret |
 | AC-20 | Transition — no flicker | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Manual: compact → expanded transition — no unstyled flash or empty intermediate frame |
-| AC-20a | Fill the viewport | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Manual: enter expanded — surface fills `100vw × 100vh` with solid `--white-500` |
+| AC-20a | Fill the viewport | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Manual: enter expanded — viewport is occluded; on desktop the host page is visible only behind a blurred backdrop sibling around the inset white card; below the §12.1 PD-05 desktop breakpoint the white card itself fills the viewport edge-to-edge |
 | AC-20b | Hero image hidden | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Manual: enter expanded — host hero image not visible behind widget |
 | AC-20c | Back navigation — history entry pushed on expand | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/widget.test.tsx — `history.pushState` called once on compact → expanded with `{ siiliExpanded: true }` |
 | AC-20d | Close button — rendering | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @evolving | Automated: tests/expandedView.test.tsx — close button renders with `aria-label="Sulje keskustelu"`. Visual: see §2.5 row AC-20d for hit-target + Siili-token styling (Figma confirmation pending Edit-seat access) |
@@ -158,9 +158,9 @@ directly.
 | AC-25c | Source references — unlinked badge is static | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/chatMessage.test.tsx — unlinked source renders as `<span>`, never as a link |
 | AC-26 | No-sources case | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/chatMessage.test.tsx — empty and undefined `sources` both suppress the "Lähteet:" section |
 | AC-27 | Auto-scroll to newest | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Manual: append several Q+A pairs — newest smoothly scrolls into view |
-| AC-28 | Input positioned below the latest reply | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-28 — input in document flow below latest reply with `--textarea-shadow` |
-| AC-28b | Input placement — short conversations are not bottom-pinned | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Manual: short convo — input sits directly below latest reply, no empty space above |
-| AC-28c | Input placement — long conversations keep latest reply and input visible | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Manual: long convo — latest reply + input both visible after auto-scroll |
+| AC-28 | Input positioned at the bottom of the conversation column | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-28 — input bottom-pinned inside the conversation column with `--textarea-shadow`; Q+A stream scrolls above and behind it |
+| AC-28b | (deprecated) Input placement — short conversations are not bottom-pinned — reversed by AC-28 amendment (input is now always bottom-pinned) | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | deprecated | @stable | n/a (deprecated — see AC-28) |
+| AC-28c | Input placement — latest reply visible above the bottom-pinned input, fade above input, scroll isolation | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Manual: long convo — latest reply lands just above the bottom-pinned input after auto-scroll; vertical opacity fade band masks messages scrolling under the input; conversation-stream scrollbar consumes column space only and does not push the sidebar / title / input / desktop margin |
 | AC-29 | Follow-up questions | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/app.test.tsx — second send appends a new pair while the first remains intact |
 | AC-30 | Input disabled during load | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/app.test.tsx — textarea + send button both `disabled` until the in-flight promise resolves |
 | AC-31 | Dismissal retains messages | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/widget.test.tsx — popstate-driven dismiss returns to compact and the textarea stays mounted (proves App did not blow up; conversation contents survive the mode flip and persist independently per AC-31e) |
@@ -170,14 +170,14 @@ directly.
 | AC-31d | (deprecated) New message from compact with history appends — superseded by AC-31f (compact-send now mints a fresh conversation) | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | deprecated | @evolving | n/a (deprecated — see AC-31f) |
 | AC-31f | Compact-mode send mints a new conversation when history exists | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/app.test.tsx — compact-mode send with prior messages mints a new conversation (sidebar visibility threshold ≥ 2 hits naturally); compact-mode send into an empty active conversation appends rather than duplicating |
 | AC-32 | Input focus — retained after send in expanded mode | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @aspirational | Manual: send via Enter and via send-button click in expanded — focus is on the textarea after the pair renders and once the input re-enables (aspirational) |
-| AC-33 | Previous discussion list — visibility | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @evolving | Automated: tests/expandedView.test.tsx — sidebar renders in expanded mode whether the PD-08 store holds one conversation or many; the active row is marked `aria-current="true"` |
+| AC-33 | Previous discussion list — visibility, transparent shell, scroll isolation | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @evolving | Automated: tests/expandedView.test.tsx — sidebar renders in expanded mode whether the PD-08 store holds one conversation or many; the active row is marked `aria-current="true"`. Manual: sidebar outer container has no background of its own (per-row treatment only); a vertical divider separates it from the conversation column; row-list scrollbar consumes sidebar space only and does not push the divider, conversation column, or desktop margin |
 | AC-33a | Previous discussion list — items render | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @aspirational | Manual: dev harness with seeded multi-conversation store — each row carries a label derived from its first user question; the active row is visually distinct (aspirational) |
 | AC-33b | Previous discussion item — activation | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @aspirational | Manual: type a draft in the active conversation, click an inactive row — Q+A stream swaps, no DevTools Network POST fires, draft restored on re-activation (aspirational) |
 | AC-33c | (deprecated) Previous discussion list — empty state — superseded by AC-33 (sidebar is always visible in expanded mode; the "store of one hides the sidebar" clause no longer holds) | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | deprecated | @aspirational | n/a (deprecated — see AC-33) |
 | AC-33d | Previous discussion list — mobile responsive treatment | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @aspirational | Manual: viewport below §12.1 PD-05 mobile breakpoint with two seeded conversations — sidebar collapses behind a discoverable affordance, reachable in one tap (aspirational) |
 | AC-33e | Previous discussion item — per-row delete with confirmation | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @evolving | Manual: dev harness with two seeded conversations under PD-08 — × on a row opens a confirmation modal matching Figma `ds:242:490` (see §2.5 row AC-33e), centered in the viewport with the rest of the widget surface visibly blurred; primary destructive action removes the row from the sidebar and the PD-08 store; cancel (button or `Esc`) closes the modal with no state change. Automated: tests/app.test.tsx — single-leftover-row delete mints a fresh empty conversation and stays in expanded mode (no compact dismissal) |
 | AC-34 | Per-conversation title in expanded view | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @aspirational | Manual / Visual: see §2.5 row AC-34 — per-conversation title is rendered above the Q+A stream and updates on AC-33b activation; empty conversation falls back to a neutral default (aspirational) |
-| AC-35 | Start-new-conversation affordance in expanded mode | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/conversationStore.test.ts — `createConversation()` mints a fresh entry without mutating priors; tests/expandedView.test.tsx — activating the "Luo uusi keskustelu" button calls `onStartNewConversation`. Visual: see §2.5 row AC-35 — Figma `ds:237:398` |
+| AC-35 | Start-new-conversation affordance in expanded mode | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/conversationStore.test.ts — `createConversation()` mints a fresh entry without mutating priors; tests/expandedView.test.tsx — activating the "Luo uusi keskustelu" button calls `onStartNewConversation`. Visual: see §2.5 row AC-35 — Figma `ds:237:398`; gradient runs diagonally violet→blue from top-left to bottom-right per `ds:237:323` (distinct from the Send button's gradient direction) |
 | AC-40 | Service rejection | [§3.4](ACCEPTANCE_CRITERIA_BODIES.md#34-error-handling) | active | @stable | Automated: tests/chatMessage.test.tsx — error pair renders `role="alert"` with the error text; no `role="status"` blob and no "Lähteet:" section |
 | AC-41 | No crash on error | [§3.4](ACCEPTANCE_CRITERIA_BODIES.md#34-error-handling) | active | @stable | Manual: after forced error — user can still type + send new messages; error scoped to one pair |
 | AC-42 | No developer leakage | [§3.4](ACCEPTANCE_CRITERIA_BODIES.md#34-error-handling) | active | @stable | Automated: tests/app.test.tsx — App renders the fixed `SAFE_ERROR` copy from `src/errorCopy.ts`; raw `err.message` is never forwarded to the DOM |
@@ -283,6 +283,37 @@ PR.
   [`AGENTS.md`](AGENTS.md) § Code Connect for the matching mapping
   state.
 
+> **2026-05-06 — Lane J partial-sweep (Figma re-align, designer brief).** The
+> designer flagged that several visual / layout decisions had not landed
+> from Figma. This lane amends the AC contract before the matching code
+> change ships in a follow-up turn. Eight asks consolidated against the
+> existing AC catalog: (1) "Siili AI-avustaja" headline left-aligned with
+> the sidebar column (AC-21, §2.5 sweep only); (2) sidebar outer
+> container has no background of its own — only individual rows carry
+> surface treatment (AC-33 + AC-33a, AC-33 body extended); (3) vertical
+> divider between sidebar and conversation columns (AC-33 body
+> extended); (4) input pinned to the bottom of the conversation column
+> with the Q+A stream scrolling above and behind it (AC-28 body
+> rewritten + AC-28b tombstoned + AC-28c body rewritten); (5) vertical
+> opacity-fade band masks messages scrolling under the input (AC-28c
+> body extended); (6) conversation-stream and sidebar-row-list
+> scrollbars consume their own column space without shifting siblings
+> (AC-28c + AC-33 bodies extended); (7) "Luo uusi keskustelu" gradient
+> runs diagonally violet→blue from top-left to bottom-right, distinct
+> from the Send button's gradient direction (AC-35 body extended;
+> implementation introduces a CTA-only gradient token in the follow-up
+> turn — `--send-gradient` is unchanged because AC-72 still uses it);
+> (8) at or above the §12.1 PD-05 desktop breakpoint the expanded
+> overlay is composed of an inset white card and a blurred backdrop
+> sibling that together fill the viewport rather than a single
+> full-bleed surface (AC-20a body rewritten; AC-90 §2.5 sweep only).
+> Reverified anchors: `site:434:2424` (expanded screen layout),
+> `ds:191:258` (sidebar), `ds:237:323` (Luo uusi keskustelu Default
+> variant — gradient direction). No new AC IDs were minted; per
+> [`.cursor/rules/ac-amending.mdc`](.cursor/rules/ac-amending.mdc)
+> "one source per fact", every ask folds into existing IDs. Code
+> change ships in a follow-up turn against the amended contract.
+>
 > **2026-05-05 — Lane E-1 partial-sweep (IR-site frame rename, follow-up to Lane E).** The
 > IR-site frames previously cited as `site:143:601` (AI-agentti) and
 > `site:201:2273` (AI-agentti, haetaan tietoa) have been renamed in
@@ -354,29 +385,29 @@ PR.
 | AC-12b  | `ds:152:86`                                   | Suggestion chip labels — single-line (nowrap)    | 2026-04-22   | Lane E full-sweep |
 | AC-16   | `ds:152:129`                                  | Send button — Active (gradient)                  | 2026-04-22   | Lane E full-sweep |
 | AC-20   | `site:434:2424`                               | Expanded view mount / first-frame layout         | 2026-05-05   | Lane E full-sweep + Lane E-1 ID rename |
-| AC-20a  | `site:434:2424`                               | Expanded surface fills viewport                  | 2026-05-05   | Lane C graduation + Lane E-1 ID rename |
+| AC-20a  | `site:434:2424`                               | Expanded surface fills viewport (desktop layout adopts inset white card + blurred backdrop sibling band; below the §12.1 PD-05 desktop breakpoint the white card itself fills the viewport edge-to-edge) | 2026-05-06   | Lane J — Figma re-align |
 | AC-20d  | `site:434:2424`, `ds:196:853`                 | Close (×) button styling & placement             | 2026-05-05   | Lane E full-sweep + Lane E-1 ID rename |
 | AC-20e  | `site:434:2424`, `ds:152:116`                 | First Q+A pair visible on first expanded frame   | 2026-05-05   | Lane E full-sweep + Lane E-1 ID rename |
-| AC-21   | `ds:152:97`                                   | Expanded header ("Siili AI-avustaja")            | 2026-04-22   | Lane E full-sweep |
+| AC-21   | `ds:152:97`                                   | Expanded header ("Siili AI-avustaja", left-aligned with the sidebar column per `ds:152:97`) | 2026-05-06   | Lane J — Figma re-align |
 | AC-22   | `ds:152:116`                                  | Question bubble (Q+A pair)                       | 2026-04-22   | Lane E full-sweep |
 | AC-23   | `ds:152:137`, `site:434:2696`                 | Loading blob / loading state                     | 2026-05-05   | Lane A graduation + Lane E-1 ID rename |
 | AC-23b  | `ds:152:137`, `site:434:2696`                 | Loading blob — rounded gray shape, pulse tempo   | 2026-05-05   | Lane A graduation + Lane E-1 ID rename |
 | AC-25   | `ds:152:135`                                  | Source reference badge                           | 2026-04-22   | Lane E full-sweep |
 | AC-25b  | `ds:152:135`                                  | Source reference — linked (opens in new tab)     | 2026-04-22   | Lane E full-sweep |
 | AC-25c  | `ds:152:135`                                  | Source reference — static unlinked badge         | 2026-04-22   | Lane E full-sweep |
-| AC-28   | `site:434:2424`, `ds:152:121`                 | ChatInput placement + textarea shadow            | 2026-05-05   | Lane C graduation + Lane E-1 ID rename |
-| AC-28b  | `site:434:2424`, `ds:152:121`                 | ChatInput — short conversation, not bottom-pinned| 2026-05-05   | Lane C graduation + Lane E-1 ID rename |
-| AC-28c  | `site:434:2424`, `ds:152:121`                 | ChatInput — long conversation, reply+input visible| 2026-05-05  | Lane C graduation + Lane E-1 ID rename |
-| AC-33   | `ds:191:258`, `site:434:2424`                 | Previous discussion list — sidebar visibility & layout | 2026-05-06   | Sidebar always visible in expanded mode (AC-33c tombstoned) |
-| AC-33a  | `ds:191:268`                                  | Previous discussion item — row content & active state | —            | — |
+| AC-28   | `site:434:2424`, `ds:152:121`                 | ChatInput pinned to the bottom of the conversation column + textarea shadow; Q+A stream scrolls above and behind it | 2026-05-06   | Lane J — Figma re-align |
+| AC-28b  | `site:434:2424`, `ds:152:121`                 | (deprecated) ChatInput — short conversation, not bottom-pinned — reversed by AC-28 amendment | 2026-05-06   | Lane J — Figma re-align (n/a — deprecated AC-28b) |
+| AC-28c  | `site:434:2424`, `ds:152:121`                 | ChatInput — latest reply visible above the bottom-pinned input; vertical opacity-fade band masks messages scrolling under the input; conversation-stream scrollbar consumes column space only | 2026-05-06   | Lane J — Figma re-align |
+| AC-33   | `ds:191:258`, `site:434:2424`                 | Previous discussion list — sidebar visibility & layout (transparent shell, per-row surface treatment, vertical divider between sidebar column and Q+A column, scroll isolation on the row list) | 2026-05-06   | Lane J — Figma re-align (transparent shell + per-row bg + vertical divider + scroll isolation confirmed against `ds:191:258` and `site:434:2424`) |
+| AC-33a  | `ds:191:268`                                  | Previous discussion item — row content & active state (per-row surface treatment lifted out of the sidebar shell; active row visually distinguished) | 2026-05-06   | Lane J — Figma re-align |
 | AC-33d  | — (code-authored)                             | Sidebar mobile collapse / discoverable affordance (Lane E-1 surfaced candidate anchor `site:435:2914` AI-agentti - Menu open - Mobile; promotion deferred to AC-amend turn) | —            | — |
 | AC-33e  | `ds:191:268` (× glyph inline within the row, surfaced by the live `get_code_connect_map` snippet on `ds:191:258` showing a `ResetButton` at the trailing edge); confirmation modal card `ds:242:490` (title `ds:242:431` *"Poista keskustelu"* / body `ds:242:550` → `ds:242:433` *"Haluatko varmasti poistaa keskustelun {label}?"* with bolded label / cancel button `ds:242:438` *"Peruuta"* / destructive confirm button `ds:242:444` *"Poista"* on a destructive-red action surface). Centered viewport overlay + blurred backdrop around the card remain `— (code-authored)` — Figma `ds:242:490` spec's the card in isolation. | Per-row dismiss affordance + in-widget confirmation modal | 2026-05-06   | Single-leftover-row delete now mints fresh & stays expanded (sidebar always visible per AC-33) |
 | AC-34   | `site:434:2424`, `site:434:2696`              | Per-conversation title text element above the Q+A stream | —            | — |
-| AC-35   | `ds:237:398`, `site:434:2424`                 | Start-new-conversation affordance — primary CTA Button (Default `ds:237:323` / Hover `ds:237:399` / Pressed `ds:237:411`, "Luo uusi keskustelu", content-sized violet→blue gradient pill with `white-space: nowrap` label and `+` icon `ds:237:332`, 8×20 padding, 12 gap) anchored at the top of the AC-33 sidebar in `site:434:2424`, `site:434:2696`, and the mobile drawer `site:435:2914` | 2026-05-06   | AC-35 wrap-fix (drop stale 184×40 annotation; Figma's `content-stretch` + `whitespace-nowrap` is the source of truth) |
+| AC-35   | `ds:237:398`, `site:434:2424`                 | Start-new-conversation affordance — primary CTA Button (Default `ds:237:323` / Hover `ds:237:399` / Pressed `ds:237:411`, "Luo uusi keskustelu", content-sized violet→blue gradient pill with `white-space: nowrap` label and `+` icon `ds:237:332`, 8×20 padding, 12 gap) anchored at the top of the AC-33 sidebar in `site:434:2424`, `site:434:2696`, and the mobile drawer `site:435:2914`. Gradient direction confirmed against `ds:237:323` — diagonal violet (top-left) → blue (bottom-right), distinct from the Send button family's gradient direction; implementation introduces a CTA-only gradient token in the follow-up turn so `--send-gradient` / AC-72 stay untouched. | 2026-05-06   | Lane J — Figma re-align |
 | AC-72   | `ds:152:129`, `ds:152:131`, `ds:152:133`      | Send button Active / Hover / Pressed             | 2026-04-22   | Lane E full-sweep |
 | AC-73   | — (code-authored)                             | Typography — Everett weights (via `--font-family*` tokens) | 2026-04-22   | Lane E full-sweep (code-authored watch) |
 | AC-73b  | — (code-authored)                             | Typography — sans-serif fallback, no large CLS   | 2026-04-22   | Lane E full-sweep (code-authored watch) |
-| AC-90   | `site:13:527`, `site:434:2424`                | Desktop (≥1024px) layout                         | 2026-05-05   | Lane E full-sweep + Lane E-1 ID rename |
+| AC-90   | `site:13:527`, `site:434:2424`                | Desktop (≥1024px) layout — adopts inset white card + blurred backdrop band per AC-20a; padding and column widths confirmed against `site:434:2424` | 2026-05-06   | Lane J — Figma re-align |
 | AC-91   | — (code-authored)                             | Tablet (640–1023px) layout                       | 2026-04-22   | Lane F graduation (code-authored, designer delegation) |
 | AC-92   | — (code-authored)                             | Mobile (<640px) layout — compact stacks input    | 2026-04-22   | Lane F graduation (code-authored, designer delegation) |
 | AC-92b  | — (code-authored)                             | Mobile (<640px) — chips scroll or wrap           | 2026-04-22   | Lane F graduation (code-authored, designer delegation) |

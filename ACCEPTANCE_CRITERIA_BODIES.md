@@ -253,12 +253,19 @@ Maps to the Investor agent composition and its main component; see
 
 - **AC-20a** — *Fill the viewport* · **@stable**
   - **Given** the widget has entered expanded mode,
-  - **Then** the chat surface fills the entire browser viewport
-    (100vw × 100vh from the widget's root container), with an
-    opaque background matching the expanded-view composition
-    (see §2.5 row AC-20a).
-  - **Then** no host-page content behind the widget is visible through
-    it (no translucency, no gaps at the edges).
+  - **Then** the widget's overlay covers the entire browser viewport
+    (100vw × 100vh from the widget's root container) so host-page
+    content behind the widget is not interactive — at or above the
+    §12.1 PD-05 desktop breakpoint the overlay is composed of an
+    inset white card and a blurred backdrop sibling that together
+    fill the viewport (see §2.5 row AC-20a / `site:434:2424`); below
+    the desktop breakpoint the white card itself fills the viewport
+    edge-to-edge.
+  - **Then** wherever host-page content is visible at all (the
+    desktop backdrop band), it is visibly defocused (e.g. via
+    `backdrop-filter: blur(...)` or, where unsupported, a translucent
+    white wash) so it cannot be mistaken for an interactive surface.
+  (amended 2026-05, Lane J — Figma re-align: split full-bleed into white card + blurred backdrop on desktop per `site:434:2424`; AC-20b unchanged because the hero is still hidden from the user's perceived focus.)
 
 - **AC-20b** — *Hero image hidden* · **@stable**
   - **Given** the widget is in expanded mode,
@@ -391,25 +398,34 @@ Maps to the Investor agent composition and its main component; see
   - **Then** the messages container smoothly scrolls the newest pair
     into view.
 
-- **AC-28** — *Input positioned below the latest reply* · **@stable**
+- **AC-28** — *Input positioned at the bottom of the conversation column* · **@stable**
   - **Given** expanded mode is shown,
-  - **Then** the `ChatInput` is rendered immediately underneath the
-    most recent assistant reply (or its loading blob), in document
-    flow, matching the textarea placement in the Investor agent
-    composition (see §2.5 row AC-28).
+  - **Then** the `ChatInput` is pinned to the bottom of the
+    conversation column (sticky / absolutely positioned within the
+    column). The Q+A stream scrolls in its own overflow container
+    above and behind the input. AC-27 (auto-scroll to newest) lands
+    each new pair just above the input, with at least the latest
+    reply and the input both visible together (see AC-28c).
+  (amended 2026-05, Lane J — Figma re-align: input is now bottom-pinned regardless of conversation length per `site:434:2424`; AC-28b reversed and tombstoned in the same edit.)
 
-- **AC-28b** — *Input placement — short conversations are not bottom-pinned* · **@stable**
-  - **Given** the conversation is short enough that all Q+A pairs fit
-    in the viewport,
-  - **Then** the input sits directly below the latest reply — it is
-    **not** pinned to the bottom of the viewport with empty space
-    above it.
+- **AC-28b** — *(deprecated) Input placement — short conversations are not bottom-pinned* · **@stable**
+  - [DEPRECATED 2026-05 — reversed by AC-28 amendment, reason: designer pinned the input to the bottom of the conversation column regardless of length, per `site:434:2424`. The "short conversation = no bottom pin" rule is no longer the design contract.]
 
-- **AC-28c** — *Input placement — long conversations keep latest reply and input visible* · **@stable**
+- **AC-28c** — *Input placement — latest reply visible above the bottom-pinned input, fade above input, scroll isolation* · **@stable**
   - **Given** the conversation is long enough to scroll,
-  - **Then** after the auto-scroll in AC-27, the latest reply and the
-    input beneath it are both visible together, with the input at or
-    near the bottom of the viewport.
+  - **Then** after the AC-27 auto-scroll, the latest reply is visible
+    immediately above the bottom-pinned input from AC-28; the input
+    itself is fully visible at the bottom of the conversation column.
+  - **Then** the band between the conversation stream and the input
+    presents a vertical opacity fade (e.g. `mask-image` or a
+    pseudo-element gradient) so messages scrolling under the input
+    fade out rather than colliding with the input shell.
+  - **Then** the conversation stream is its own overflow container —
+    its scrollbar consumes column space without shifting the
+    sidebar, the title, the input, or the desktop margin. The
+    sidebar's row list is also its own overflow container under the
+    same rule (see AC-33).
+  (amended 2026-05, Lane J — Figma re-align: clarified bottom-pinned + opacity-fade band + scroll-isolation contract per `site:434:2424`.)
 
 - **AC-29** — *Follow-up questions* · **@stable**
   - **Given** the user is in expanded mode and sends another message,
@@ -510,7 +526,7 @@ Maps to the Investor agent composition and its main component; see
     first send triggers the transition to expanded and AC-28 / AC-29
     govern where the input lands.
 
-- **AC-33** — *Previous discussion list — visibility* · **@evolving**
+- **AC-33** — *Previous discussion list — visibility, transparent shell, scroll isolation* · **@evolving**
   - **Given** the widget is in expanded mode,
   - **Then** the sidebar (Figma `ds:191:258`, see §2.5 row AC-33)
     is rendered alongside the Q+A stream, regardless of how many
@@ -527,7 +543,17 @@ Maps to the Investor agent composition and its main component; see
     discoverable affordance (drawer / overflow toggle) — the
     sidebar's *contents* remain reachable in one tap; AC-33d owns
     the visual collapse, AC-33 only asserts reachability.
-  (added 2026-04, Figma component drift; amended 2026-05, #PR — sidebar now always visible in expanded mode so the user can always reach the start-new and per-row delete affordances; AC-33c tombstoned)
+  - **Then** the sidebar's outer container has no background of its
+    own — only individual rows carry surface treatment (see AC-33a)
+    and a vertical divider separates the sidebar column from the
+    Q+A column (see §2.5 row AC-33). This keeps the sidebar visually
+    secondary to the active conversation.
+  - **Then** the row list scrolls inside its own overflow container
+    when long, with its scrollbar consuming sidebar space only — it
+    does not push the divider, the conversation column, or the
+    desktop margin (mirrors AC-28c scroll isolation on the other
+    column).
+  (added 2026-04, Figma component drift; amended 2026-05, #PR — sidebar now always visible in expanded mode so the user can always reach the start-new and per-row delete affordances; AC-33c tombstoned; amended 2026-05, Lane J — Figma re-align: transparent shell + per-row treatment + vertical divider + scroll isolation, per `ds:191:258` / `site:434:2424`.)
 
 - **AC-33a** — *Previous discussion list — items render* · **@aspirational**
   - **Given** the sidebar is rendered (per AC-33),
@@ -653,6 +679,10 @@ Maps to the Investor agent composition and its main component; see
     Pressed darken the gradient via the shared `--send-overlay-*`
     tokens used by the send button so the brand gradient and its
     state-overlay rules live in one place.
+  - **Then** the gradient runs diagonally from the top-left
+    (violet) to the bottom-right (blue), distinct from the Send
+    button family's gradient direction; the exact angle is
+    Figma-owned (see §2.5 row AC-35 / `ds:237:323`).
   - **When** the user activates it (click or keyboard),
   - **Then** the widget creates a new entry in the PD-08
     conversation store, sets it as the active conversation,
@@ -677,7 +707,7 @@ Maps to the Investor agent composition and its main component; see
     icon, Hover / Pressed) and the Code Connect mapping landed in
     the same week, graduating the AC `@aspirational` →
     `@evolving` → `@stable`.
-  (added 2026-04, Figma component drift; amended 2026-05, multi-discussion flow rework; amended 2026-05, parity landed + Code Connect mapped; amended 2026-05, #PR — sidebar always visible per AC-33 means the store-of-one reachability caveat is dropped)
+  (added 2026-04, Figma component drift; amended 2026-05, multi-discussion flow rework; amended 2026-05, parity landed + Code Connect mapped; amended 2026-05, #PR — sidebar always visible per AC-33 means the store-of-one reachability caveat is dropped; amended 2026-05, Lane J — Figma re-align: pin diagonal direction violet→blue top-left → bottom-right; introduces a CTA-only gradient token in the implementation turn — `--send-gradient` is unchanged because AC-72 still uses it.)
 
 - **AC-34** — *Per-conversation title in expanded view* · **@aspirational**
   - **Given** the widget is in expanded mode showing a specific

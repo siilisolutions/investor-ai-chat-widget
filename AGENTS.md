@@ -17,12 +17,14 @@ Host page (siili.com)
                  │    └─ ChatInput
                  │         └─ ContinuePill (AC-10a / site:395:5439 — rendered when prior history exists)
                  └─ ExpandedView (chat messages + input + close button + sidebar)
+                      │   (desktop: rendered as inset white card + blurred backdrop sibling per AC-20a, amended 2026-05 Lane J;
+                      │    below the §12.1 PD-05 desktop breakpoint the white card itself fills the viewport edge-to-edge)
                       ├─ CloseButton (× top-right, AC-20d / ds:196:853)
-                      ├─ PreviousDiscussionList (sidebar, AC-33 / ds:191:258 — always rendered in expanded mode, amended 2026-05)
+                      ├─ PreviousDiscussionList (sidebar, AC-33 / ds:191:258 — always rendered in expanded mode, amended 2026-05; transparent shell + per-row surface treatment + vertical divider + scroll isolation per AC-33 amended 2026-05 Lane J)
                       │    └─ PreviousDiscussionItem (row, AC-33a / ds:191:268)
                       ├─ ChatMessage (question bubble + answer + sources)
                       │    └─ SourceBadge (reference pill)
-                      └─ ChatInput (shared textarea + send button)
+                      └─ ChatInput (shared textarea + send button — bottom-pinned inside the conversation column with an opacity-fade band masking messages scrolling under it per AC-28 / AC-28c, amended 2026-05 Lane J; AC-28b reversed and tombstoned in the same edit)
 ```
 
 **State transitions:**
@@ -144,6 +146,7 @@ All tokens live in `src/styles/variables.css` as CSS custom properties. These va
 | `--blue-700` | `#2323b2` | Continue-pill text link (Figma `site:395:5439`) |
 | `--violet-500` | `rgb(170, 50, 255)` | Send button gradient end |
 | `--red-600` | `#d20000` | Destructive action surface (AC-33e confirm-delete button, Figma `ds:242:444`) |
+| `--cta-gradient` | `linear-gradient(117.63deg, var(--violet-500) 0%, var(--blue-500) 100%)` | "Luo uusi keskustelu" CTA pill (AC-35, Figma `ds:237:323`); intentionally distinct from `--send-gradient` so AC-72 send-button states stay untouched |
 | `--font-family` | `'Everett', sans-serif` | All text |
 | `--radius` | `20px` | All interactive elements |
 | `--textarea-shadow` | `0px 4px 12px rgba(0,0,0,0.2)` | Expanded mode textarea |
@@ -354,3 +357,4 @@ When you add a new React component that has a corresponding main component in IR
 - [ ] **Mobile responsiveness** — basic flex layout, needs breakpoint testing. Lane E-1 (2026-05-05) surfaced two new IR-site mobile frames `site:435:2904` (AI-agentti - Mobile) and `site:435:2914` (AI-agentti - Menu open - Mobile, drawer-revealed sidebar) plus `ds:214:1214` Mobile menu and `ds:230:656` 24×24 Menu button — anchoring `AC-33d` / `AC-92c` to these frames (graduating both rows out of `— (code-authored)`) needs an AC-amend turn first; a future `MenuButton.tsx` component will pair with the drawer.
 - [ ] **Error handling UX** — shows generic error text; could be improved
 - [ ] **Analytics / tracking** — no events emitted yet
+- [x] **Lane J — Figma re-align (2026-05-06)** — designer-driven contract amendments landed in [`ACCEPTANCE_CRITERIA.md`](ACCEPTANCE_CRITERIA.md) / [`ACCEPTANCE_CRITERIA_BODIES.md`](ACCEPTANCE_CRITERIA_BODIES.md): AC-20a body rewritten (desktop = inset white card + blurred backdrop sibling), AC-28 body rewritten (input bottom-pinned in the conversation column), AC-28b tombstoned (reversed by AC-28), AC-28c body rewritten (latest reply above bottom-pinned input + opacity-fade band + scroll isolation), AC-33 body extended (transparent sidebar shell + per-row treatment + vertical divider + scroll isolation), AC-35 body extended (gradient runs diagonally violet→blue from top-left to bottom-right per `ds:237:323`, distinct from `--send-gradient`). Implementation: `ExpandedView` is now `.backdrop` (full-viewport, `backdrop-filter: blur(20px)` + `rgba(255,255,255,0.5)` wash on desktop ≥1024 px, `rgba(255,255,255,0.7)` translucent fallback) wrapping `.surface` (white card; edge-to-edge mobile, inset with `border-radius` + subtle elevation on desktop). `.contentColumn` flex-pins `.inputWrapper` at the bottom; `.messages` is its own overflow container with `scrollbar-gutter: stable` and a bottom `mask-image` fade, with auto-scroll landing the latest pair via a `.messagesEnd` sentinel + `scrollIntoView({ block: 'end' })` so the AC-83 test spy keeps passing. Sidebar shell is transparent; `gray-400` lifted onto each `PreviousDiscussionItem` row. New `--cta-gradient` token in [`src/styles/variables.css`](src/styles/variables.css) drives `.newButton`; `--send-gradient` / AC-72 untouched.

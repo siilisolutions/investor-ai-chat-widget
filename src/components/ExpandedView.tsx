@@ -3,16 +3,29 @@
  * message is sent. Maps to Figma nodes `ds:152:97` ("Investor agent"
  * main component) and `site:434:2424` ("AI-agentti" screen frame).
  *
- * Layout: a fixed full-viewport surface (per AC-20a / AC-20b) with
- * a header ("Siili AI-avustaja"), an absolutely-positioned close
- * button (AC-20d, Figma `ds:196:853`) at the top-right, and a body
- * row that hosts an optional left sidebar (`PreviousDiscussionList`,
- * AC-33 / Figma `ds:191:258`) plus a content column containing the
- * Q+A stream and a textarea directly below the latest reply
- * (AC-28 / AC-28b). The surface itself is the scroll container so
- * the compact → expanded transition does not reflow the host page
- * (AC-20f) and auto-scroll keeps the latest reply and the input
- * visible together (AC-27 / AC-28c).
+ * Layout (amended 2026-05, Lane J — Figma re-align):
+ * - `.backdrop` — full-viewport `position: fixed` overlay. At or
+ *   above the §12.1 PD-05 desktop breakpoint (≥1024 px) it adds
+ *   padding so the inner `.surface` reads as a margin-around card,
+ *   and applies `backdrop-filter: blur(...)` over a translucent
+ *   white wash so the host page is visibly defocused (AC-20a, with
+ *   a solid `rgba(255, 255, 255, 0.7)` fallback for browsers that
+ *   do not support `backdrop-filter`).
+ * - `.surface` — the white card. Edge-to-edge below 1024 px
+ *   (AC-92c), inset with `border-radius` + subtle elevation at or
+ *   above 1024 px. Hosts an absolutely-positioned `CloseButton`
+ *   (AC-20d, Figma `ds:196:853`) at the top-right plus a centred
+ *   `.layout` wrapper that bounds the title row and body to a
+ *   comfortable max-width.
+ * - `.body` — flex row of `PreviousDiscussionList` (AC-33, Figma
+ *   `ds:191:258`), a 1 px vertical `.divider`, and `.contentColumn`.
+ * - `.contentColumn` — flex column with `.messages` (own overflow
+ *   container, `scrollbar-gutter: stable`, bottom `mask-image`
+ *   opacity fade per AC-28c) and `.inputWrapper` (bottom-pinned via
+ *   the column's flex layout, AC-28). Auto-scroll lands the latest
+ *   reply just above the input by calling `scrollIntoView` on a
+ *   sentinel inside `.messages`; the nearest scrollable ancestor
+ *   is `.messages` itself, so the scroll never leaks to the page.
  *
  * Sidebar visibility (AC-33, amended 2026-05): the sidebar is
  * rendered whenever the widget is in expanded mode, regardless of
@@ -20,13 +33,20 @@
  * permanent home of the AC-35 "Luo uusi keskustelu" CTA and the
  * AC-33e per-row delete `×`, both of which the user must always be
  * able to reach. The earlier "single-conversation hides the
- * sidebar" rule (AC-33c) is tombstoned.
+ * sidebar" rule (AC-33c) is tombstoned. Lane J also stripped the
+ * sidebar's outer background — the gray-400 surface lives on each
+ * row now, and a 1 px vertical divider separates the columns.
  *
  * AC-20j — `Esc` pressed anywhere inside the expanded surface
  * dismisses the chat by calling `onClose`. Activation of the close
  * button does the same. Whether dismiss balances the history stack
  * is owned by `App.tsx` based on the `interceptBackNavigation`
  * option.
+ *
+ * AC-20f — the `useEffect` that locks `html` / `body`
+ * `overflow: hidden` stays. The internal scroll surface moved from
+ * `.expanded` (Lane C) to `.messages` / `.items` (Lane J), but the
+ * host-page scroll lock is independent of that and still required.
  *
  * AC-80: the textarea is auto-focused on mount so the first keyboard
  * action lands on the primary input, regardless of whether the
@@ -75,7 +95,7 @@ export function ExpandedView({
   onStartNewConversation,
   onDeleteConversation,
 }: ExpandedViewProps) {
-  const inputRef = useRef<HTMLDivElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const html = document.documentElement
@@ -94,7 +114,7 @@ export function ExpandedView({
     const prefersReduce =
       typeof window !== 'undefined' &&
       window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    inputRef.current?.scrollIntoView({
+    messagesEndRef.current?.scrollIntoView({
       behavior: prefersReduce ? 'auto' : 'smooth',
       block: 'end',
     })
@@ -108,32 +128,46 @@ export function ExpandedView({
   }
 
   return (
-    <div className={styles.expanded} onKeyDown={handleKeyDown}>
-      <CloseButton onClick={onClose} className={styles.closeButton} />
-      <h2 className={styles.title}>Siili AI-avustaja</h2>
-      <div className={styles.body}>
-        <PreviousDiscussionList
-          conversations={conversations}
-          activeConversationId={activeConversationId}
-          onActivate={onActivateConversation}
-          onStartNew={onStartNewConversation}
-          onDelete={onDeleteConversation}
-        />
-        <div className={styles.contentColumn}>
-          <div className={styles.messages}>
-            {messages.map((message) => (
-              <ChatMessage key={message.id} message={message} />
-            ))}
-          </div>
-          <div ref={inputRef} className={styles.inputWrapper}>
-            <ChatInput
-              variant="expanded"
-              disabled={loading}
-              autoFocus
-              value={draft}
-              onValueChange={onDraftChange}
-              onSend={onSend}
+    <div className={styles.backdrop}>
+      <div className={styles.surface} onKeyDown={handleKeyDown}>
+        <CloseButton onClick={onClose} className={styles.closeButton} />
+        <div className={styles.layout}>
+          <h2 className={styles.title}>Siili AI-avustaja</h2>
+          <div className={styles.body}>
+            <PreviousDiscussionList
+              conversations={conversations}
+              activeConversationId={activeConversationId}
+              onActivate={onActivateConversation}
+              onStartNew={onStartNewConversation}
+              onDelete={onDeleteConversation}
             />
+            <div
+              className={styles.divider}
+              role="presentation"
+              aria-hidden="true"
+            />
+            <div className={styles.contentColumn}>
+              <div className={styles.messages}>
+                {messages.map((message) => (
+                  <ChatMessage key={message.id} message={message} />
+                ))}
+                <div
+                  ref={messagesEndRef}
+                  className={styles.messagesEnd}
+                  aria-hidden="true"
+                />
+              </div>
+              <div className={styles.inputWrapper}>
+                <ChatInput
+                  variant="expanded"
+                  disabled={loading}
+                  autoFocus
+                  value={draft}
+                  onValueChange={onDraftChange}
+                  onSend={onSend}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>

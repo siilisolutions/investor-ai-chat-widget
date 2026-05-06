@@ -36,6 +36,20 @@
   --send-overlay-hover: rgba(0, 0, 0, 0.2);
   --send-overlay-pressed: rgba(0, 0, 0, 0.4);
 
+  /*
+   * CTA gradient — used by the "Luo uusi keskustelu" pill (AC-35,
+   * Figma `ds:237:323`). Intentionally distinct from `--send-gradient`:
+   * the send button family runs at `-75deg blue→violet`, the CTA runs
+   * diagonally violet (top-left) → blue (bottom-right) at Figma's
+   * 117.63deg. Keeping the tokens separate means AC-72 send-button
+   * states stay untouched. (added 2026-05, Lane J — Figma re-align.)
+   */
+  --cta-gradient: linear-gradient(
+    117.63deg,
+    var(--violet-500) 0%,
+    var(--blue-500) 100%
+  );
+
   /* Typography */
   --font-family: 'Everett', sans-serif;
   --font-family-light: 'Everett Light', 'Everett', sans-serif;

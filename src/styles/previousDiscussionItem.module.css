@@ -2,10 +2,14 @@
  * Single previous-discussion row. The row is now a flex container
  * holding two sibling buttons: the activation button (carries the
  * label, fills available width, ellipsis-on-overflow) and the AC-33e
- * × delete button (fixed trailing slot). Active row uses the
- * gray-500 token (same as the question bubble) so the "you are here"
- * cue ties to existing widget surfaces; inactive rows are
- * transparent and reveal the sidebar's gray-400 background.
+ * × delete button (fixed trailing slot).
+ *
+ * Lane J (2026-05) — the gray-400 surface treatment lifted off the
+ * sidebar shell and onto each row so the sidebar's outer container
+ * is transparent (AC-33). Default rows are gray-400, hover is white
+ * (same as before), active is gray-500 (same as the question
+ * bubble) so the "you are here" cue stays tied to existing widget
+ * surfaces.
  */
 
 .row {
@@ -13,6 +17,7 @@
   display: flex;
   align-items: stretch;
   width: 100%;
+  background: var(--gray-400);
   border-radius: var(--radius);
   overflow: hidden;
   transition: background-color 120ms ease-out;
