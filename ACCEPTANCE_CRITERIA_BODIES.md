@@ -349,6 +349,21 @@ Maps to the Investor agent composition and its main component; see
   - **Given** expanded mode is shown,
   - **Then** the header reads *"Siili AI-avustaja"* styled per the
     Investor agent component (see §2.5 row AC-21).
+  - **Given** the viewport is at or above the §12.1 PD-05 desktop
+    breakpoint,
+  - **Then** the header sits left-aligned with the AC-33 sidebar
+    column.
+  - **Given** the viewport is below the §12.1 PD-05 mobile
+    breakpoint,
+  - **Then** the header sits inside a single top-bar row that also
+    holds the AC-33d hamburger affordance (left edge) and the
+    AC-20d close button (right edge), per `site:435:2904` /
+    `site:435:2914`. The AC-33 sidebar collapses behind the
+    hamburger on mobile per AC-33d, so the title's desktop
+    "left-aligned with the sidebar column" rule does not apply at
+    this breakpoint — instead the title flexes to fill the row
+    between the hamburger and close button.
+  (amended 2026-05, #PR — Mobile drawer landed: pin the mobile top-bar layout co-anchoring the title with the AC-33d hamburger and the AC-20d close button per `site:435:2904` / `site:435:2914`.)
 
 - **AC-22** — *Question bubble* · **@stable**
   - **Given** any Q+A pair,
@@ -590,19 +605,59 @@ Maps to the Investor agent composition and its main component; see
     the "store of one hides the sidebar" clause no longer holds.]
   (added 2026-04, Figma component drift; deprecated 2026-05, #PR — sidebar made always-visible.)
 
-- **AC-33d** — *Previous discussion list — mobile responsive treatment* · **@aspirational**
+- **AC-33d** — *Previous discussion list — mobile responsive treatment* · **@evolving**
   - **Given** the viewport is below the §12.1 PD-05 mobile
     breakpoint and the sidebar would otherwise be rendered (per
     AC-33),
-  - **Then** the sidebar collapses behind a discoverable
-    affordance (e.g. a hamburger / overflow toggle) so it does
-    not consume primary chat real-estate on a small screen,
-    while still being reachable in one tap.
-  - This row is currently *code-authored* — IR-site does not
-    publish a mobile-band Figma frame for the sidebar yet, so the
-    affordance shape is at engineering's discretion until a frame
-    lands.
-  (added 2026-04, Figma component drift)
+  - **Then** the sidebar collapses behind a hamburger toggle
+    (Figma component `ds:230:656` — Menu button, 24×24 with
+    three horizontal stripes) anchored at the left edge of the
+    AC-21 mobile top-bar row, so it does not consume primary
+    chat real-estate on a small screen while still being
+    reachable in one tap.
+  - **When** the user activates the hamburger,
+  - **Then** a drawer slides in from the left edge of the
+    expanded surface (Figma `ds:214:1214` — Mobile menu;
+    rendered in context inside `site:435:2914`). The drawer
+    card is white with the widget's brand drop-shadow, takes
+    roughly three-quarters of the viewport width
+    (~292 px on the 390 px frame), and contains, top to bottom:
+    a dismiss `×` button at the top-right of the card (Figma
+    component `ds:196:853`, the same close-glyph reused from
+    AC-20d but scoped to the drawer rather than the chat), and
+    the AC-33 `PreviousDiscussionList` rendered verbatim — the
+    AC-35 "Luo uusi keskustelu" CTA, the AC-33b row activation
+    affordances, and the AC-33e per-row delete `×` are all
+    reachable inside the drawer with no behavioural change.
+  - **Then** the rest of the expanded surface (the area behind
+    and beside the drawer card) is overlaid with a translucent
+    dark wash and a light backdrop blur (e.g.
+    `rgba(0,0,0,0.2)` + `backdrop-filter: blur(2px)` per
+    `ds:214:1214`) so the active conversation reads as visibly
+    *backgrounded* — the user can still see the chat behind the
+    drawer to keep their place, but interactions land on the
+    drawer until it is dismissed.
+  - **When** the user dismisses the drawer — by activating the
+    drawer's `×` button, pressing `Esc`, tapping the
+    blurred backdrop outside the drawer card, activating
+    "Luo uusi keskustelu" (AC-35), or activating any
+    discussion row (AC-33b) —
+  - **Then** the drawer closes. Activations of the AC-35 CTA
+    and the AC-33b rows still take their normal effect (mint a
+    new conversation / swap the active conversation); the
+    drawer simply auto-dismisses afterwards so the user is
+    returned to the conversation they just chose. Focus
+    returns to the hamburger toggle on close so keyboard users
+    can resume.
+  - The AC-33e per-row delete `×` does **not** dismiss the
+    drawer — its confirmation modal needs to render *over* the
+    drawer so the user can confirm or cancel without losing
+    sidebar context.
+  - The drawer is mounted only at this breakpoint band; at or
+    above the §12.1 PD-05 desktop breakpoint the AC-33 sidebar
+    renders inline as a column inside the conversation card and
+    the hamburger is absent.
+  (added 2026-04, Figma component drift; amended 2026-05, #PR — Mobile drawer landed: graduated @aspirational → @evolving, anchored to `ds:214:1214` / `ds:230:656` / `site:435:2914` (see §2.5 row AC-33d), pinned the slide-in drawer + blurred backdrop + dismiss paths.)
 
 - **AC-33e** — *Previous discussion item — per-row delete with confirmation* · **@evolving**
   - **Given** the AC-33 sidebar is rendered (i.e. the widget is in

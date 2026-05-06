@@ -1,9 +1,11 @@
 /*
  * Sidebar shell for the AC-33 previous-discussion list. Anchored to
  * the left of the expanded-view content column on desktop. Below the
- * §12.1 PD-05 mobile breakpoint the sidebar collapses to the top of
- * the surface as a horizontal pill row (AC-33d) — code-authored
- * because IR-site does not publish a mobile frame for this yet.
+ * §12.1 PD-05 mobile breakpoint the sidebar is hidden by
+ * `expandedView.module.css` and the AC-33d `MobileMenu` drawer hosts
+ * this same component verbatim — no mobile-specific styles live in
+ * this module any more (the drawer card supplies its own padding /
+ * shadow per `ds:214:1214`).
  *
  * Lane J (2026-05) — the sidebar's outer container is now
  * transparent: the gray-400 surface treatment lives on each
@@ -107,28 +109,4 @@
   gap: var(--space-xs);
   overflow-y: auto;
   scrollbar-gutter: stable;
-}
-
-@media (max-width: 639px) {
-  .list {
-    flex: 0 0 auto;
-    width: 100%;
-    align-self: stretch;
-  }
-
-  .newButton {
-    width: 100%;
-  }
-
-  .items {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-gutter: auto;
-  }
-
-  .items > li {
-    flex-shrink: 0;
-  }
 }

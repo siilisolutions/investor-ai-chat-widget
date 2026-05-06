@@ -1,0 +1,77 @@
+/*
+ * Menu button styles — matches Figma node `ds:230:656` (Menu
+ * button). Three 16×2.4 px stripes baseline-aligned at 7.2 px
+ * intervals inside a 24×24 icon frame. The button itself is
+ * 44×44 so the touch target stays comfortable (mirrors the
+ * AC-20d `CloseButton` policy); the hover / pressed surface is
+ * pinned to the icon frame's 24×24 footprint via the inner
+ * `.icon` element so the surface treatment matches Figma's
+ * 24×24 component bounds rather than the enlarged hit area.
+ *
+ * Reduced motion: hover transitions drop under
+ * `prefers-reduced-motion: reduce` (mirrors AC-20k's policy
+ * for the close button family).
+ */
+
+.menuButton {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family);
+  flex-shrink: 0;
+}
+
+.menuButton:focus-visible {
+  outline: 2px solid var(--black-500);
+  outline-offset: 2px;
+}
+
+.icon {
+  position: relative;
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-pill);
+  transition: background-color 120ms ease-out;
+}
+
+.menuButton:hover .icon {
+  background: var(--gray-300);
+}
+
+.menuButton:active .icon {
+  background: var(--gray-500);
+}
+
+.stripe {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  height: 2.4px;
+  background: var(--black-500);
+}
+
+.stripe:nth-child(1) {
+  top: 4px;
+}
+
+.stripe:nth-child(2) {
+  top: 11.2px;
+}
+
+.stripe:nth-child(3) {
+  top: 18.4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon {
+    transition: none;
+  }
+}

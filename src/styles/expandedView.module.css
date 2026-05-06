@@ -1,5 +1,8 @@
 /*
- * Expanded-view layout (amended 2026-05, Lane J — Figma re-align).
+ * Expanded-view layout (amended 2026-05, Lane J — Figma re-align;
+ * amended 2026-05, AC-33d Mobile drawer — added mobile top-bar
+ * layout + hides inline sidebar at <640 px so the AC-33d drawer
+ * owns mobile presentation).
  *
  * Outer chrome
  * ------------
@@ -16,16 +19,33 @@
  *
  * Internal layout
  * ---------------
- * `.surface` is the white card. It is itself a flex column holding
- * the absolute `.closeButton` (AC-20d) plus a centred `.layout`
- * wrapper that bounds the title row + body to a comfortable max-width.
+ * `.surface` is the white card (position: relative so the close
+ * button can absolute-position to its corner on tablet / desktop).
+ * Inside it sits a centred `.layout` wrapper that bounds the title
+ * row + body to a comfortable max-width.
+ *
+ * `.topBar` hosts the AC-33d hamburger (left, mobile only via CSS),
+ * the AC-21 title (flex-1), and the AC-20d `CloseButton`. The close
+ * button is rendered ONCE in the DOM and re-positioned per
+ * breakpoint:
+ * - Mobile (<640 px): in-flow at the right of `.topBar` per
+ *   `site:435:2904`.
+ * - Tablet / Desktop (≥640 px): `position: absolute` against
+ *   `.surface`'s top-right corner per `site:434:2424` (the title
+ *   then visually left-aligns with the sidebar column because the
+ *   close button is taken out of flex flow).
+ *
  * `.body` is a flex row of `PreviousDiscussionList` (transparent
- * shell, AC-33), a 1 px `.divider`, and `.contentColumn`. The content
- * column is itself a flex column holding `.messages` (own overflow
- * container with `scrollbar-gutter: stable` + a bottom mask-image
- * opacity fade per AC-28c) and `.inputWrapper` (bottom-pinned per
- * AC-28). `AC-27` auto-scroll lands the latest pair just above the
- * input via a sentinel inside `.messages`.
+ * shell, AC-33), a 1 px `.divider`, and `.contentColumn`. On mobile
+ * `.desktopSidebar` and `.divider` are hidden — the AC-33 sidebar
+ * is reachable only through the AC-33d drawer (`MobileMenu`,
+ * Figma `ds:214:1214`).
+ *
+ * The content column is itself a flex column holding `.messages`
+ * (own overflow container with `scrollbar-gutter: stable` + a bottom
+ * mask-image opacity fade per AC-28c) and `.inputWrapper`
+ * (bottom-pinned per AC-28). `AC-27` auto-scroll lands the latest
+ * pair just above the input via a sentinel inside `.messages`.
  *
  * The host-page scroll lock (`html` / `body` `overflow: hidden`) lives
  * in the component (`useEffect`) and stays — only the *internal*
@@ -74,28 +94,6 @@
 }
 
 /*
- * AC-20d — close button anchored to the top-right corner of the
- * surface (the white card). On desktop the surface has margin via
- * the backdrop's padding, so absolute positioning here sits the
- * button at the card corner; on mobile the surface fills the
- * viewport, so the button sits at the viewport corner — same intent
- * either way.
- */
-.closeButton {
-  position: absolute;
-  top: var(--space-lg);
-  right: var(--space-lg);
-  z-index: 1;
-}
-
-@media (max-width: 639px) {
-  .closeButton {
-    top: var(--space-sm);
-    right: var(--space-sm);
-  }
-}
-
-/*
  * `.layout` bounds title + body to a comfortable max-width and
  * centres them inside the surface. Both rows share the same wrapper
  * so the title's left edge aligns with the sidebar's left edge per
@@ -121,9 +119,30 @@
  */
 @media (max-width: 639px) {
   .layout {
-    padding: var(--space-xl) var(--space-lg) 0;
+    padding: var(--space-lg) var(--space-lg) 0;
     gap: var(--space-lg);
   }
+}
+
+/*
+ * Mobile (<640 px) default — top-bar row holds the hamburger
+ * (left), title (flex-1), and AC-20d close (right) per
+ * `site:435:2904`. The hamburger and the in-flow close are CSS-only
+ * affordances at this breakpoint (the hamburger is `display: none`
+ * above 640 px; the close jumps to `position: absolute` above
+ * 640 px — see the desktop block below).
+ */
+.topBar {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 100%;
+  gap: var(--space-xl);
+}
+
+.menuButton {
+  display: inline-flex;
+  flex-shrink: 0;
 }
 
 .title {
@@ -133,8 +152,37 @@
   line-height: normal;
   color: var(--black-500);
   margin: 0;
-  align-self: flex-start;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.closeButton {
   flex-shrink: 0;
+}
+
+/*
+ * Tablet / Desktop (≥640 px) — the hamburger is hidden and the
+ * close button jumps to `position: absolute` against `.surface`
+ * (top-right corner per AC-20d / `site:434:2424`). The title then
+ * visually left-aligns with the sidebar column because the close
+ * is taken out of flex flow and the title's `flex: 1 1 auto` fills
+ * the row.
+ */
+@media (min-width: 640px) {
+  .menuButton {
+    display: none;
+  }
+
+  .closeButton {
+    position: absolute;
+    top: var(--space-lg);
+    right: var(--space-lg);
+    z-index: 1;
+  }
+
+  .topBar {
+    gap: 0;
+  }
 }
 
 .body {
@@ -147,17 +195,21 @@
   width: 100%;
 }
 
-@media (max-width: 639px) {
-  .body {
-    flex-direction: column;
-    gap: var(--space-lg);
-  }
+/*
+ * AC-33 desktop — `.desktopSidebar` is just a wrapper that hosts the
+ * inline `PreviousDiscussionList` so the same parent file can hide
+ * the inline copy on mobile (the AC-33d drawer hosts its own copy
+ * on mobile per `ds:214:1214`).
+ */
+.desktopSidebar {
+  display: contents;
 }
 
 /*
  * AC-33 (Lane J) — 1 px vertical divider between the sidebar column
- * and the conversation column. Hidden when the body stacks vertically
- * on mobile.
+ * and the conversation column. Hidden on mobile (the sidebar moves
+ * into the AC-33d drawer at that breakpoint, so the divider has
+ * nothing to divide).
  */
 .divider {
   flex: 0 0 1px;
@@ -166,6 +218,10 @@
 }
 
 @media (max-width: 639px) {
+  .desktopSidebar {
+    display: none;
+  }
+
   .divider {
     display: none;
   }

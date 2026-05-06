@@ -1,0 +1,100 @@
+/*
+ * Mobile menu drawer — matches Figma component `ds:214:1214` and
+ * its in-context placement inside `site:435:2914`. Per AC-33d the
+ * drawer is mounted only at viewports below the §12.1 PD-05 mobile
+ * breakpoint; the parent (`ExpandedView`) is responsible for not
+ * rendering this component above that breakpoint.
+ *
+ * Visual contract:
+ * - `.backdrop` is an absolutely-positioned overlay covering the
+ *   expanded surface (`ExpandedView` is `position: fixed`, so this
+ *   anchors against the surface card via `inset: 0`). Background
+ *   is `rgba(0,0,0,0.2)` with `backdrop-filter: blur(2px)` so the
+ *   conversation behind the drawer reads as visibly backgrounded
+ *   without disappearing.
+ * - `.card` is the drawer card itself: white, ~75 % of viewport
+ *   width (capped at 292 px to mirror the Figma frame on a 390 px
+ *   screen), full surface height, with the brand drop-shadow.
+ *   16 px padding, 4 px gap between children to mirror Figma's
+ *   `gap-[4px]`.
+ * - `.closeRow` sits at the top of the card (h-24, justify-end)
+ *   with the dismiss `×` button at the trailing edge per
+ *   `ds:214:1214` (`213:1023` row).
+ *
+ * Reduced motion: the slide-in transform is dropped under
+ * `prefers-reduced-motion: reduce` so the drawer just appears.
+ */
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  animation: drawerBackdropFade 200ms ease-out;
+}
+
+@supports (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .backdrop {
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+}
+
+@keyframes drawerBackdropFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.card {
+  position: relative;
+  flex: 0 0 auto;
+  width: min(75vw, 292px);
+  background: var(--white-500);
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.25));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-lg);
+  box-sizing: border-box;
+  animation: drawerSlideIn 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes drawerSlideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/*
+ * Top-of-drawer row that hosts the dismiss `×`. Figma's `213:1023`
+ * row is 24 px tall around a 32×32 close button, but our shared
+ * `CloseButton` is 44×44 (AC-20d hit-target trade-off, same as the
+ * chat-level close); the row therefore flexes to fit instead of
+ * cropping the button.
+ */
+.closeRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .card {
+    animation: none;
+  }
+}
