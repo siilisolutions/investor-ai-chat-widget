@@ -201,14 +201,20 @@ describe('AC-80 — keyboard focus contract', () => {
     // Non-linked badges still render as spans (no extra anchor in the tree).
     const anchors = container.querySelectorAll('a[href]')
     expect(anchors).toHaveLength(0)
-    // The focus order in expanded mode includes the close button, the
-    // textarea, and the send button — and *only* those three (no
-    // anchor for the unlinked badge). Order is DOM-order.
+    // The focus order in expanded mode is DOM-order. AC-20d /
+    // AC-80's hard requirement is that the close button, textarea,
+    // and send button are all keyboard-reachable; the relative
+    // position of the sidebar's start-new CTA, row activate
+    // buttons, and per-row × delete (AC-33 / AC-35 / AC-33e — all
+    // reachable per AC-80's "every interactive surface keyboard-
+    // reachable" clause) is intentionally not pinned here.
     const order = focusOrder(container).map(describeElement)
-    expect(order).toEqual([
-      'button[Sulje keskustelu]',
-      'textarea[Siili investor chatbot message]',
-      'button[Send message]',
-    ])
+    expect(order).toContain('button[Sulje keskustelu]')
+    expect(order).toContain('textarea[Siili investor chatbot message]')
+    expect(order).toContain('button[Send message]')
+    // The unlinked badge does NOT enter focus order (no anchor in
+    // the tree). This is the assertion the original test was
+    // really protecting.
+    expect(order.some((s) => s.startsWith('a['))).toBe(false)
   })
 })

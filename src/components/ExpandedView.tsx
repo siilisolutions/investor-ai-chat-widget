@@ -14,9 +14,13 @@
  * (AC-20f) and auto-scroll keeps the latest reply and the input
  * visible together (AC-27 / AC-28c).
  *
- * Sidebar visibility (AC-33 / AC-33c): the sidebar is rendered only
- * when `conversations.length > 1`. With a single conversation the
- * widget falls back to the pre-AC-33 single-column layout.
+ * Sidebar visibility (AC-33, amended 2026-05): the sidebar is
+ * rendered whenever the widget is in expanded mode, regardless of
+ * how many conversations the PD-08 store holds. The sidebar is the
+ * permanent home of the AC-35 "Luo uusi keskustelu" CTA and the
+ * AC-33e per-row delete `×`, both of which the user must always be
+ * able to reach. The earlier "single-conversation hides the
+ * sidebar" rule (AC-33c) is tombstoned.
  *
  * AC-20j — `Esc` pressed anywhere inside the expanded surface
  * dismisses the chat by calling `onClose`. Activation of the close
@@ -103,22 +107,18 @@ export function ExpandedView({
     }
   }
 
-  const showSidebar = conversations.length > 1
-
   return (
     <div className={styles.expanded} onKeyDown={handleKeyDown}>
       <CloseButton onClick={onClose} className={styles.closeButton} />
       <h2 className={styles.title}>Siili AI-avustaja</h2>
       <div className={styles.body}>
-        {showSidebar && (
-          <PreviousDiscussionList
-            conversations={conversations}
-            activeConversationId={activeConversationId}
-            onActivate={onActivateConversation}
-            onStartNew={onStartNewConversation}
-            onDelete={onDeleteConversation}
-          />
-        )}
+        <PreviousDiscussionList
+          conversations={conversations}
+          activeConversationId={activeConversationId}
+          onActivate={onActivateConversation}
+          onStartNew={onStartNewConversation}
+          onDelete={onDeleteConversation}
+        />
         <div className={styles.contentColumn}>
           <div className={styles.messages}>
             {messages.map((message) => (

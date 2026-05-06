@@ -75,13 +75,13 @@
 }
 
 /*
- * AC-33 — when at least two conversations exist, `.body` hosts a
- * sidebar to the left of the content column. With only one
- * conversation the sidebar is not rendered (AC-33c) and the body
- * collapses gracefully to the single content column. Below the
- * §12.1 PD-05 mobile breakpoint the body stacks vertically — sidebar
- * collapses to a horizontal pill row above the messages (AC-33d,
- * code-authored).
+ * AC-33 (amended 2026-05) — `.body` hosts the sidebar to the left
+ * of the content column whenever expanded mode is open, regardless
+ * of how many conversations the PD-08 store holds (the earlier
+ * "single-conversation hides the sidebar" rule, AC-33c, is
+ * tombstoned). Below the §12.1 PD-05 mobile breakpoint the body
+ * stacks vertically — sidebar collapses to a horizontal pill row
+ * above the messages (AC-33d, code-authored).
  */
 .body {
   display: flex;

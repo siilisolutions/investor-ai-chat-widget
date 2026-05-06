@@ -27,7 +27,7 @@ describe('conversationStore — PD-08 storage', () => {
     clearAll()
   })
 
-  it('AC-33c: a fresh tab session starts with zero conversations', () => {
+  it('AC-31e: a fresh browser profile (cleared site storage) starts with zero conversations', () => {
     expect(listConversations()).toEqual([])
   })
 

@@ -5,6 +5,11 @@
  *   AC-83 — reduced-motion auto-scroll behaviour.
  *   AC-20d — close button rendering, hit target, and aria-label.
  *   AC-20j — close button activation + Esc dismiss both call `onClose`.
+ *   AC-33  — sidebar visibility (always rendered in expanded mode,
+ *             both single-conversation and multi-conversation cases).
+ *   AC-33b — per-row activation calls `onActivateConversation`.
+ *   AC-33e — per-row × calls `onDeleteConversation` with id + label.
+ *   AC-35  — start-new-conversation button calls `onStartNewConversation`.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/preact'
@@ -211,7 +216,7 @@ describe('ExpandedView — AC-33 sidebar visibility', () => {
     scrollSpy.mockRestore()
   })
 
-  it('AC-33c: with only the active conversation, the sidebar is not rendered', () => {
+  it('AC-33: with only the active conversation, the sidebar is still rendered so the user can reach the AC-35 start-new CTA and the AC-33e per-row delete', () => {
     render(
       <ExpandedView
         messages={[MESSAGE]}
@@ -227,10 +232,25 @@ describe('ExpandedView — AC-33 sidebar visibility', () => {
         onDeleteConversation={NOOP}
       />,
     )
-    expect(screen.queryByRole('complementary')).toBeNull()
-    // The "Aiemmat keskustelut" heading lives only inside the sidebar,
-    // so its absence proves the sidebar was not rendered.
-    expect(screen.queryByText('Aiemmat keskustelut')).toBeNull()
+    expect(
+      screen.getByRole('complementary', { name: 'Aiemmat keskustelut' }),
+    ).toBeInTheDocument()
+    // The AC-35 start-new CTA is the always-reachable surface that
+    // motivates AC-33's amended always-visible rule.
+    expect(
+      screen.getByRole('button', { name: 'Luo uusi keskustelu' }),
+    ).toBeInTheDocument()
+    // The single conversation appears as a row, marked active.
+    const onlyRow = screen.getByRole('button', {
+      name: 'Mikä on yhtiön osinkopolitiikka?',
+    })
+    expect(onlyRow).toHaveAttribute('aria-current', 'true')
+    // The AC-33e per-row delete × is reachable on the only row.
+    expect(
+      screen.getByRole('button', {
+        name: 'Poista keskustelu — Mikä on yhtiön osinkopolitiikka?',
+      }),
+    ).toBeInTheDocument()
   })
 
   it('AC-33: with two conversations the sidebar renders with both rows and the active row marked aria-current', () => {

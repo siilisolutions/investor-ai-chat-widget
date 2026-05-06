@@ -36,8 +36,13 @@
  *   restores it.
  * - Starting a new conversation from inside expanded mode (AC-35)
  *   mints an id, saves an empty entry, and sets it as active.
- *   Previous conversations remain in the store and surface in the
- *   sidebar from the moment a second conversation exists.
+ *   Previous conversations remain in the store and surface as
+ *   additional rows in the AC-33 sidebar (which is always
+ *   rendered in expanded mode, amended 2026-05).
+ * - Confirming a per-row delete (AC-33e) removes the row from the
+ *   PD-08 store. Removing the only remaining row mints a fresh
+ *   empty conversation as the new active and stays in expanded
+ *   mode — the always-visible sidebar requires at least one row.
  *
  * Back-navigation contract (AC-20c / AC-20g / AC-20h / AC-20i):
  * when `interceptBackNavigation` is on (default), the compact →
@@ -324,13 +329,13 @@ export function App({ chatService, interceptBackNavigation = true }: AppProps) {
   // the in-memory store. If the removed row was active, switch the
   // active conversation to the next-most-recent remaining row
   // (mirrors AC-33b activation semantics — state-only, no service
-  // call). The "store ends empty" branch is defensive only — the
-  // sidebar (and therefore the × affordance) requires
-  // conversations.length > 1 per AC-33c, so this is unreachable
-  // through normal UI flow; we mint a fresh empty conversation
-  // up-front (so the side effect lives outside the setStore updater
-  // and doesn't double-fire under StrictMode) and drop the user
-  // back to compact mode in the same render.
+  // call). When the removed row is the *only* remaining
+  // conversation, mint a fresh empty conversation as the new active
+  // and stay in expanded mode — the AC-33 always-visible-sidebar
+  // invariant requires at least one row at all times. The
+  // replacement is constructed up-front (outside the setStore
+  // updater) so the side effect doesn't double-fire under
+  // StrictMode.
   const handleConfirmDelete = useCallback(() => {
     if (!pendingDelete) return
     const removedId = pendingDelete.id
@@ -357,8 +362,6 @@ export function App({ chatService, interceptBackNavigation = true }: AppProps) {
             : prev.activeId,
       }
     })
-
-    if (willBeEmpty) setMode('compact')
   }, [pendingDelete, conversations])
 
   return (

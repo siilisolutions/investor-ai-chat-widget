@@ -114,7 +114,10 @@ describe('App', () => {
     fireEvent.input(textarea, { target: { value: 'Q1' } })
     fireEvent.keyDown(textarea, { key: 'Enter' })
     await screen.findByText('first answer')
-    expect(screen.getByText('Q1')).toBeInTheDocument()
+    // Each question now appears in two places — the Q+A bubble and
+    // the sidebar row label (sidebar is always visible per AC-33,
+    // amended 2026-05). `getAllByText` covers both.
+    expect(screen.getAllByText('Q1').length).toBeGreaterThan(0)
 
     const expandedTextarea = screen.getByLabelText(
       'Siili investor chatbot message',
@@ -126,9 +129,9 @@ describe('App', () => {
     await screen.findByText('second answer')
 
     // Prior pair still rendered, unchanged
-    expect(screen.getByText('Q1')).toBeInTheDocument()
+    expect(screen.getAllByText('Q1').length).toBeGreaterThan(0)
     expect(screen.getByText('first answer')).toBeInTheDocument()
-    expect(screen.getByText('Q2')).toBeInTheDocument()
+    expect(screen.getAllByText('Q2').length).toBeGreaterThan(0)
   })
 
   it('AC-33b: switching between conversations restores each one\u2019s draft and does not call the service', async () => {
@@ -240,8 +243,8 @@ describe('App', () => {
     expect(await screen.findByText('newer')).toBeInTheDocument()
     // The older conversation's answer is NOT in the active stream.
     expect(screen.queryByText('older')).not.toBeInTheDocument()
-    // Both conversations surface in the sidebar (≥ 2 conversations
-    // → AC-33 visibility threshold met).
+    // Both conversations surface in the sidebar (always rendered
+    // in expanded mode per AC-33 amended 2026-05).
     expect(
       screen.getByRole('button', { name: 'older question?' }),
     ).toBeInTheDocument()
@@ -291,8 +294,8 @@ describe('App', () => {
     // sidebar row label).
     expect(screen.queryByText('prior answer')).not.toBeInTheDocument()
 
-    // The prior conversation surfaces in the sidebar (sidebar appears
-    // as soon as a second conversation exists).
+    // The prior conversation surfaces in the sidebar (always
+    // rendered in expanded mode per AC-33 amended 2026-05).
     expect(
       screen.getByRole('button', { name: 'prior question?' }),
     ).toBeInTheDocument()
@@ -329,13 +332,20 @@ describe('App', () => {
 
     await screen.findByText('first answer')
 
-    // Sidebar's visibility threshold is conversations.length > 1.
-    // If the send had spuriously minted a second conversation, the
-    // sidebar would render and the new conversation's empty label
-    // would surface. Confirm it does not.
+    // Sidebar is always rendered in expanded mode (AC-33 amended
+    // 2026-05). Exactly one row should appear — the active one
+    // labelled with the question we just asked. If AC-31f had
+    // spuriously minted a second conversation the sidebar would
+    // carry two rows.
     expect(
-      screen.queryByRole('complementary', { name: 'Aiemmat keskustelut' }),
-    ).not.toBeInTheDocument()
+      screen.getByRole('complementary', { name: 'Aiemmat keskustelut' }),
+    ).toBeInTheDocument()
+    const rows = screen.getAllByRole('button', { name: 'first question' })
+    // The same text appears twice in the DOM — once in the Q+A
+    // bubble and once as the sidebar row label — but only the
+    // sidebar row is a button.
+    expect(rows).toHaveLength(1)
+    expect(rows[0]).toHaveAttribute('aria-current', 'true')
   })
 
   it('AC-33e: × on a row opens the confirmation dialog showing the row\u2019s label and a cancel does nothing', async () => {
@@ -435,11 +445,107 @@ describe('App', () => {
     }
     expect(parsed.conversations.map((c) => c.id)).toEqual(['conv-B'])
 
-    // With only one conversation left the sidebar disappears
-    // (AC-33c invariant survives the removal).
+    // Sidebar is always rendered in expanded mode (AC-33 amended
+    // 2026-05) — surviving the removal it now carries exactly one
+    // row (conv-B's).
     expect(
-      screen.queryByRole('complementary', { name: 'Aiemmat keskustelut' }),
+      screen.getByRole('complementary', { name: 'Aiemmat keskustelut' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Question B?' }),
+    ).toBeInTheDocument()
+  })
+
+  it('AC-33e: deleting the only remaining conversation mints a fresh empty conversation and stays in expanded mode', async () => {
+    saveConversation({
+      id: 'conv-only',
+      messages: [
+        {
+          id: 'm-only',
+          question: 'only question?',
+          answer: 'only answer',
+        },
+      ],
+      draft: '',
+    })
+
+    const service = makeService(async () => ({
+      id: 'never',
+      question: 'q',
+      answer: 'never',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    // Hero shows the continue-pill because hasHistory is true.
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Jatka edellistä keskustelua' }),
+    )
+
+    // Sidebar visible (AC-33 always-visible amended 2026-05) with
+    // exactly one row — the only seeded conversation.
+    expect(
+      screen.getByRole('complementary', { name: 'Aiemmat keskustelut' }),
+    ).toBeInTheDocument()
+
+    // Click the per-row × on the only row.
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Poista keskustelu — only question?' }),
+    )
+    fireEvent.click(await screen.findByRole('button', { name: 'Poista' }))
+
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+    )
+
+    // The widget stays in expanded mode — the textarea is mounted
+    // and the close button is rendered. (Compact mode would render
+    // the suggestion chips and no close button.)
+    expect(
+      screen.getByLabelText('Siili investor chatbot message'),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Sulje keskustelu' }),
+    ).toBeInTheDocument()
+    // Suggestion chips (compact-only) are NOT in the DOM.
+    expect(
+      screen.queryByRole('button', {
+        name: 'Mikä on yhtiön nykyinen osinkopolitiikka?',
+      }),
     ).not.toBeInTheDocument()
+
+    // Sidebar is still rendered, with a single row labelled with
+    // PreviousDiscussionList's NEUTRAL_LABEL ("Uusi keskustelu") —
+    // the freshly-minted replacement has no Q+A pair yet.
+    expect(
+      screen.getByRole('complementary', { name: 'Aiemmat keskustelut' }),
+    ).toBeInTheDocument()
+    const replacementRow = screen.getByRole('button', {
+      name: 'Uusi keskustelu',
+    })
+    expect(replacementRow).toHaveAttribute('aria-current', 'true')
+
+    // The deleted conversation is gone from the active stream and
+    // from the sidebar.
+    expect(screen.queryByText('only answer')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'only question?' }),
+    ).not.toBeInTheDocument()
+
+    // PD-08 store reflects the swap: the original id is gone, a
+    // fresh id is in.
+    const raw = window.localStorage.getItem('siili.conversationStore.v1')
+    const parsed = JSON.parse(raw as string) as {
+      conversations: { id: string; messages: unknown[] }[]
+    }
+    expect(parsed.conversations).toHaveLength(1)
+    expect(parsed.conversations[0].id).not.toBe('conv-only')
+    expect(parsed.conversations[0].messages).toEqual([])
+
+    // No service call across the entire delete + replacement path.
+    expect(
+      (service.sendMessage as ReturnType<typeof vi.fn>).mock.calls.length,
+    ).toBe(0)
   })
 
   it('AC-33e: removing the active conversation switches the active stream to the next-most-recent remaining row', async () => {

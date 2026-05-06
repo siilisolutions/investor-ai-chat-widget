@@ -3,14 +3,15 @@
  * expanded mode. Maps to Figma node `ds:191:258` (Previous discussion
  * list).
  *
- * Visibility contract (AC-33 / AC-33c): the list is rendered by
- * `ExpandedView` only when *more than the active conversation*
- * exists in the PD-08 store. When only the active conversation is
- * present (typical first-ever expanded session in a new tab), the
- * sidebar is not rendered at all and the expanded view falls back to
- * the single-column layout. This component is therefore always
- * called with at least two conversations; it does not render an
- * empty state itself.
+ * Visibility contract (AC-33, amended 2026-05): the list is rendered
+ * by `ExpandedView` whenever the widget is in expanded mode,
+ * regardless of how many conversations the PD-08 store holds. The
+ * earlier "single-conversation hides the sidebar" rule (AC-33c) is
+ * tombstoned — the sidebar is the permanent home of the AC-35 "Luo
+ * uusi keskustelu" CTA and the AC-33e per-row delete `×`, both of
+ * which the user must always be able to reach in expanded mode. The
+ * row list is never empty: the "expanded always has an active
+ * conversation" invariant guarantees at least one row.
  *
  * Per AC-33a, each row is a `PreviousDiscussionItem` with a label
  * derived from the first user question of that conversation,

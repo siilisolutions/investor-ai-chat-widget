@@ -451,8 +451,8 @@ Maps to the Investor agent composition and its main component; see
   - **Then** the conversations remain available — none of those
     boundaries are reset signals. The user re-enters the host page
     with the continue-pill (AC-10a) reachable on the hero and the
-    sidebar (AC-33) populated as soon as the store holds more than
-    one conversation.
+    sidebar (AC-33) populated with the persisted rows as soon as
+    they re-enter expanded mode.
   - **Given** the user clears site storage via browser tooling (or
     a different browser profile loads the host page),
   - **Then** the store is empty and the widget mounts in its
@@ -472,8 +472,8 @@ Maps to the Investor agent composition and its main component; see
     store, sets it as the active conversation, transitions to
     expanded mode, and the new Q+A pair is the first entry in that
     fresh conversation. Earlier conversations are preserved in the
-    store and surface in the AC-33 sidebar from the moment a second
-    conversation exists.
+    store and surface in the AC-33 sidebar (which is always
+    rendered in expanded mode).
   - **Given** the widget is in compact mode and the active
     conversation has no Q+A pairs (typical of the first-ever send
     in a new browser profile),
@@ -510,18 +510,24 @@ Maps to the Investor agent composition and its main component; see
     first send triggers the transition to expanded and AC-28 / AC-29
     govern where the input lands.
 
-- **AC-33** — *Previous discussion list — visibility* · **@aspirational**
-  - **Given** the widget is in expanded mode and the conversation
-    store (per PD-08) holds at least one prior conversation
-    distinct from the active one,
-  - **Then** a sidebar listing the prior conversations is rendered
-    alongside the Q+A stream, so the user can switch between them
-    without losing the active draft.
-  - **Given** the conversation store holds zero prior conversations
-    (covered fully by AC-33c),
-  - **Then** the sidebar is not rendered and the expanded view
-    falls back to the single-column layout that exists today.
-  (added 2026-04, Figma component drift)
+- **AC-33** — *Previous discussion list — visibility* · **@evolving**
+  - **Given** the widget is in expanded mode,
+  - **Then** the sidebar (Figma `ds:191:258`, see §2.5 row AC-33)
+    is rendered alongside the Q+A stream, regardless of how many
+    conversations the PD-08 store holds. The sidebar is the
+    permanent home of two affordances the user must always be able
+    to reach in expanded mode: the "Luo uusi keskustelu" CTA
+    (AC-35) and the per-row delete `×` (AC-33e). The active
+    conversation is always one of the rows — the "expanded always
+    has an active conversation" invariant guarantees the row list
+    is never empty.
+  - **Given** the viewport is below the §12.1 PD-05 mobile
+    breakpoint,
+  - **Then** the always-visible rule is satisfied by the AC-33d
+    discoverable affordance (drawer / overflow toggle) — the
+    sidebar's *contents* remain reachable in one tap; AC-33d owns
+    the visual collapse, AC-33 only asserts reachability.
+  (added 2026-04, Figma component drift; amended 2026-05, #PR — sidebar now always visible in expanded mode so the user can always reach the start-new and per-row delete affordances; AC-33c tombstoned)
 
 - **AC-33a** — *Previous discussion list — items render* · **@aspirational**
   - **Given** the sidebar is rendered (per AC-33),
@@ -551,15 +557,12 @@ Maps to the Investor agent composition and its main component; see
     the draft.
   (added 2026-04, Figma component drift)
 
-- **AC-33c** — *Previous discussion list — empty state* · **@aspirational**
-  - **Given** the conversation store contains only the active
-    conversation (typical of the first-ever expanded session in a
-    new tab),
-  - **Then** the sidebar is not rendered — the user is not shown
-    an empty list or a placeholder, and the expanded view uses
-    the existing single-column layout. The sidebar appears only
-    once a second conversation exists.
-  (added 2026-04, Figma component drift)
+- **AC-33c** — *(deprecated) Previous discussion list — empty state* · **@aspirational**
+  - [DEPRECATED 2026-05 — superseded by AC-33, reason: the sidebar
+    is now always visible in expanded mode so the user can always
+    reach the AC-35 start-new CTA and the AC-33e per-row delete `×`;
+    the "store of one hides the sidebar" clause no longer holds.]
+  (added 2026-04, Figma component drift; deprecated 2026-05, #PR — sidebar made always-visible.)
 
 - **AC-33d** — *Previous discussion list — mobile responsive treatment* · **@aspirational**
   - **Given** the viewport is below the §12.1 PD-05 mobile
@@ -576,12 +579,14 @@ Maps to the Investor agent composition and its main component; see
   (added 2026-04, Figma component drift)
 
 - **AC-33e** — *Previous discussion item — per-row delete with confirmation* · **@evolving**
-  - **Given** the AC-33 sidebar is rendered (PD-08 store holds
-    more than the active conversation per AC-33c),
+  - **Given** the AC-33 sidebar is rendered (i.e. the widget is in
+    expanded mode — sidebar visibility no longer gates on the
+    conversation count, see the AC-33c tombstone),
   - **Then** each `PreviousDiscussionItem` row carries a trailing
     dismiss (`×`) affordance scoped to that row's conversation
-    id. The glyph is the `ResetButton` already surfaced by the
-    live `get_code_connect_map` snippet on `ds:191:258`,
+    id, including the only row when the store holds a single
+    conversation. The glyph is the `ResetButton` already surfaced
+    by the live `get_code_connect_map` snippet on `ds:191:258`,
     rendered at the trailing edge of the row inside `ds:191:268`.
   - **When** the user activates the `×` (click or keyboard),
   - **Then** an in-widget confirmation modal opens, centered in
@@ -612,10 +617,13 @@ Maps to the Investor agent composition and its main component; see
     removed conversation was the active one, the active
     conversation switches to the next-most-recent remaining row
     (mirrors AC-33b activation semantics — state-only, no network
-    call). Removing the *only* remaining conversation drops the
-    user back to compact mode with a fresh empty conversation as
-    the new active (consistent with the "expanded always has an
-    active conversation" invariant).
+    call). Removing the *only* remaining conversation mints a
+    fresh empty conversation, sets it as the new active, and
+    keeps the user in expanded mode (consistent with the
+    "expanded always has an active conversation" invariant and
+    the AC-33 always-visible-sidebar invariant — the sidebar
+    re-populates with the freshly-minted row, the Q+A stream
+    clears, and the textarea clears).
   - **When** the user cancels — by activating the cancel button,
     pressing `Esc`, or clicking the blurred backdrop outside the
     modal card —
@@ -629,13 +637,11 @@ Maps to the Investor agent composition and its main component; see
     [`.cursor/rules/ac-amending.mdc`](.cursor/rules/ac-amending.mdc)
     §AC Authoring an `@evolving` body describes intent and defers
     visuals to §2.5.
-  (added 2026-05, #PR — Multi-discussion delete flow; amended 2026-05, #PR — Figma `ds:242:490` confirmation modal landed; graduated @aspirational → @evolving; amended 2026-05, #PR — backdrop click resolved as cancel + neutral-label fallback confirmed)
+  (added 2026-05, #PR — Multi-discussion delete flow; amended 2026-05, #PR — Figma `ds:242:490` confirmation modal landed; graduated @aspirational → @evolving; amended 2026-05, #PR — backdrop click resolved as cancel + neutral-label fallback confirmed; amended 2026-05, #PR — single-leftover-row delete now mints fresh & stays expanded, aligning with AC-33 always-visible sidebar)
 
 - **AC-35** — *Start-new-conversation affordance in expanded mode* · **@stable**
-  - **Given** the widget is in expanded mode and the AC-33 sidebar
-    is rendered (per AC-33 / AC-33c — i.e. the PD-08 store holds
-    more than the active conversation, or the equivalent mobile
-    drawer is open per AC-33d),
+  - **Given** the widget is in expanded mode (the AC-33 sidebar is
+    therefore always rendered, regardless of conversation count),
   - **Then** a primary-CTA affordance sits at the top of the
     sidebar — above the "Aiemmat keskustelut" heading — labelled
     "Luo uusi keskustelu" and styled as a brand-gradient pill
@@ -654,14 +660,12 @@ Maps to the Investor agent composition and its main component; see
     draft. The previously-active conversation is preserved in the
     store and remains a row in the same sidebar; no network call
     is made on activation alone (per the same contract as AC-33b).
-  - **Given** the PD-08 store holds only the active conversation
-    (the AC-33c empty-sidebar state),
-  - **Then** the in-expanded affordance is not directly reachable
-    by design — the path to grow the store from one entry is the
-    AC-31f compact-mode flow (dismiss via close / Esc / back-nav,
-    then send a new message from compact). Once a second
-    conversation exists, the sidebar — and this affordance with
-    it — surfaces from then on.
+  - The in-expanded affordance is reachable from any expanded
+    state — including the case where the PD-08 store holds only
+    the active conversation. The AC-31f compact-mode flow remains
+    a valid alternative path (dismiss via close / Esc / back-nav,
+    then send a new message from compact), but it is no longer
+    the only path to grow the store from one entry.
   - This AC closes a gap that emerged during the Figma component
     drift (2026-04): the AC-33 sidebar cluster only describes
     *switching* between existing conversations; without AC-35 the
@@ -673,7 +677,7 @@ Maps to the Investor agent composition and its main component; see
     icon, Hover / Pressed) and the Code Connect mapping landed in
     the same week, graduating the AC `@aspirational` →
     `@evolving` → `@stable`.
-  (added 2026-04, Figma component drift; amended 2026-05, multi-discussion flow rework; amended 2026-05, parity landed + Code Connect mapped)
+  (added 2026-04, Figma component drift; amended 2026-05, multi-discussion flow rework; amended 2026-05, parity landed + Code Connect mapped; amended 2026-05, #PR — sidebar always visible per AC-33 means the store-of-one reachability caveat is dropped)
 
 - **AC-34** — *Per-conversation title in expanded view* · **@aspirational**
   - **Given** the widget is in expanded mode showing a specific

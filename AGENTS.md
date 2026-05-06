@@ -16,9 +16,9 @@ Host page (siili.com)
                  ├─ CompactView (hero input + chips)
                  │    └─ ChatInput
                  │         └─ ContinuePill (AC-10a / site:395:5439 — rendered when prior history exists)
-                 └─ ExpandedView (chat messages + input + close button + optional sidebar)
+                 └─ ExpandedView (chat messages + input + close button + sidebar)
                       ├─ CloseButton (× top-right, AC-20d / ds:196:853)
-                      ├─ PreviousDiscussionList (sidebar, AC-33 / ds:191:258 — rendered when >1 conversation)
+                      ├─ PreviousDiscussionList (sidebar, AC-33 / ds:191:258 — always rendered in expanded mode, amended 2026-05)
                       │    └─ PreviousDiscussionItem (row, AC-33a / ds:191:268)
                       ├─ ChatMessage (question bubble + answer + sources)
                       │    └─ SourceBadge (reference pill)
@@ -30,7 +30,7 @@ Host page (siili.com)
 - `expanded → compact`: user clicks the close button, presses `Esc`, or triggers browser back. `messages` is preserved (AC-31).
 - The widget stays in expanded mode once a conversation starts unless dismissed.
 
-**Conversation store (PD-08, amended 2026-05):** `App` owns an array of `Conversation` objects keyed by id plus an `activeId`. The store is hydrated from `localStorage` on mount and persisted on every message append; reloads, tab close, and browser restart all preserve history (AC-31e). The store is reset only when the user clears site storage via browser tooling. Activating a sidebar row swaps `activeId` only — no network call (AC-33b). Compact-mode sends mint a fresh conversation when the active one already holds Q+A pairs (AC-31f); the continue-pill (AC-10a / AC-10c, Figma `site:395:5439`) re-enters the most-recent stored conversation. Starting a new conversation from inside expanded mode (AC-35) mints a fresh id and appends to the store.
+**Conversation store (PD-08, amended 2026-05):** `App` owns an array of `Conversation` objects keyed by id plus an `activeId`. The store is hydrated from `localStorage` on mount and persisted on every message append; reloads, tab close, and browser restart all preserve history (AC-31e). The store is reset only when the user clears site storage via browser tooling. Activating a sidebar row swaps `activeId` only — no network call (AC-33b). Compact-mode sends mint a fresh conversation when the active one already holds Q+A pairs (AC-31f); the continue-pill (AC-10a / AC-10c, Figma `site:395:5439`) re-enters the most-recent stored conversation. Starting a new conversation from inside expanded mode (AC-35) mints a fresh id and appends to the store. Per-row delete (AC-33e) removes the row from the store; deleting the only remaining row mints a fresh empty conversation as the new active and stays in expanded mode (the AC-33 always-visible-sidebar invariant requires at least one row).
 
 ## Figma — The Source of Truth for All Visual Work
 
@@ -159,13 +159,13 @@ All tokens live in `src/styles/variables.css` as CSS custom properties. These va
 | `src/App.tsx` | Root component — manages compact/expanded mode, the multi-conversation store (per PD-08), back-navigation interceptor (AC-20c / AC-20g / AC-20i), and dismiss flow (AC-20j / AC-31) |
 | `src/components/CompactView.tsx` | Hero mode: input + suggestion chips + optional continue-pill |
 | `src/components/ContinuePill.tsx` | "Jatka edellistä keskustelua" affordance inside the compact textarea shell (AC-10a / AC-10c, Figma `site:395:5439`) |
-| `src/components/ExpandedView.tsx` | Chat mode: messages list + input + close button + optional sidebar (2-column layout) |
+| `src/components/ExpandedView.tsx` | Chat mode: messages list + input + close button + sidebar (2-column layout, sidebar always rendered per AC-33 amended 2026-05) |
 | `src/components/ChatInput.tsx` | Shared textarea + send button (compact/expanded variants) |
 | `src/components/ChatMessage.tsx` | Single Q&A pair with optional sources and loading state |
 | `src/components/SourceBadge.tsx` | Reference pill (link or static) |
 | `src/components/SuggestionChip.tsx` | Predefined question chip |
 | `src/components/CloseButton.tsx` | × button rendered top-right of expanded view (AC-20d, Figma `ds:196:853`) |
-| `src/components/PreviousDiscussionList.tsx` | Sidebar of past conversations (AC-33, Figma `ds:191:258`); only rendered when more than one conversation exists |
+| `src/components/PreviousDiscussionList.tsx` | Sidebar of past conversations (AC-33, Figma `ds:191:258`); always rendered in expanded mode (amended 2026-05) — permanent home of the AC-35 "Luo uusi keskustelu" CTA and the AC-33e per-row × delete |
 | `src/components/PreviousDiscussionItem.tsx` | Single sidebar row (AC-33a, Figma `ds:191:268`) — flex container holding the activate button (label, AC-33b) and the per-row × delete button (AC-33e) as siblings; label derived from first user question of the conversation |
 | `src/components/ConfirmDialog.tsx` | Modal confirmation surface for destructive actions (AC-33e per-row delete; Figma card `ds:242:490`). Centered viewport overlay + blurred backdrop; three cancel paths (cancel button / `Esc` / backdrop click); focus captured on open and restored on close |
 | `src/services/chatService.ts` | **MOCK** chat service — used when `WidgetOptions.apiUrl` is omitted (dev default) |
@@ -342,7 +342,7 @@ When you add a new React component that has a corresponding main component in IR
 - [x] **Close discussion button (`ds:196:853`)** — `src/components/CloseButton.tsx` ships in `ExpandedView` and is connected in Figma. Visual confirmation against Figma is still pending; ACs AC-20d / AC-20j / AC-20k are now `@evolving`.
 - [x] **Back-navigation interception** — browser-back dismisses expanded mode via `App.tsx` push/popstate logic. `WidgetOptions.interceptBackNavigation` (default `true`) opts in. ACs AC-20c / AC-20g / AC-20h / AC-20i are `@evolving`.
 - [x] **Continue-conversation pill (compact)** — `src/components/ContinuePill.tsx` renders *"Jatka edellistä keskustelua"* inside the compact textarea shell whenever prior history exists. AC-10a / AC-10c are `@evolving` (graduated from `@aspirational` in the 2026-05 multi-discussion flow rework). AC-31b (compact re-entry surfaces continue-pill and hides asked chips) is still `@aspirational` — its rendering half is now satisfied; the chip-de-duplication half (AC-10b) is not yet implemented.
-- [x] **Previous discussion sidebar (`ds:191:258` / `ds:191:268`)** — `PreviousDiscussionList` + `PreviousDiscussionItem` ship in `ExpandedView`'s 2-column layout, are connected in Figma, and are backed by `src/services/conversationStore.ts` (PD-08 localStorage). AC-33 / AC-33a / AC-33b / AC-33c / AC-33d remain `@aspirational` until Figma confirms the visual; AC-35 (start-new affordance) is also `@aspirational`.
+- [x] **Previous discussion sidebar (`ds:191:258` / `ds:191:268`)** — `PreviousDiscussionList` + `PreviousDiscussionItem` ship in `ExpandedView`'s 2-column layout, are connected in Figma, and are backed by `src/services/conversationStore.ts` (PD-08 localStorage). The sidebar is now always rendered in expanded mode (AC-33 amended 2026-05 from `@aspirational` → `@evolving`; the earlier "≥ 2 conversations to render" rule, AC-33c, is tombstoned). AC-33a / AC-33b / AC-33d remain `@aspirational` until Figma confirms the visual; AC-35 graduated to `@stable` separately.
 - [x] **Hero textarea variant (`ds:181:144`)** — the widget renders both variants via `ChatInput`'s `compact` prop and the variant resolves through the `181:143` Code Connect parent set.
 - [ ] **Everett font loading** — assumes host page loads the font; may need `@font-face` fallback
 - [ ] **Streaming responses** — current interface is request/response; add SSE/WebSocket support
