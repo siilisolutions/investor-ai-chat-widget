@@ -7,7 +7,9 @@
  *           all map to a single user-safe Finnish string; no leakage of
  *           status codes, URLs, or payload bodies.
  *   AC-52 — POSTs `{ messages: ChatTurn[] }` to the configured URL,
- *           preserving chronological order.
+ *           preserving chronological order, with the
+ *           `X-Disable-Continuous-Eval: true` perf header set on every
+ *           request.
  *   AC-53 — maps `{ response }` → ChatMessage; ignores unknown fields;
  *           forward-compatibly surfaces `sources` when present and
  *           drops malformed source entries.
@@ -63,6 +65,18 @@ describe('createApiChatService', () => {
     expect(url).toBe(API_URL)
     expect(init.method).toBe('POST')
     expect(JSON.parse(init.body as string)).toEqual({ messages: history })
+  })
+
+  it('AC-52: sends `X-Disable-Continuous-Eval: true` on every request to keep the agent fast', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ response: 'ok' }))
+    await createApiChatService(API_URL).sendMessage([
+      { role: 'user', content: 'q' },
+    ])
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit]
+    const headers = init.headers as Record<string, string>
+    expect(headers['Content-Type']).toBe('application/json')
+    expect(headers['X-Disable-Continuous-Eval']).toBe('true')
   })
 
   it('AC-53: maps `{ response }` to a ChatMessage using the last user turn as the question', async () => {

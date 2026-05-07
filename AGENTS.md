@@ -257,6 +257,7 @@ The real `ChatService` adapter already ships with the widget (`src/services/apiC
 - **Dev**: copy the URL into `.env.local` as `VITE_API_URL=…` (git-ignored via `*.local`) and run `npm run dev`. `src/main.tsx` reads it and forwards it to `init()`. Leave the var unset to iterate against the bundled mock.
 - **CORS**: the backend must allowlist the host origin plus `http://localhost:5173` for dev. The widget never falls back to a proxy.
 - **History**: per AC-52, every call posts the full successful-turn history as `{ messages: [{ role: "user" | "assistant", content: string }, …] }`. Loading placeholders and errored pairs are filtered out by `App.tsx`.
+- **Perf header**: per AC-52, every request carries `X-Disable-Continuous-Eval: true` so the backend skips its continuous-evaluation pass. The header is unconditional; if a slow/evaluated mode is ever wanted as a debug aid, that's a new `WidgetOptions` toggle and a separate AC.
 - **Response shape**: the adapter expects `{ response: string }` (plain text per AC-N1). Unknown fields are ignored; if the backend adds `sources: [{ label, href? }]` later, the adapter already picks them up with no code change (AC-53).
 - **Error / timeout**: non-2xx responses, network failures, and requests past 30 s are mapped to a user-safe Finnish string (AC-43 / AC-44). Raw errors are logged to the console only in dev builds.
 

@@ -68,7 +68,10 @@ export function createApiChatService(apiUrl: string): ChatService {
     try {
       response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Disable-Continuous-Eval': 'true',
+        },
         body: JSON.stringify({ messages: history }),
         signal: controller.signal,
       })

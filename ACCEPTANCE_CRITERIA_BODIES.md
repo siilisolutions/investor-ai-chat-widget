@@ -861,11 +861,16 @@ Maps to the Investor agent composition and its main component; see
     AC-40) MUST be excluded from the posted history — only
     successfully-completed turns, plus the new user message, are
     sent.
+  - **Then** every request carries an `X-Disable-Continuous-Eval:
+    true` header so the backend skips its continuous-evaluation
+    pass; this is a static, unconditional header — the widget has
+    no UI affordance to opt back in to slower / evaluated mode.
   - **Then** history is kept in React state for in-flight rendering
     plus the PD-08 `localStorage` store for cross-session
     persistence (AC-31e); it is not exposed on `window` and is
     not shared with any server beyond the explicit POST to
     `apiUrl`.
+  (amended 2026-05, #PR — added X-Disable-Continuous-Eval perf header so the backend can skip its continuous-evaluation pass on every request)
 
 - **AC-53** — *Real-backend adapter — response mapping and forward-compatible schema* · **@evolving**
   - **Given** the backend returns `{ "response": "…answer text…" }`
