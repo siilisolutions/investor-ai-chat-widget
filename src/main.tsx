@@ -5,6 +5,9 @@
  *
  * Set `VITE_API_URL` in `.env.local` to point dev at the real
  * backend; leave it unset to use the bundled mock (AC-04, AC-51).
+ * Set `VITE_PRIVACY_POLICY_URL` in `.env.local` to surface a real
+ * privacy-policy link inside the AC-66b *Lue lisää* long-form;
+ * leave it unset to render the long form without a trailing link.
  * This file is not part of the library bundle (see `vite.config.ts`
  * → `build.lib.entry`), so the env var never leaks into production.
  */
@@ -12,8 +15,13 @@
 import { init } from './widget.tsx'
 
 const apiUrl = import.meta.env.VITE_API_URL
+const privacyPolicyUrl = import.meta.env.VITE_PRIVACY_POLICY_URL
 
 init({
   container: '#siili-chatbot',
   apiUrl: typeof apiUrl === 'string' && apiUrl.length > 0 ? apiUrl : undefined,
+  privacyPolicyUrl:
+    typeof privacyPolicyUrl === 'string' && privacyPolicyUrl.length > 0
+      ? privacyPolicyUrl
+      : undefined,
 })

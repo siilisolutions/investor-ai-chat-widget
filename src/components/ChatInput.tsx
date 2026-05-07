@@ -36,7 +36,18 @@ interface ChatInputProps {
   autoFocus?: boolean
   value?: string
   onValueChange?: (next: string) => void
-  onSend: (message: string) => void
+  /**
+   * Submit handler. Most callers ignore the return value and let
+   * `submit()` clear the textarea on the happy path. A caller that
+   * intercepts the send (e.g. App's AC-66 terms gate, which queues
+   * the message instead of dispatching it) can return `false` to
+   * signal "deferred" — `submit()` will then leave the textarea
+   * value untouched so the user can continue editing or re-submit
+   * after the gate closes. Any other return value (`void`, a
+   * `Promise`, a truthy primitive) keeps the existing
+   * clear-on-submit behaviour.
+   */
+  onSend: (message: string) => unknown
   /**
    * Optional trailing slot rendered inside the shell, after the send
    * button. Used in compact mode for the AC-10a continue-pill (Figma
@@ -92,7 +103,13 @@ export function ChatInput({
   const submit = () => {
     const trimmed = value.trim()
     if (!trimmed || disabled) return
-    onSend(trimmed)
+    // AC-66: an explicit `false` return means the caller deferred the
+    // send (e.g. App's terms gate intercepted) and the input should
+    // be preserved verbatim so the user can keep editing or
+    // re-submit after the gate closes. Any other return value
+    // (`void`, a Promise, etc.) keeps the existing clear-on-submit
+    // behaviour for every other caller.
+    if (onSend(trimmed) === false) return
     setValue('')
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto'

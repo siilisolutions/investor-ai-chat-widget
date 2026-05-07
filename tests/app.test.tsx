@@ -23,6 +23,10 @@ import { App } from '../src/App'
 import { buildHistory } from '../src/chatHistory'
 import { SAFE_ERROR } from '../src/errorCopy'
 import { saveConversation } from '../src/services/conversationStore'
+import {
+  clearAcceptance as clearTermsAcceptance,
+  getAcceptance as getTermsAcceptance,
+} from '../src/services/termsStore'
 import type {
   ChatMessage,
   ChatService,
@@ -722,5 +726,169 @@ describe('App', () => {
     expect(document.body.textContent ?? '').not.toContain(leakyMessage)
 
     errorSpy.mockRestore()
+  })
+})
+
+describe('App — AC-66 Käyttöehdot terms-of-use gate', () => {
+  it('AC-66: first compact-mode textarea send opens the Käyttöehdot dialog and does not call the chat service', async () => {
+    clearTermsAcceptance()
+
+    const service = makeService(async () => ({
+      id: 'never',
+      question: 'q',
+      answer: 'never',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    const textarea = screen.getByLabelText(
+      'Siili investor chatbot message',
+    ) as HTMLTextAreaElement
+    fireEvent.input(textarea, { target: { value: 'first ever question' } })
+    fireEvent.keyDown(textarea, { key: 'Enter' })
+
+    expect(
+      await screen.findByRole('dialog', { name: 'Käyttöehdot' }),
+    ).toBeInTheDocument()
+    // The chat service is *not* called while the gate is open — the
+    // queued question is held in App state.
+    expect(
+      (service.sendMessage as ReturnType<typeof vi.fn>).mock.calls.length,
+    ).toBe(0)
+  })
+
+  it('AC-66: first compact-mode chip click opens the gate and holds the suggestion until accept', async () => {
+    clearTermsAcceptance()
+
+    const service = makeService(async (history) => ({
+      id: 'fresh',
+      question: history[history.length - 1].content,
+      answer: 'fresh answer',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Mikä on yhtiön nykyinen osinkopolitiikka?',
+      }),
+    )
+
+    expect(
+      await screen.findByRole('dialog', { name: 'Käyttöehdot' }),
+    ).toBeInTheDocument()
+    expect(
+      (service.sendMessage as ReturnType<typeof vi.fn>).mock.calls.length,
+    ).toBe(0)
+  })
+
+  it('AC-66: activating Hyväksyn käyttöehdot persists acceptance, replays the queued send, and transitions to expanded', async () => {
+    clearTermsAcceptance()
+
+    const service = makeService(async (history) => ({
+      id: 'fresh',
+      question: history[history.length - 1].content,
+      answer: 'first ever answer',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    const textarea = screen.getByLabelText(
+      'Siili investor chatbot message',
+    ) as HTMLTextAreaElement
+    fireEvent.input(textarea, { target: { value: 'first ever question' } })
+    fireEvent.keyDown(textarea, { key: 'Enter' })
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Hyväksyn käyttöehdot' }),
+    )
+
+    // The replay of the queued send actually reaches the chat
+    // service and the answer renders in the expanded view.
+    await screen.findByText('first ever answer')
+
+    // The persisted flag survives the test (acceptance is the
+    // whole point of AC-66c).
+    expect(getTermsAcceptance()).toBe(true)
+
+    // The chat service was called exactly once — the gate did not
+    // double-fire on the replay.
+    expect(
+      (service.sendMessage as ReturnType<typeof vi.fn>).mock.calls.length,
+    ).toBe(1)
+  })
+
+  it('AC-66: Peruuta dismisses the gate without sending and preserves the textarea draft verbatim', async () => {
+    clearTermsAcceptance()
+
+    const service = makeService(async () => ({
+      id: 'never',
+      question: 'q',
+      answer: 'never',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    const textarea = screen.getByLabelText(
+      'Siili investor chatbot message',
+    ) as HTMLTextAreaElement
+    fireEvent.input(textarea, { target: { value: 'half-typed thought' } })
+    fireEvent.keyDown(textarea, { key: 'Enter' })
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Peruuta' }),
+    )
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('dialog', { name: 'Käyttöehdot' }),
+      ).not.toBeInTheDocument(),
+    )
+
+    // Still in compact: the chips are visible, the textarea is the
+    // hero textarea, and the draft survived intact.
+    expect(
+      screen.getByRole('button', {
+        name: 'Mikä on yhtiön nykyinen osinkopolitiikka?',
+      }),
+    ).toBeInTheDocument()
+    const compactTextarea = screen.getByLabelText(
+      'Siili investor chatbot message',
+    ) as HTMLTextAreaElement
+    expect(compactTextarea.value).toBe('half-typed thought')
+
+    // No service call across the entire intercepted-and-cancelled path.
+    expect(
+      (service.sendMessage as ReturnType<typeof vi.fn>).mock.calls.length,
+    ).toBe(0)
+    // Acceptance was not silently flipped on cancel.
+    expect(getTermsAcceptance()).toBe(false)
+  })
+
+  it('AC-66c: a returning profile with stored acceptance bypasses the gate on first send', async () => {
+    // Setup file already pre-seeds acceptance; this test only
+    // affirms that the gate stays out of the way for that
+    // steady-state.
+    expect(getTermsAcceptance()).toBe(true)
+
+    const service = makeService(async (history) => ({
+      id: 'fresh',
+      question: history[history.length - 1].content,
+      answer: 'returning answer',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    const textarea = screen.getByLabelText(
+      'Siili investor chatbot message',
+    ) as HTMLTextAreaElement
+    fireEvent.input(textarea, { target: { value: 'returning question' } })
+    fireEvent.keyDown(textarea, { key: 'Enter' })
+
+    await screen.findByText('returning answer')
+    // The dialog never opened.
+    expect(
+      screen.queryByRole('dialog', { name: 'Käyttöehdot' }),
+    ).not.toBeInTheDocument()
   })
 })

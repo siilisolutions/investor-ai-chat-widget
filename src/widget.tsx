@@ -57,6 +57,11 @@ export function init(options: WidgetOptions): void {
   }
   const chatService = resolveService(options.apiUrl)
   const interceptBackNavigation = options.interceptBackNavigation !== false
+  const privacyPolicyUrl =
+    typeof options.privacyPolicyUrl === 'string' &&
+    options.privacyPolicyUrl.trim().length > 0
+      ? options.privacyPolicyUrl.trim()
+      : undefined
   const root = createRoot(el)
   roots.set(el, root)
   root.render(
@@ -64,6 +69,7 @@ export function init(options: WidgetOptions): void {
       <App
         chatService={chatService}
         interceptBackNavigation={interceptBackNavigation}
+        privacyPolicyUrl={privacyPolicyUrl}
       />
     </StrictMode>
   )

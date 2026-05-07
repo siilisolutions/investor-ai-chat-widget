@@ -979,6 +979,71 @@ financial decisions. They apply primarily to the backend, but the
     assistant (the "Siili AI-avustaja" header, plus any disclaimer
     required by legal).
 
+- **AC-66** — *Terms-of-use gate intercepts the first send* · **@evolving**
+  - **Given** a browser profile that has not yet activated *Hyväksyn
+    käyttöehdot* in this widget,
+  - **When** the user activates a send from compact mode (textarea
+    Enter / send-button click, or suggestion-chip activation),
+  - **Then** the queued message is held and the *Käyttöehdot* dialog
+    renders centred over a dimmed full-viewport backdrop, mirroring
+    the AC-33e confirmation-dialog shell (Figma `ds:242:490`) with
+    *Käyttöehdot*-specific copy and the `--cta-gradient` primary
+    button. Activating *Hyväksyn käyttöehdot* persists acceptance
+    (see AC-66c), dismisses the gate, and proceeds with the queued
+    message — the widget transitions to expanded mode with the
+    question already on its way to the chat service. Activating
+    *Peruuta* dismisses the gate without sending: the widget remains
+    in compact mode and the textarea draft (if any) is preserved
+    verbatim for the user to edit or re-submit. Once acceptance is
+    recorded, subsequent sends in the same browser profile bypass
+    the gate entirely (see AC-66c). The mounted dialog also covers
+    the `Esc`-to-dismiss and backdrop-click-to-dismiss paths the
+    AC-33e shell already provides; both are equivalent to *Peruuta*
+    here.
+  - **Owner:** widget — internally implementable end-to-end against
+    the host page's `WidgetOptions.privacyPolicyUrl` (the link target
+    is the only host-supplied value; gate behaviour itself ships in
+    the widget).
+  (added 2026-05, #PR — Käyttöehdot terms gate landed)
+
+- **AC-66b** — *Terms-of-use gate — Lue lisää expansion* · **@evolving**
+  - **Given** the AC-66 gate is showing the short form,
+  - **When** the user activates the *Lue lisää* link inside the
+    dialog body,
+  - **Then** the body swaps in-place to the long-form *Käyttöehdot*
+    copy (canonical Finnish; English parity follows AC-63) inside a
+    scrollable region; the dialog card height does not grow to
+    accommodate it, and the surrounding scrollbar consumes its own
+    column space. The toggle becomes *Näytä vähemmän* and returns
+    to the short form on activation. Section headings (e.g.
+    *Tietojen luonne ja ajantasaisuus*, *Oikeudelliset rajoitukset*,
+    *Tekoälyjärjestelmän rajoitukset*, *Henkilötietojen käsittely*)
+    are emphasised with `<strong>`. When the host page passes
+    `WidgetOptions.privacyPolicyUrl`, the long form's
+    privacy-policy sentence renders that URL as an anchor with
+    `target="_blank" rel="noopener noreferrer"` (mirrors AC-25b's
+    link semantics); when absent, the sentence stands alone with
+    no broken-looking placeholder. Per AC-N1 all body copy is plain
+    text and `<strong>` only — no Markdown, no HTML injection.
+  (added 2026-05, #PR — Käyttöehdot terms gate landed)
+
+- **AC-66c** — *Terms acceptance persists across sessions* · **@evolving**
+  - **Given** the user has previously activated *Hyväksyn
+    käyttöehdot* in the same browser profile,
+  - **When** that profile mounts the widget on any later page load
+    (reload, tab close + reopen, browser restart),
+  - **Then** sends bypass the gate and proceed directly to the chat
+    service. Acceptance is keyed under `siili.termsAccepted.v1`,
+    mirroring PD-08's keying convention; bumping the schema version
+    reprompts on the next send so legal can re-collect consent if
+    the copy changes materially. Storage failures (private mode,
+    quota exceeded, missing `Storage` API) degrade *fail-closed* —
+    the gate continues to show until acceptance can be persisted —
+    rather than silently letting the user through. The store is a
+    plain boolean keyed on the schema version; it never holds PII
+    (per AC-N1's spirit and the AC-120b non-PII posture).
+  (added 2026-05, #PR — Käyttöehdot terms gate landed)
+
 ---
 
 ## 5. Visual Design & Brand (Award-Critical)

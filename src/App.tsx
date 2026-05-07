@@ -57,12 +57,26 @@
  * (AC-31). Persistence across tab close and browser restart is
  * satisfied by the `localStorage` choice in PD-08 (AC-31e); the
  * earlier "tab close clears" contract (AC-31c) is tombstoned.
+ *
+ * Käyttöehdot terms gate (AC-66 / AC-66b / AC-66c): on the very
+ * first compact-mode send (textarea or chip) for a browser profile
+ * that has not yet accepted, `handleSend` intercepts the call, holds
+ * the queued question, and opens `TermsDialog`. *Hyväksyn
+ * käyttöehdot* persists acceptance via `termsStore.setAcceptance`
+ * and replays the queued send through `dispatchSend`. *Peruuta*
+ * (button / `Esc` / backdrop click) closes the dialog without
+ * sending — the textarea draft is preserved verbatim because the
+ * intercept happens before `dispatchSend` clears it. Once accepted,
+ * subsequent sends bypass the gate. Storage failures degrade
+ * fail-closed: `setAcceptance` returns `false` and the gate stays
+ * up rather than letting the user through.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CompactView } from './components/CompactView.tsx'
 import { ConfirmDialog } from './components/ConfirmDialog.tsx'
 import { ExpandedView } from './components/ExpandedView.tsx'
+import { TermsDialog } from './components/TermsDialog.tsx'
 import { buildHistory } from './chatHistory.ts'
 import { SAFE_ERROR } from './errorCopy.ts'
 import {
@@ -71,6 +85,10 @@ import {
   listConversations,
   saveConversation,
 } from './services/conversationStore.ts'
+import {
+  getAcceptance as getTermsAcceptance,
+  setAcceptance as setTermsAcceptance,
+} from './services/termsStore.ts'
 import type { ChatService, Conversation } from './types/index.ts'
 import styles from './styles/app.module.css'
 
@@ -88,6 +106,7 @@ const nextMessageId = () => `msg-${++messageCounter}`
 interface AppProps {
   chatService: ChatService
   interceptBackNavigation?: boolean
+  privacyPolicyUrl?: string
 }
 
 const HISTORY_MARKER = 'siiliExpanded'
@@ -117,11 +136,23 @@ interface PendingDelete {
   label: string
 }
 
-export function App({ chatService, interceptBackNavigation = true }: AppProps) {
+export function App({
+  chatService,
+  interceptBackNavigation = true,
+  privacyPolicyUrl,
+}: AppProps) {
   const [mode, setMode] = useState<Mode>('compact')
   const [{ conversations, activeId }, setStore] =
     useState<ConversationState>(initializeStore)
   const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null)
+  // AC-66 / AC-66c — terms gate state. `termsAccepted` is hydrated
+  // from localStorage on first render so a returning profile bypasses
+  // the gate immediately; `pendingQuestion` holds the queued send
+  // while the gate is open so accepting can replay it.
+  const [termsAccepted, setTermsAcceptedState] = useState<boolean>(
+    getTermsAcceptance,
+  )
+  const [pendingQuestion, setPendingQuestion] = useState<string | null>(null)
   const pushedRef = useRef(false)
 
   // Memoized so each derived reference is stable when neither the
@@ -205,7 +236,13 @@ export function App({ chatService, interceptBackNavigation = true }: AppProps) {
     [activeId, updateConversation],
   )
 
-  const handleSend = useCallback(
+  // Internal — the network-and-state path. Assumes the AC-66 terms
+  // gate has already been satisfied (or doesn't apply for this
+  // profile). `handleSend` below is the gated wrapper called by
+  // `CompactView` / `ExpandedView`; `handleAcceptTerms` calls this
+  // directly when replaying the queued send so it doesn't re-enter
+  // the gate.
+  const dispatchSend = useCallback(
     async (question: string) => {
       const turnId = nextMessageId()
       // AC-31f — compact-mode send mints a fresh conversation when
@@ -268,6 +305,52 @@ export function App({ chatService, interceptBackNavigation = true }: AppProps) {
     },
     [activeId, chatService, messages, mode, updateConversation],
   )
+
+  // AC-66 — gated wrapper. On the first compact-mode send for a
+  // profile that hasn't yet accepted, hold the queued question and
+  // open the terms dialog instead of dispatching. The textarea
+  // draft is naturally preserved because (a) we never reach
+  // `dispatchSend`'s `draft: ''` write for the expanded-mode
+  // controlled path, and (b) returning `false` synchronously tells
+  // `ChatInput.submit()` to skip its own clear-on-submit step for
+  // the uncontrolled compact-mode textarea. Once acceptance is
+  // recorded (in localStorage and `termsAccepted` state), this
+  // branch is bypassed for the rest of the profile's lifetime.
+  const handleSend = useCallback(
+    (question: string): false | Promise<void> => {
+      if (!termsAccepted) {
+        setPendingQuestion(question)
+        return false
+      }
+      return dispatchSend(question)
+    },
+    [dispatchSend, termsAccepted],
+  )
+
+  // AC-66 / AC-66c — accept handler. Persists the acceptance flag
+  // (fail-closed: if the storage write reports failure we leave the
+  // gate up rather than letting the user through), updates in-memory
+  // state, and replays any queued send through `dispatchSend` so the
+  // gate-free path runs even though the closure-over-`termsAccepted`
+  // in `handleSend` may not have re-rendered yet.
+  const handleAcceptTerms = useCallback(() => {
+    const persisted = setTermsAcceptance(true)
+    if (!persisted) return
+    setTermsAcceptedState(true)
+    const queued = pendingQuestion
+    setPendingQuestion(null)
+    if (queued !== null) {
+      void dispatchSend(queued)
+    }
+  }, [dispatchSend, pendingQuestion])
+
+  // AC-66 — cancel handler. Drops the queued question and closes the
+  // dialog. The compact textarea draft is preserved automatically
+  // because `dispatchSend` (which would have cleared it) was never
+  // called.
+  const handleCancelTerms = useCallback(() => {
+    setPendingQuestion(null)
+  }, [])
 
   // AC-10c — activate the continue-pill: re-enter expanded mode
   // pointing at the most-recent conversation that has Q+A pairs. No
@@ -401,6 +484,12 @@ export function App({ chatService, interceptBackNavigation = true }: AppProps) {
         confirmLabel="Poista"
         onCancel={handleCancelDelete}
         onConfirm={handleConfirmDelete}
+      />
+      <TermsDialog
+        open={pendingQuestion !== null}
+        onAccept={handleAcceptTerms}
+        onCancel={handleCancelTerms}
+        privacyPolicyUrl={privacyPolicyUrl}
       />
     </div>
   )

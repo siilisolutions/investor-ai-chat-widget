@@ -83,7 +83,9 @@ If the host has its own asset pipeline (e.g. HubSpot `/hubfs/`), download the tw
 
 `interceptBackNavigation` is also optional and defaults to `true`. With it on, the compact → expanded transition pushes a synthetic history entry so the browser back button (or Android hardware back) dismisses the chat instead of navigating away from the host page; the close button (`×`) and `Esc` use the same dismiss path. Set `interceptBackNavigation: false` if the host page already manages its own history stack and would prefer the widget not touch it — the close button and `Esc` continue to dismiss, they just won't call `history.back()` to balance the stack.
 
-For local development against the real backend, copy the endpoint into `.env.local` as `VITE_API_URL=…` (the file is git-ignored) and run `npm run dev`.
+`privacyPolicyUrl` is also optional. The widget shows a *Käyttöehdot* (terms-of-use) gate on a profile's **first send** (AC-66) and the gate's *Lue lisää* long form ends with a sentence that links to the host site's privacy policy when this URL is supplied (rendered as a `target="_blank" rel="noopener noreferrer"` anchor, AC-66b). Omit it and the long form renders the same sentence without a link. Acceptance is persisted in `localStorage` so the gate only appears once per browser profile (AC-66c).
+
+For local development against the real backend, copy the endpoint into `.env.local` as `VITE_API_URL=…` (the file is git-ignored) and run `npm run dev`. To surface a real privacy-policy link in the dev harness's terms gate, also add `VITE_PRIVACY_POLICY_URL=…` to the same file.
 
 ### Option C — Staging: auto-track latest release
 

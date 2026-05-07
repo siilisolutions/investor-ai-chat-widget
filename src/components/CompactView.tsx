@@ -25,7 +25,14 @@ import styles from '../styles/compactView.module.css'
 
 interface CompactViewProps {
   suggestions: string[]
-  onSend: (message: string) => void
+  /**
+   * Submit handler — typed `unknown` so the AC-66 terms-gate signal
+   * (an explicit `false` return from App's `handleSend` when the
+   * gate intercepts) flows through to `ChatInput.submit()` without
+   * being widened away by a `void` declaration in the prop chain.
+   * Most callers (chip click, happy-path send) ignore the return.
+   */
+  onSend: (message: string) => unknown
   /**
    * Whether the PD-08 store contains at least one conversation with
    * messages. Gates the AC-10a continue-pill. Defaults to `false` so

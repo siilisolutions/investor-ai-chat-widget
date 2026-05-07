@@ -1,0 +1,191 @@
+/*
+ * `termsDialog.module.css` — scoped styles for the AC-66 Käyttöehdot
+ * gate (Figma `ds:257:1096` short / `ds:242:551` long, in screen
+ * context `site:555:2186`). The card mirrors the AC-33e
+ * `confirmDialog.module.css` shell — same white surface, `--radius`,
+ * `--textarea-shadow`, 32 px padding, 32 px section gap, bold 24/24
+ * title (`ds:242:431`), 16/22 body (`ds:242:550` → `ds:242:433`),
+ * 16 px-gap actions row (`ds:242:443`) with outlined cancel + a
+ * `--cta-gradient` primary button (`ds:242:609` "Hyväksyn
+ * käyttöehdot") instead of the destructive red AC-33e variant.
+ *
+ * The body region is scrollable in the long form per `ds:242:551`'s
+ * scrollbar (`ds:242:578`); short form (`ds:257:1096`) has nothing
+ * to scroll so the same overflow rule is a no-op there.
+ *
+ * Z-index sits one above `.expanded` (which uses 2147483000) so the
+ * dialog is always over the chat surface but below the absolute-max
+ * int (some host pages reserve that for their own top-level UI).
+ */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  z-index: 2147483646;
+  animation: termsDialogFadeIn 200ms ease;
+}
+
+.card {
+  background: var(--white-500);
+  border-radius: var(--radius);
+  box-shadow: var(--textarea-shadow);
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  max-width: 520px;
+  width: 100%;
+  max-height: min(600px, 100vh - var(--space-2xl));
+  box-sizing: border-box;
+  animation: termsDialogScaleIn 200ms ease;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-family-bold);
+  font-size: 24px;
+  line-height: 24px;
+  letter-spacing: 0.216px;
+  color: var(--black-500);
+  text-align: left;
+}
+
+.body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 22px;
+  letter-spacing: 0.144px;
+  color: var(--black-500);
+  width: 100%;
+  word-break: break-word;
+  scrollbar-gutter: stable;
+}
+
+.body p {
+  margin: 0;
+}
+
+.body p + p {
+  margin-top: var(--space-md);
+}
+
+.body strong {
+  font-family: var(--font-family-bold);
+}
+
+.expandToggle,
+.policyLink {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--blue-500);
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
+  cursor: pointer;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color 150ms ease;
+}
+
+.expandToggle:focus-visible,
+.policyLink:focus-visible {
+  outline-color: var(--blue-500);
+  border-radius: 2px;
+}
+
+.policyLink {
+  display: inline;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-lg);
+  width: 100%;
+}
+
+.cancel,
+.confirm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm) 20px;
+  border-radius: var(--radius);
+  font-family: var(--font-family);
+  font-size: 14px;
+  line-height: 24px;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color 150ms ease, filter 120ms ease;
+}
+
+.cancel {
+  background: transparent;
+  border: 1px solid var(--black-500);
+  color: var(--black-500);
+}
+
+.confirm {
+  background: var(--cta-gradient);
+  border: none;
+  color: var(--white-500);
+}
+
+.cancel:focus-visible,
+.confirm:focus-visible {
+  outline-color: var(--blue-500);
+}
+
+.confirm:hover {
+  filter: brightness(0.92);
+}
+
+.confirm:active {
+  filter: brightness(0.84);
+}
+
+@keyframes termsDialogFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes termsDialogScaleIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .card {
+    animation: none;
+  }
+  .cancel,
+  .confirm,
+  .expandToggle,
+  .policyLink {
+    transition: none;
+  }
+}

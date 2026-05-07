@@ -87,9 +87,18 @@ export interface ChatService {
  *   intercepted (AC-20h). Set to `false` to opt out (AC-20i) — the
  *   close button (AC-20d) and `Esc` (AC-20j) still dismiss, but the
  *   browser back button passes through to host-page navigation.
+ * - `privacyPolicyUrl` — optional URL the AC-66 *Käyttöehdot* gate's
+ *   long-form body links to (Figma `ds:242:551`). When supplied, the
+ *   privacy-policy sentence at the end of the long form renders an
+ *   anchor with `target="_blank" rel="noopener noreferrer"` (AC-66b,
+ *   mirrors AC-25b's link semantics). When omitted, the sentence
+ *   stands alone with no broken-looking placeholder. The URL itself
+ *   lives on the host page so it can be rotated without a widget
+ *   rebuild — same posture as `apiUrl`.
  */
 export interface WidgetOptions {
   container: string | HTMLElement
   apiUrl?: string
   interceptBackNavigation?: boolean
+  privacyPolicyUrl?: string
 }
