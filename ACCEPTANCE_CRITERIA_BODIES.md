@@ -570,18 +570,32 @@ Maps to the Investor agent composition and its main component; see
     column).
   (added 2026-04, Figma component drift; amended 2026-05, #PR — sidebar now always visible in expanded mode so the user can always reach the start-new and per-row delete affordances; AC-33c tombstoned; amended 2026-05, Lane J — Figma re-align: transparent shell + per-row treatment + vertical divider + scroll isolation, per `ds:191:258` / `site:434:2424`.)
 
-- **AC-33a** — *Previous discussion list — items render* · **@aspirational**
+- **AC-33a** — *Previous discussion list — items render* · **@evolving**
   - **Given** the sidebar is rendered (per AC-33),
   - **Then** each prior conversation is represented by a row whose
     label identifies the conversation to the user (e.g. derived
     from the first user question in that conversation, truncated
     to fit the row), so the user can recognise which thread is
     which.
+  - **Given** an inactive row is hovered or activated,
+  - **Then** the row's idle, hovered, and active surfaces come from
+    the same Default / Hover / Pressed variant family in Figma (see
+    §2.5 row AC-33a) so the four observable states (idle-inactive,
+    hovered-inactive, idle-active, hovered-active) read as a coherent
+    set rather than four unrelated greys.
   - **Given** the active conversation is also tracked in the same
     store,
   - **Then** the active row is visually distinguished from the
-    inactive rows (active state).
-  (added 2026-04, Figma component drift)
+    inactive rows by **two** cues working together: a typographic
+    weight cue on the row label (bold), and the row's surface set
+    to the Pressed variant's neutral surface (see §2.5 row AC-33a).
+    The active row therefore reads as visibly "depressed" against
+    the lighter Default and Hover surfaces of inactive rows. No
+    separate transient "while pressing" surface is rendered because
+    the click instantly switches the active conversation; hovering
+    an already-active row keeps the Pressed surface so the active
+    cue is not bleached back to Hover.
+  (added 2026-04, Figma component drift; amended 2026-05, #PR — graduated @aspirational → @evolving; visual states pinned to the `ds:230:452` parent set's Default / Hover / Pressed variants with active row using the Pressed surface as the AC-33a active-row cue alongside the bold-label cue; specifics live in §2.5 row AC-33a.)
 
 - **AC-33b** — *Previous discussion item — activation* · **@aspirational**
   - **Given** the sidebar lists prior conversations (per AC-33a),

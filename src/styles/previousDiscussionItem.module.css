@@ -6,10 +6,19 @@
  *
  * Lane J (2026-05) — the gray-400 surface treatment lifted off the
  * sidebar shell and onto each row so the sidebar's outer container
- * is transparent (AC-33). Default rows are gray-400, hover is white
- * (same as before), active is gray-500 (same as the question
- * bubble) so the "you are here" cue stays tied to existing widget
- * surfaces.
+ * is transparent (AC-33).
+ *
+ * AC-33a state surfaces (amended 2026-05) — match the Figma parent
+ * set `ds:230:452`:
+ *   - Default (idle, inactive)     → `--gray-400` (#efefef, `ds:191:268`)
+ *   - Hover (inactive, hovered)    → `--gray-500` (#e5e5e5, `ds:230:453`)
+ *   - Pressed / active conversation → `--gray-600` (#c0c0c0, `ds:230:459`)
+ * The active row uses the Pressed variant's surface as its idle
+ * treatment (no separate transient "while pressing" state — the click
+ * instantly switches the active conversation, so the row stays
+ * visibly "depressed" as the AC-33a active-row cue, alongside the
+ * label's bold weight). Hovering an already-active row keeps the
+ * Pressed surface so the active cue is not bleached back to Hover.
  */
 
 .row {
@@ -24,11 +33,12 @@
 }
 
 .row:hover {
-  background: var(--white-500);
+  background: var(--gray-500);
 }
 
-.row.active {
-  background: var(--gray-500);
+.row.active,
+.row.active:hover {
+  background: var(--gray-600);
 }
 
 .activate {

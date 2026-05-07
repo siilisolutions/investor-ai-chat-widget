@@ -94,10 +94,13 @@
 }
 
 /*
- * `.layout` bounds title + body to a comfortable max-width and
- * centres them inside the surface. Both rows share the same wrapper
- * so the title's left edge aligns with the sidebar's left edge per
- * AC-21 / Lane J.
+ * `.layout` hosts the title row and the body row. It fills the
+ * surface card and is left-aligned so the sidebar (and the title
+ * directly above it) hug the card's left edge per `site:434:2424`.
+ * The conversation column inside `.body` self-caps via its own
+ * `max-width: var(--content-width)`, so very wide viewports leave
+ * empty whitespace to the right of the conversation rather than
+ * pushing the sidebar toward the centre.
  */
 .layout {
   flex: 1 1 auto;
@@ -107,8 +110,6 @@
   gap: var(--space-2xl);
   padding: var(--space-3xl) var(--space-2xl) 0;
   width: 100%;
-  max-width: calc(var(--content-width) + 240px + var(--space-2xl) + 1px);
-  margin: 0 auto;
   box-sizing: border-box;
 }
 
