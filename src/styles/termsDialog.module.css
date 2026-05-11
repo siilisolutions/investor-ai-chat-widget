@@ -1,13 +1,20 @@
 /*
  * `termsDialog.module.css` — scoped styles for the AC-66 Käyttöehdot
  * gate (Figma `ds:257:1096` short / `ds:242:551` long, in screen
- * context `site:555:2186`). The card mirrors the AC-33e
- * `confirmDialog.module.css` shell — same white surface, `--radius`,
- * `--textarea-shadow`, 32 px padding, 32 px section gap, bold 24/24
- * title (`ds:242:431`), 16/22 body (`ds:242:550` → `ds:242:433`),
- * 16 px-gap actions row (`ds:242:443`) with outlined cancel + a
- * `--cta-gradient` primary button (`ds:242:609` "Hyväksyn
- * käyttöehdot") instead of the destructive red AC-33e variant.
+ * context `site:555:2186` short / `site:555:2200` long). The card
+ * mirrors the AC-33e `confirmDialog.module.css` shell — same white
+ * surface, `--radius`, `--textarea-shadow`, 32 px padding, 32 px
+ * section gap, bold 24/24 title (`ds:242:431`, centered per Figma),
+ * 16/22 body (`ds:242:550` → `ds:242:433`), 16 px-gap actions row
+ * (`ds:242:443`) with outlined cancel + a `--cta-gradient` primary
+ * button (`ds:242:609` "Hyväksyn käyttöehdot") instead of the
+ * destructive red AC-33e variant.
+ *
+ * Surrounding viewport overlay matches the AC-33e treatment anchored
+ * on `site:555:2214`: a dim-only `Background dim` rectangle at
+ * `rgba(0, 0, 0, 0.2)` over the compact hero, dialog absolutely
+ * centered; no `backdrop-filter: blur` at the modal layer (Lane L,
+ * 2026-05-11).
  *
  * The body region is scrollable in the long form per `ds:242:551`'s
  * scrollbar (`ds:242:578`); short form (`ds:257:1096`) has nothing
@@ -21,9 +28,7 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -54,7 +59,7 @@
   line-height: 24px;
   letter-spacing: 0.216px;
   color: var(--black-500);
-  text-align: left;
+  text-align: center;
 }
 
 .body {

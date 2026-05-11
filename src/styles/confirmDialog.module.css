@@ -4,10 +4,13 @@
  * surface, widget radius + textarea-shadow, 32 px padding, 32 px
  * section gap, 520 px max-width, bold title `ds:242:431`, body
  * `ds:242:550` → `ds:242:433`, cancel `ds:242:438`, destructive
- * confirm `ds:242:444` on `--red-600`). The surrounding overlay
- * + blurred backdrop are code-authored — Figma spec's the card in
- * isolation; the embed-safety + viewport-fill behaviour is
- * engineering's responsibility.
+ * confirm `ds:242:444` on `--red-600`). The surrounding viewport
+ * overlay is anchored on `site:555:2214` *Investor agent -
+ * confirmation* (Lane L, 2026-05-11): a dim-only `Background dim`
+ * rectangle at `rgba(0, 0, 0, 0.2)` over the chat surface, dialog
+ * absolutely centered with `translate(-50%, -50%)`; Figma applies
+ * no `backdrop-filter: blur` at the modal layer, so the
+ * implementation here drops the previous 8 px modal-side blur.
  *
  * Z-index sits one above `.expanded` (which uses 2147483000) so
  * the modal is always over the chat surface but below the
@@ -18,9 +21,7 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;

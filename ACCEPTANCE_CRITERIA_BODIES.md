@@ -685,7 +685,7 @@ Maps to the Investor agent composition and its main component; see
     rendered at the trailing edge of the row inside `ds:191:268`.
   - **When** the user activates the `×` (click or keyboard),
   - **Then** an in-widget confirmation modal opens, centered in
-    the viewport over a blurred backdrop covering the rest of
+    the viewport over a dimmed backdrop covering the rest of
     the widget surface so the dismiss prompt is the unambiguous
     focal point and the user cannot interact with the underlying
     chat until they choose. The modal *card itself* matches the
@@ -703,10 +703,10 @@ Maps to the Investor agent composition and its main component; see
     The widget already fills `100vw × 100vh` in expanded mode per
     AC-20a, so "rest of the widget surface" is equivalent to
     "rest of the screen" from the user's perspective on every
-    viewport that can reach this affordance. The blurred-backdrop
-    treatment around the card is *code-authored* — the §2.5
-    Figma anchor pins the card in isolation; the surrounding
-    overlay is engineering's responsibility.
+    viewport that can reach this affordance. The surrounding
+    viewport overlay is anchored on `site:555:2214` per §2.5
+    row AC-33e (Lane L, 2026-05-11) — a dim-only `Background dim`
+    rectangle over the chat surface, no modal-layer blur.
   - **When** the user confirms,
   - **Then** the row is removed from the PD-08 store; if the
     removed conversation was the active one, the active
@@ -720,7 +720,7 @@ Maps to the Investor agent composition and its main component; see
     re-populates with the freshly-minted row, the Q+A stream
     clears, and the textarea clears).
   - **When** the user cancels — by activating the cancel button,
-    pressing `Esc`, or clicking the blurred backdrop outside the
+    pressing `Esc`, or clicking the dimmed backdrop outside the
     modal card —
   - **Then** the modal closes and no state changes; focus returns
     to the row's `×` button so keyboard users can resume.
@@ -732,7 +732,7 @@ Maps to the Investor agent composition and its main component; see
     [`.cursor/rules/ac-amending.mdc`](.cursor/rules/ac-amending.mdc)
     §AC Authoring an `@evolving` body describes intent and defers
     visuals to §2.5.
-  (added 2026-05, #PR — Multi-discussion delete flow; amended 2026-05, #PR — Figma `ds:242:490` confirmation modal landed; graduated @aspirational → @evolving; amended 2026-05, #PR — backdrop click resolved as cancel + neutral-label fallback confirmed; amended 2026-05, #PR — single-leftover-row delete now mints fresh & stays expanded, aligning with AC-33 always-visible sidebar)
+  (added 2026-05, #PR — Multi-discussion delete flow; amended 2026-05, #PR — Figma `ds:242:490` confirmation modal landed; graduated @aspirational → @evolving; amended 2026-05, #PR — backdrop click resolved as cancel + neutral-label fallback confirmed; amended 2026-05, #PR — single-leftover-row delete now mints fresh & stays expanded, aligning with AC-33 always-visible sidebar; amended 2026-05, #PR — backdrop softened "blurred" → "dimmed" after `site:555:2214` anchored the surrounding viewport overlay in Lane L)
 
 - **AC-35** — *Start-new-conversation affordance in expanded mode* · **@stable**
   - **Given** the widget is in expanded mode (the AC-33 sidebar is

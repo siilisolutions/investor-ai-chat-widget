@@ -13,6 +13,10 @@
  *   scrollable body, Figma scrollbar `ds:242:578`).
  * - `site:555:2186` — short form composed over the dimmed compact
  *   hero (the in-screen visual context).
+ * - `site:555:2200` — long form composed over the dimmed compact
+ *   hero (Lane L, 2026-05-11). Same `Background dim` rectangle at
+ *   `rgba(0, 0, 0, 0.2)` pattern as the AC-33e modal anchored on
+ *   `site:555:2214`; no `backdrop-filter: blur` at the modal layer.
  *
  * The card visually re-uses the AC-33e dialog shell (white surface,
  * `--radius`, `--textarea-shadow`, 32 px padding, 32 px section gap)
@@ -36,7 +40,7 @@
  * Cancel paths (per AC-66, mirroring AC-33e):
  * - *Peruuta* button click → `onCancel`.
  * - `Esc` keypress while the dialog has focus → `onCancel`.
- * - Click on the blurred backdrop outside the card → `onCancel`.
+ * - Click on the dimmed backdrop outside the card → `onCancel`.
  *
  * Focus management mirrors `ConfirmDialog`: the previously-focused
  * element is captured on open and restored on close; cancel is

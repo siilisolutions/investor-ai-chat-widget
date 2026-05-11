@@ -662,7 +662,7 @@ describe('App', () => {
     ).toBeInTheDocument()
   })
 
-  it('AC-33e: clicking the blurred backdrop outside the modal card cancels without removing the row', async () => {
+  it('AC-33e: clicking the dimmed backdrop outside the modal card cancels without removing the row', async () => {
     saveConversation({
       id: 'conv-A',
       messages: [{ id: 'mA', question: 'Question A?', answer: 'answer A' }],

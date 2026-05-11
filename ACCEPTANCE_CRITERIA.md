@@ -286,6 +286,68 @@ PR.
   [`AGENTS.md`](AGENTS.md) § Code Connect for the matching mapping
   state.
 
+> **2026-05-11 — Lane L partial-sweep (Figma anchor catch-up).** Five new
+> IR-site frames have surfaced since the 2026-05-07 Käyttöehdot mint.
+> Three rows in the manifest gain a new anchor: AC-28c picks up
+> `site:550:1884` *AI-agentti, haetaan tietoa - scrollbar* (canonical
+> scrollbar-visible state of the conversation column); AC-33e picks up
+> `site:555:2214` *Investor agent - confirmation* (resolves the previously
+> code-authored centered-overlay + dim-backdrop pattern); AC-66b picks up
+> `site:555:2200` *Investor hero - käyttöehdot - laaja* (long-form
+> Käyttöehdot in screen context). Two further frames — `site:591:3203`
+> *Etusivu - Mobile* and `site:608:1855` *Etusivu - Mobile - v2* — are
+> candidate anchors for the currently `— (code-authored)` AC-92 / AC-92b
+> rows; both compose the existing `ds:152:75` `Investor hero` scaled to
+> 390 wide with the host's `Header (With menu)` chrome above, and per
+> [`.cursor/rules/ac-amending.mdc`](.cursor/rules/ac-amending.mdc)
+> candidate-anchor / promotion split (Lane E-1 / Lane K precedent)
+> promotion is deferred until the designer confirms which iteration
+> (v1 / v2) is canonical. **Drift surfaced, not resolved this lane.**
+> Spot-checking the AC-33e modal against `site:555:2214` found the
+> shared backdrop in
+> [`src/styles/confirmDialog.module.css`](src/styles/confirmDialog.module.css)
+> and
+> [`src/styles/termsDialog.module.css`](src/styles/termsDialog.module.css)
+> applies `backdrop-filter: blur(8px)` over `rgba(0,0,0,0.4)` whereas
+> Figma uses a dim-only `Background dim` rectangle at `rgba(0,0,0,0.2)`
+> with no blur on the modal layer; `termsDialog.module.css`'s `.title`
+> is `text-align: left` whereas the shared `ds:242:431` title element
+> renders `text-center` in Figma (matching
+> `confirmDialog.module.css`'s `.title`). The AC-33e body in
+> [`ACCEPTANCE_CRITERIA_BODIES.md`](ACCEPTANCE_CRITERIA_BODIES.md) also
+> still describes the surrounding overlay as a *blurred backdrop* three
+> times; with `site:555:2214` anchored, the body should soften to
+> *dimmed* in the follow-up reconciliation turn (an `@evolving` body
+> should not pin "blurred" specifically per
+> [`.cursor/rules/ac-amending.mdc`](.cursor/rules/ac-amending.mdc) §AC
+> Authoring, but the contradiction is now visible against a published
+> Figma frame). English copy embedded in the `site:555:2200` long-form
+> body region carries an inline designer authoring artifact
+> (`[10:15 AM]Och samma på engelska:`) and is treated as draft
+> authoring — AC-66b stays "English parity follows AC-63". The IR-DS
+> reset-button component set (`ds:227:239` parent with Default
+> `ds:152:88` / Hover `ds:227:240` / Pressed `ds:228:244` siblings) is
+> a structural bookkeeping note only; the React component is still a
+> backlog gap per AGENTS.md.
+>
+> **Update — 2026-05-11 (Lane L follow-up code reconciliation).** The
+> three drift findings above were resolved in the same lane in a
+> follow-up turn:
+> [`src/styles/confirmDialog.module.css`](src/styles/confirmDialog.module.css)
+> and
+> [`src/styles/termsDialog.module.css`](src/styles/termsDialog.module.css)
+> `.backdrop` rules dropped `backdrop-filter: blur(8px)` and switched
+> the dim from `rgba(0,0,0,0.4)` → `rgba(0,0,0,0.2)` to match Figma's
+> dim-only modal layer; `termsDialog.module.css` `.title` flipped from
+> `text-align: left` → `center` to match the shared `ds:242:431` title
+> element. The AC-33e body in
+> [`ACCEPTANCE_CRITERIA_BODIES.md`](ACCEPTANCE_CRITERIA_BODIES.md)
+> softened its three "blurred backdrop" mentions to "dimmed backdrop"
+> and now cites `site:555:2214` for the surrounding viewport overlay
+> instead of declaring it code-authored. JSDocs on `ConfirmDialog.tsx`
+> / `TermsDialog.tsx` and the CSS module headers were bumped in the
+> same edit. AC-33e body amendment log carries the new entry.
+>
 > **2026-05-06 — Lane K partial-sweep (mobile drawer, designer brief).** The
 > designer flagged that the AC-33 sidebar should collapse behind a
 > hamburger toggle on mobile, with a left-anchored slide-in drawer
@@ -422,15 +484,15 @@ PR.
 | AC-25c  | `ds:152:135`                                  | Source reference — static unlinked badge         | 2026-04-22   | Lane E full-sweep |
 | AC-28   | `site:434:2424`, `ds:152:121`                 | ChatInput pinned to the bottom of the conversation column + textarea shadow; Q+A stream scrolls above and behind it | 2026-05-06   | Lane J — Figma re-align |
 | AC-28b  | `site:434:2424`, `ds:152:121`                 | (deprecated) ChatInput — short conversation, not bottom-pinned — reversed by AC-28 amendment | 2026-05-06   | Lane J — Figma re-align (n/a — deprecated AC-28b) |
-| AC-28c  | `site:434:2424`, `ds:152:121`                 | ChatInput — latest reply visible above the bottom-pinned input; vertical opacity-fade band masks messages scrolling under the input; conversation-stream scrollbar consumes column space only | 2026-05-06   | Lane J — Figma re-align |
+| AC-28c  | `site:434:2424`, `site:550:1884`, `ds:152:121` | ChatInput — latest reply visible above the bottom-pinned input; vertical opacity-fade band masks messages scrolling under the input; conversation-stream scrollbar consumes column space only (canonical scrollbar-visible state on `site:550:1884` — `Scrollbar` instance not hidden, runs the full column height, sits inside the column's right gutter so siblings do not shift) | 2026-05-11   | Lane L partial-sweep |
 | AC-33   | `ds:191:258`, `site:434:2424`                 | Previous discussion list — sidebar visibility & layout (transparent shell, per-row surface treatment, vertical divider between sidebar column and Q+A column, scroll isolation on the row list) | 2026-05-06   | Lane J — Figma re-align (transparent shell + per-row bg + vertical divider + scroll isolation confirmed against `ds:191:258` and `site:434:2424`) |
 | AC-33a  | `ds:230:452` (parent set: Default `ds:191:268` / Hover `ds:230:453` / Pressed `ds:230:459`) | Previous discussion item — row content & visual states. Per-row surface treatment lifted out of the sidebar shell (Lane J). Idle / hovered / active surfaces come from the parent set's Default / Hover / Pressed variants — Default is the lightest neutral, Hover is one step darker, Pressed is the darkest. The active conversation row reads as visibly *depressed* against inactive rows: it uses the Pressed variant's surface as its idle treatment plus a bold-label cue (typographic weight on the row label). Hovering an already-active row keeps the Pressed surface — the active cue is not bleached back to Hover. | 2026-05-06   | Hover/Pressed/active-row cluster landed (sidebar item) |
 | AC-33d  | `ds:214:1214`, `ds:230:656`, `site:435:2914`  | Sidebar mobile collapse — hamburger toggle (`ds:230:656`) at the top-left of the mobile top-bar opens a left-anchored slide-in drawer (`ds:214:1214`) over a translucent dark backdrop with `backdrop-filter: blur(2px)`; drawer card hosts an internal `ds:196:853` `×` button at top-right plus the AC-33 `PreviousDiscussionList` verbatim. Anchored in screen context by `site:435:2914`. | 2026-05-06   | Mobile drawer landed |
-| AC-33e  | `ds:191:268` (× glyph inline within the row, surfaced by the live `get_code_connect_map` snippet on `ds:191:258` showing a `ResetButton` at the trailing edge); confirmation modal card `ds:242:490` (title `ds:242:431` *"Poista keskustelu"* / body `ds:242:550` → `ds:242:433` *"Haluatko varmasti poistaa keskustelun {label}?"* with bolded label / cancel button `ds:242:438` *"Peruuta"* / destructive confirm button `ds:242:444` *"Poista"* on a destructive-red action surface). Centered viewport overlay + blurred backdrop around the card remain `— (code-authored)` — Figma `ds:242:490` spec's the card in isolation. | Per-row dismiss affordance + in-widget confirmation modal | 2026-05-06   | Single-leftover-row delete now mints fresh & stays expanded (sidebar always visible per AC-33) |
+| AC-33e  | `ds:191:268` (× glyph inline within the row, surfaced by the live `get_code_connect_map` snippet on `ds:191:258` showing a `ResetButton` at the trailing edge); confirmation modal card `ds:242:490` (title `ds:242:431` *"Poista keskustelu"* / body `ds:242:550` → `ds:242:433` *"Haluatko varmasti poistaa keskustelun {label}?"* with bolded label / cancel button `ds:242:438` *"Peruuta"* / destructive confirm button `ds:242:444` *"Poista"* on a destructive-red action surface); in-screen overlay anchored on `site:555:2214` (`Background dim` rectangle at `rgba(0,0,0,0.2)` over the chat surface, dialog absolutely centered with `translate(-50%, -50%)`; Figma applies no `backdrop-filter: blur` at the modal layer — implementation in [`src/styles/confirmDialog.module.css`](src/styles/confirmDialog.module.css) matches per the Lane L follow-up code reconciliation). | Per-row dismiss affordance + in-widget confirmation modal | 2026-05-11   | Lane L partial-sweep (in-screen overlay anchored on `site:555:2214`; modal-backdrop drift resolved in same lane follow-up) |
 | AC-34   | `site:434:2424`, `site:434:2696`              | Per-conversation title text element above the Q+A stream | —            | — |
 | AC-35   | `ds:237:398`, `site:434:2424`                 | Start-new-conversation affordance — primary CTA Button (Default `ds:237:323` / Hover `ds:237:399` / Pressed `ds:237:411`, "Luo uusi keskustelu", content-sized violet→blue gradient pill with `white-space: nowrap` label and `+` icon `ds:237:332`, 8×20 padding, 12 gap) anchored at the top of the AC-33 sidebar in `site:434:2424`, `site:434:2696`, and the mobile drawer `site:435:2914`. Gradient direction confirmed against `ds:237:323` — diagonal violet (top-left) → blue (bottom-right), distinct from the Send button family's gradient direction; implementation introduces a CTA-only gradient token in the follow-up turn so `--send-gradient` / AC-72 stay untouched. | 2026-05-06   | Lane J — Figma re-align |
 | AC-66   | `site:555:2186`, `ds:257:1096`                | Terms-of-use gate — short-form *Käyttöehdot* dialog rendered centred over a dimmed full-viewport backdrop above the compact hero. Card mirrors the existing `ds:242:490` confirmation-dialog shell: white surface, `--radius`, `--textarea-shadow`, 32 px padding, 32 px section gap, bold 24/24 title `ds:242:431`, body `ds:242:550` → `ds:242:433`, button row `ds:242:443` with outlined cancel + `--cta-gradient` confirm. *Lue lisää* link inside the body uses `--blue-500` (Figma `#3232ff`). Primary button label *"Hyväksyn käyttöehdot"*, cancel *"Peruuta"*. | 2026-05-07   | New AC mint — Käyttöehdot terms gate |
-| AC-66b  | `ds:242:551`                                  | Terms-of-use gate — long-form variant. Same shell as AC-66 but the body region scrolls (Figma `ds:242:578` scrollbar) so the surrounding card height does not grow with the long copy. Long-form copy is the canonical Finnish — section headings rendered as `<strong>` (*Tietojen luonne ja ajantasaisuus* / *Oikeudelliset rajoitukset* / *Tekoälyjärjestelmän rajoitukset* / *Henkilötietojen käsittely*) plus a closing privacy-policy sentence; English parity follows AC-63. | 2026-05-07   | New AC mint — Käyttöehdot terms gate |
+| AC-66b  | `ds:242:551`, `site:555:2200`                 | Terms-of-use gate — long-form variant. Same shell as AC-66 but the body region scrolls (Figma `ds:242:578` scrollbar) so the surrounding card height does not grow with the long copy. Long-form copy is the canonical Finnish — section headings rendered as `<strong>` (*Tietojen luonne ja ajantasaisuus* / *Oikeudelliset rajoitukset* / *Tekoälyjärjestelmän rajoitukset* / *Henkilötietojen käsittely*) plus a closing privacy-policy sentence; English parity follows AC-63. In-screen context anchored on `site:555:2200` (long-form card composed over the dimmed compact hero, same `Background dim` rectangle at `rgba(0,0,0,0.2)` pattern as `site:555:2214`); embedded English copy in the Figma body region carries an inline designer authoring artifact (`[10:15 AM]Och samma på engelska:`) and is treated as draft authoring — body unchanged. | 2026-05-11   | Lane L partial-sweep |
 | AC-66c  | — (code-authored)                             | Terms acceptance persistence — `localStorage` key `siili.termsAccepted.v1` mirroring PD-08's keying convention; bumping the schema version reprompts. Fail-closed on storage errors (private mode, quota). Lives next to `src/services/conversationStore.ts`. | 2026-05-07   | New AC mint — Käyttöehdot terms gate |
 | AC-72   | `ds:152:129`, `ds:152:131`, `ds:152:133`      | Send button Active / Hover / Pressed             | 2026-04-22   | Lane E full-sweep |
 | AC-73   | — (code-authored)                             | Typography — Everett weights (via `--font-family*` tokens) | 2026-04-22   | Lane E full-sweep (code-authored watch) |

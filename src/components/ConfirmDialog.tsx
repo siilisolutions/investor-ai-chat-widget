@@ -4,11 +4,13 @@
  * the inner card mirrors the children the design system publishes
  * (title `ds:242:431`, body `ds:242:550` → `ds:242:433`, cancel
  * button `ds:242:438`, destructive confirm button `ds:242:444`). The
- * surrounding overlay + blurred backdrop are code-authored — Figma
- * spec's the card in isolation, not the surrounding viewport
- * treatment, per AC-33e and §2.5 row AC-33e.
+ * surrounding viewport overlay is anchored on `site:555:2214`
+ * *Investor agent - confirmation* (Lane L, 2026-05-11): a dim-only
+ * `Background dim` rectangle at `rgba(0, 0, 0, 0.2)` over the chat
+ * surface, dialog absolutely centered with `translate(-50%, -50%)`,
+ * no `backdrop-filter: blur` at the modal layer.
  *
- * Per AC-33e the dialog is centered in the viewport over a blurred
+ * Per AC-33e the dialog is centered in the viewport over a dimmed
  * backdrop covering the rest of the widget surface (the widget
  * fills `100vw × 100vh` in expanded mode per AC-20a, so "rest of
  * the widget surface" is equivalent to "rest of the screen" on
@@ -18,7 +20,7 @@
  * Cancel paths (all three documented on the AC body):
  * - Cancel button click → `onCancel`.
  * - `Esc` keypress while the dialog has focus → `onCancel`.
- * - Click on the blurred backdrop outside the card → `onCancel`.
+ * - Click on the dimmed backdrop outside the card → `onCancel`.
  *
  * Focus management:
  * - On open, the previously-focused element is captured and the
