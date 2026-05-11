@@ -9,6 +9,7 @@ This project ships as an **IIFE** on third-party pages. Assume **strict CSP** an
 
 - **Globals**: Expose only the **`SiiliChatbot`** namespace (see `vite.config.ts` + `src/widget.tsx`). Do not attach helpers or state to `window` outside that API.
 - **Styles**: Keep styling in **CSS Modules** and tokens from `src/styles/variables.css`. Avoid global selectors, `!important` hacks, or tag-only rules that could override the host page.
+- **Host-defensive resets** (the inverse direction — host bleed *into* the widget) live under the `.siiliChatbot :focus` block at the bottom of `src/styles/variables.css`. Each rule there must cite the specific host CSS selector it defends against in a comment so future agents can prune entries when host contracts change. Specificity is `0,1,1` (`.siiliChatbot` + `:focus`/`:focus-visible`/element); beats the typical host `0,1,0` rules deterministically regardless of stylesheet load order. Do NOT escalate to `!important` here — if a host rule wins despite specificity, surface it for a Shadow DOM follow-up (Lane O / AC-112) rather than papering over with `!important`.
 - **Markup**: Do not use `dangerouslySetInnerHTML` or unsanitized HTML for chat content unless the product explicitly requires it and sanitization is defined. Prefer plain text / React children.
 - **IDs and portals**: Prefer generated or scoped attributes; avoid fixed `id` values that could clash with the host.
 - **Errors**: User-visible errors should be safe strings—no raw stack traces or internal URLs in production UI.

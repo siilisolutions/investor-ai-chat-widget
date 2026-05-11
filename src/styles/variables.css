@@ -87,3 +87,29 @@
 .siiliChatbot *::after {
   box-sizing: inherit;
 }
+
+/*
+ * Host-defensive resets — host pages may apply global rules that bleed
+ * into the widget (AC-112 "Graceful CSS isolation"). Keep this list
+ * narrow and named: each rule cites the specific host CSS rule it
+ * defends against, so future agents can prune the list when host
+ * contracts change. The widget owns its own `:focus-visible` styling
+ * via `outline` per AC-80; nothing here adds visual treatment, only
+ * cancels host bleed.
+ *
+ * Discovered against the Siili host site (sijoittajille.siili.com)
+ * in Lane N (2026-05-11). Specificity here is 0,1,1 — beats the host
+ * rules' 0,1,0 deterministically regardless of stylesheet load order.
+ */
+.siiliChatbot :focus,
+.siiliChatbot :focus-visible {
+  /*
+   * Defends against `:focus { box-shadow: 0 0 4px 4px rgba(50,50,255,.5); outline: 1px solid transparent }`
+   * in `template_styles-2026.min.css`. Without this, a focused
+   * `<textarea>` / `<button>` / `<a>` inside the widget gets a 4 px
+   * blue host-page focus glow that stacks underneath our own
+   * outline-based focus rings (visible as a "double focus" on
+   * staging vs. local in dev harness).
+   */
+  box-shadow: none;
+}
