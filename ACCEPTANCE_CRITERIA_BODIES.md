@@ -1199,11 +1199,24 @@ These criteria exist to satisfy P2's competition-entry ambition.
   - **Then** the compact view stacks the input above the chips (not
     side-by-side).
 
-- **AC-92b** — *Mobile (<640px) — chips scroll or wrap without overflow* · **@stable**
+- **AC-92b** — *Mobile (<640px) — chips stack vertically with single-line ellipsis* · **@evolving**
   - **Given** a viewport narrower than the mobile breakpoint
     (§12.1 PD-05),
-  - **Then** the suggestion chips are horizontally scrollable or wrap
-    onto additional rows without overflowing the viewport width.
+  - **Then** the suggestion chips stack vertically (column flex), each
+    chip taking the full width of the chip container, and any chip
+    label that exceeds that width is truncated with a single-line
+    ellipsis (`…`) — AC-12b's `white-space: nowrap` constraint still
+    holds, so labels never wrap to two lines.
+  - **And** none of the chips overflow the viewport width
+    horizontally; the previous `overflow-x: auto` horizontal-scroll
+    treatment is retired because the hidden scrollbar gave users no
+    affordance that further chips existed behind the right edge.
+  - Visual anchor in §2.5 row AC-92b is `site:608:1855` *Etusivu -
+    Mobile - v2*. The alternate iteration `site:591:3203` *Etusivu -
+    Mobile* (which renders multi-line chip labels rather than
+    single-line ellipsis) is recorded in the §2.5 row prose for
+    history but is not the canonical anchor.
+  (added 2026-04, GOV-12 split; amended 2026-04, Lane F — graduated to @stable as code-authored after designer delegated responsive judgment; amended 2026-05, #PR — promoted from `— (code-authored)` after designer published `site:608:1855` / `site:591:3203` mobile candidate frames in Lane L; recontracted from "horizontal scroll OR wrap" to "vertical stack with single-line ellipsis" per `site:608:1855` v2; demoted @stable → @evolving until the implementation lands and the designer signs off on v2 vs v1)
 
 - **AC-92c** — *Mobile (<640px) — expanded view full width with Figma padding* · **@stable**
   - **Given** a viewport narrower than the mobile breakpoint

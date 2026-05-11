@@ -15,21 +15,25 @@
 }
 
 /*
- * AC-92b (mobile <640px, PD-05) — chips overflow as a single-row horizontal
- * scroll container so `@stable` AC-12b (single-line labels) still holds.
- * Designer delegated responsive judgment (no mobile Figma frame); this
- * breakpoint is code-authored.
+ * AC-92b (mobile <640px, PD-05) — chips stack vertically with single-line
+ * ellipsis truncation per Figma `site:608:1855` *Etusivu - Mobile - v2*
+ * (Lane M, 2026-05-11). Each chip takes the full width of the chip
+ * container and any label that exceeds that width is ellipsized — see
+ * the `<640px` rule in `suggestionChip.module.css` for the chip-side
+ * truncation. AC-12b `white-space: nowrap` is preserved (chips stay
+ * single-line). The previous `overflow-x: auto` horizontal-scroll
+ * pattern is retired because the hidden scrollbar gave users no
+ * affordance that further chips existed behind the right edge.
+ *
+ * AC-91 (tablet 640–1023 px) and AC-90 (desktop ≥1024 px) keep the
+ * default `flex-wrap: wrap` from `.chips` above — those bands are
+ * not Figma-anchored (Lane F's designer-delegated code-authored
+ * stability still applies).
  */
 @media (max-width: 639px) {
   .chips {
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    flex-direction: column;
+    align-items: stretch;
     width: 100%;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .chips::-webkit-scrollbar {
-    display: none;
   }
 }

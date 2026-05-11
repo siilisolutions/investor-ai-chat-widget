@@ -215,7 +215,7 @@ directly.
 | AC-90 | Desktop (≥1024px) | [§7](ACCEPTANCE_CRITERIA_BODIES.md#7-responsiveness) | active | @stable | Manual: viewport at or above the §12.1 PD-05 desktop threshold — matches §2.5 row AC-90 padding and layout |
 | AC-91 | Tablet (640–1023px) | [§7](ACCEPTANCE_CRITERIA_BODIES.md#7-responsiveness) | active | @stable | Manual: viewport in the §12.1 PD-05 tablet band — chips wrap, textarea full width, send button inside input shell |
 | AC-92 | Mobile (<640px) — compact stacks input above chips | [§7](ACCEPTANCE_CRITERIA_BODIES.md#7-responsiveness) | active | @stable | Manual: viewport below the §12.1 PD-05 mobile breakpoint — compact stacks input above chips (not side-by-side) |
-| AC-92b | Mobile (<640px) — chips scroll or wrap without overflow | [§7](ACCEPTANCE_CRITERIA_BODIES.md#7-responsiveness) | active | @stable | Manual: viewport below the §12.1 PD-05 mobile breakpoint — chips wrap or scroll horizontally without overflowing viewport width |
+| AC-92b | Mobile (<640px) — chips stack vertically with single-line ellipsis | [§7](ACCEPTANCE_CRITERIA_BODIES.md#7-responsiveness) | active | @evolving | Manual: viewport below the §12.1 PD-05 mobile breakpoint — chips stack vertically (column flex), each chip full-width, long labels truncate with `…` (no horizontal scroll, no two-line labels). Visual: see §2.5 row AC-92b — Figma `site:608:1855` |
 | AC-92c | Mobile (<640px) — expanded view full width with Figma padding | [§7](ACCEPTANCE_CRITERIA_BODIES.md#7-responsiveness) | active | @stable | Manual: viewport below the §12.1 PD-05 mobile breakpoint in expanded — 100% container width with Figma-consistent padding |
 | AC-93 | Textarea auto-grow | [§7](ACCEPTANCE_CRITERIA_BODIES.md#7-responsiveness) | active | @stable | Manual: paste multi-line content — textarea grows to the §12.1 PD-06 cap then scrolls internally; send button stays visible |
 | AC-100 | Bundle budget | [§8](ACCEPTANCE_CRITERIA_BODIES.md#8-performance) | active | @stable | Automated: `npm run verify` — parses `vite build` gzip output and fails if combined `siili-chatbot.iife.js` + `siili-chatbot.css` exceed 60 KB |
@@ -286,6 +286,54 @@ PR.
   [`AGENTS.md`](AGENTS.md) § Code Connect for the matching mapping
   state.
 
+> **2026-05-11 — Lane M partial-sweep (mobile chip-row promotion).** The
+> AC-92 / AC-92b candidate anchors surfaced in Lane L (`site:591:3203`
+> *Etusivu - Mobile* and `site:608:1855` *Etusivu - Mobile - v2*) are
+> promoted out of `— (code-authored)` with **`site:608:1855` (v2)
+> chosen as the canonical anchor**. v2 ships single-line ellipsis
+> truncation on each vertically-stacked chip; v1 ships multi-line
+> chip labels that grow the chip surface vertically. v2 was chosen
+> because the production chip strings in `src/App.tsx::SUGGESTIONS`
+> are already long enough that v1's multi-line wrapping would not
+> visibly differ from v2's ellipsis at the production string lengths,
+> and v2 produces the stricter contract (chips never grow vertically
+> on overlong labels — predictable touch-target sizing on mobile).
+> v1 is recorded in the §2.5 AC-92 / AC-92b row prose as the design
+> alternate.
+>
+> AC-92b body recontracted from "chips are horizontally scrollable or
+> wrap onto additional rows without overflowing the viewport width"
+> (Lane F's code-authored stability call) to "chips stack vertically
+> (column flex), each chip taking the full width of the chip
+> container, and any chip label that exceeds that width is truncated
+> with a single-line ellipsis (`…`)". AC-12b `white-space: nowrap` is
+> preserved (chips remain single-line). Stability marker demoted
+> `@stable → @evolving` until the implementation lands and the
+> designer signs off on v2 specifically over v1.
+>
+> AC-92 body unchanged — input-above-chips structure is the same in
+> both v1 and v2 — but the §2.5 row picks up `site:608:1855` so the
+> input-above-chips contract is now Figma-anchored rather than
+> code-authored. Stability stays `@stable`.
+>
+> Code change in the same lane (follow-up CSS turn): replace the
+> `<640px` mobile media in
+> [`src/styles/compactView.module.css`](src/styles/compactView.module.css)
+> from `flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none`
+> (horizontal scroll) to `flex-direction: column; align-items:
+> stretch; width: 100%` (vertical stack); add a `<640px` rule to
+> [`src/styles/suggestionChip.module.css`](src/styles/suggestionChip.module.css)
+> applying `display: block; width: 100%; overflow: hidden;
+> text-overflow: ellipsis` so chip labels truncate cleanly inside
+> their full-width chip surface. AC-91 (tablet, 640–1023 px) and
+> AC-90 (desktop, ≥1024 px) keep their existing
+> `flex-wrap: wrap` behaviour — the designer has not anchored those
+> bands, so Lane F's code-authored stability call still stands for
+> tablet and desktop.
+>
+> Lane L's `site:591:3203` / `site:608:1855` candidate-anchor
+> deferral note is now resolved by this lane.
+>
 > **2026-05-11 — Lane L partial-sweep (Figma anchor catch-up).** Five new
 > IR-site frames have surfaced since the 2026-05-07 Käyttöehdot mint.
 > Three rows in the manifest gain a new anchor: AC-28c picks up
@@ -499,8 +547,8 @@ PR.
 | AC-73b  | — (code-authored)                             | Typography — sans-serif fallback, no large CLS   | 2026-04-22   | Lane E full-sweep (code-authored watch) |
 | AC-90   | `site:13:527`, `site:434:2424`                | Desktop (≥1024px) layout — adopts inset white card + blurred backdrop band per AC-20a; padding and column widths confirmed against `site:434:2424` | 2026-05-06   | Lane J — Figma re-align |
 | AC-91   | — (code-authored)                             | Tablet (640–1023px) layout                       | 2026-04-22   | Lane F graduation (code-authored, designer delegation) |
-| AC-92   | — (code-authored)                             | Mobile (<640px) layout — compact stacks input    | 2026-04-22   | Lane F graduation (code-authored, designer delegation) |
-| AC-92b  | — (code-authored)                             | Mobile (<640px) — chips scroll or wrap           | 2026-04-22   | Lane F graduation (code-authored, designer delegation) |
+| AC-92   | `site:608:1855`                               | Mobile (<640px) layout — compact stacks input above chips, each chip taking the full width of the chip container per `site:608:1855` *Etusivu - Mobile - v2*. The alternate iteration `site:591:3203` *Etusivu - Mobile* renders the same input-above-chips structure with multi-line chip labels rather than single-line ellipsis; recorded here for history but not the canonical anchor (designer delegated to v2 in Lane M). | 2026-05-11   | Lane M — promoted from code-authored after `site:608:1855` / `site:591:3203` surfaced in Lane L |
+| AC-92b  | `site:608:1855`                               | Mobile (<640px) — chips stack vertically (column flex) per `site:608:1855`, each chip taking 100% of the chip container's width, with labels truncated by single-line ellipsis (`text-overflow: ellipsis` on the chip surface, AC-12b `white-space: nowrap` preserved). The alternate iteration `site:591:3203` renders the same vertical stack with multi-line chip labels (chip surface grows with content) rather than single-line ellipsis; recorded for history but not the canonical anchor — Lane M chose v2 because Figma's published placeholder strings already exceed the chip surface, so v1's multi-line wrapping would not visibly differ from a single-line ellipsis at the production string lengths, and v2's behaviour is the stricter contract. | 2026-05-11   | Lane M — promoted from code-authored; v2 chosen as canonical, v1 recorded as alternate |
 | AC-92c  | — (code-authored)                             | Mobile (<640px) — expanded view full width       | 2026-04-22   | Lane F graduation (code-authored, designer delegation) |
 
 The §13 Traceability roll-up (persona × section) is derived from this

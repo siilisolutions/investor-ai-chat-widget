@@ -30,6 +30,25 @@
   outline-color: var(--blue-500);
 }
 
+/*
+ * AC-92b (mobile <640px, PD-05) — at the mobile breakpoint each chip
+ * takes the full width of the chip container (the `.chips` flex column
+ * in `compactView.module.css`) and labels that exceed that width are
+ * ellipsized. `display: block` replaces `inline-flex` so the chip is a
+ * full-row block with the text node directly subject to
+ * `text-overflow: ellipsis`. AC-12b `white-space: nowrap` is preserved
+ * via the base rule above. Anchored on Figma `site:608:1855` *Etusivu
+ * - Mobile - v2* (Lane M, 2026-05-11).
+ */
+@media (max-width: 639px) {
+  .chip {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .chip {
     transition: none;
