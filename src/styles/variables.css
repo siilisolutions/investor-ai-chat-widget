@@ -27,7 +27,7 @@
   --red-600: #d20000;
 
   /* Translucent surfaces (compact mode on hero image) */
-  --surface-translucent: rgba(255, 255, 255, 0.3);
+  --surface-translucent: rgba(255, 255, 255, 0.8);
 
   /* Send button gradients */
   --send-gradient: linear-gradient(

@@ -173,11 +173,9 @@ export function ChatInput({
             aria-hidden="true"
           >
             <path
-              d="M8 13V3M8 3L3 8M8 3L13 8"
+              d="M8 1.5V14.5 M2 7.5L8 1.5L14 7.5"
               stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              strokeWidth="1.8"
             />
           </svg>
         </button>
