@@ -74,7 +74,7 @@
   --space-3xl: 64px;
 
   /* Widget layout */
-  --content-width: 800px;
+  --content-width: 900px;
   --compact-textarea-width: 780px;
 
   font-family: var(--font-family);

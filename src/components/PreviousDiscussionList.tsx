@@ -91,20 +91,22 @@ export function PreviousDiscussionList({
         </svg>
         Luo uusi keskustelu
       </button>
-      <h3 className={styles.heading}>Aiemmat keskustelut</h3>
-      <ul className={styles.items}>
-        {conversations.map((c) => (
-          <li key={c.id}>
-            <PreviousDiscussionItem
-              id={c.id}
-              label={deriveLabel(c)}
-              active={c.id === activeConversationId}
-              onActivate={onActivate}
-              onDelete={onDelete}
-            />
-          </li>
-        ))}
-      </ul>
+      <div className={styles.headingSection}>
+        <h3 className={styles.heading}>Aiemmat keskustelut</h3>
+        <ul className={styles.items}>
+          {conversations.map((c) => (
+            <li key={c.id}>
+              <PreviousDiscussionItem
+                id={c.id}
+                label={deriveLabel(c)}
+                active={c.id === activeConversationId}
+                onActivate={onActivate}
+                onDelete={onDelete}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
     </aside>
   )
 }

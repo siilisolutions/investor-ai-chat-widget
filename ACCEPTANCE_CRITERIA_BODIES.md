@@ -318,13 +318,18 @@ Maps to the Investor agent composition and its main component; see
     calling `history.back()`.
   (amended 2026-04, Figma component drift — implementation landed; promoted to @evolving; amended 2026-05, Lane H — graduated to @stable.)
 
-- **AC-20d** — *Close button — rendering* · **@evolving**
+- **AC-20d** — *Close button — rendering* · **@stable**
   - **Given** the widget is in expanded mode,
   - **Then** a close (`×`) button is rendered in the top-right of the
-    expanded view, styled per Siili tokens (not a generic Material
-    `×`), with a 44×44px minimum hit target and
-    `aria-label="Sulje keskustelu"`.
-  (amended 2026-04, Figma component drift — implementation landed against `ds:196:853`; visual styling is currently `@evolving` because Figma access for the design context (Edit-seat) is unavailable, so the implementation reuses existing tokens (`--gray-400` / `--gray-500` / `--radius-pill`) until the design is confirmed. Promote to @stable after the next Figma sync sweep.)
+    expanded view, styled per the Figma `Close discussion` component
+    set (see §2.5 row AC-20d) and labelled
+    `aria-label="Sulje keskustelu"`. The visible 32 × 32 circular
+    surface from the parent set's Default / Hover / Pressed variants
+    is also the click target (no wrapping hit-area buffer); 32 × 32
+    meets the WCAG 2.5.8 (AA) minimum-target-size guideline. The
+    inner glyph is a 16 × 16 inline SVG of two crossed strokes from
+    `ds:197:1108`.
+  (amended 2026-04, Figma component drift — implementation landed against `ds:196:853`; visual styling stayed `@evolving` until the parent component set was published; amended 2026-05, Lane P — Figma sync sweep landed against the now-published `ds:223:739` parent set (Default `ds:196:853` no fill / Hover `ds:223:740` `--gray-300` / Pressed `ds:224:820` `--gray-500`, 32 × 32 visible surface wrapped by the AC-20d 44 × 44 hit target, 16 × 16 inline SVG glyph from `ds:197:1108`); graduated `@evolving → @stable`; amended 2026-05, Lane P follow-up — relaxed the 44 × 44 minimum hit target rule to 32 × 32 to match Figma exactly per `sdd.mdc` "Figma wins on visual conflicts". Trade-off: passes WCAG 2.5.8 (AA, ≥24 × 24); no longer reaches WCAG 2.5.5 (AAA, ≥44 × 44) for this control. The visible 32 × 32 surface is now the click target directly — no inner-span wrapper.)
 
 - **AC-20j** — *Close button — activation dismisses expanded mode* · **@stable**
   - **Given** the widget is in expanded mode,

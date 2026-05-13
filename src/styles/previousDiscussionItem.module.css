@@ -21,11 +21,23 @@
  * Pressed surface so the active cue is not bleached back to Hover.
  */
 
+/*
+ * Row geometry matches Figma `ds:191:268`:
+ *   - `px-[16px] py-[4px]` (4 px vertical, 16 px horizontal padding)
+ *   - `gap-[16px]` between the label and the trailing 24 × 24 reset
+ *     icon (Figma `ds:152:88`)
+ *   - `rounded-[20px]` via `--radius`
+ * The padding is applied on the inner buttons rather than the row
+ * itself so the activate button still owns the entire label cell as
+ * a click target.
+ */
 .row {
   position: relative;
   display: flex;
-  align-items: stretch;
+  align-items: center;
+  gap: var(--space-lg);
   width: 100%;
+  padding: var(--space-xs) var(--space-lg);
   background: var(--gray-400);
   border-radius: var(--radius);
   overflow: hidden;
@@ -47,10 +59,10 @@
   text-align: left;
   background: transparent;
   border: none;
-  padding: var(--space-sm) var(--space-md);
+  padding: 0;
   font-family: var(--font-family);
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 24px;
   color: var(--black-500);
   cursor: pointer;
   white-space: nowrap;
@@ -65,26 +77,34 @@
 .activate:focus-visible,
 .delete:focus-visible {
   outline: 2px solid var(--black-500);
-  outline-offset: -2px;
+  outline-offset: 2px;
+  border-radius: var(--radius);
 }
 
+/*
+ * Per-row delete (AC-33e) — Figma renders the icon as a 24 × 24
+ * "Reset" frame (`ds:152:88`) made of two crossed black bars. The
+ * SVG inside `.deleteGlyph` mirrors that shape; the button itself
+ * is just a transparent 24 × 24 hit slot.
+ */
 .delete {
-  flex: 0 0 auto;
+  flex: 0 0 24px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 24px;
+  height: 24px;
   background: transparent;
   border: none;
-  padding: 0 var(--space-sm);
-  min-width: 32px;
+  padding: 0;
   cursor: pointer;
   color: var(--black-500);
 }
 
 .deleteGlyph {
   display: block;
-  font-size: 18px;
-  line-height: 1;
+  width: 24px;
+  height: 24px;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -101,6 +101,9 @@
  * `max-width: var(--content-width)`, so very wide viewports leave
  * empty whitespace to the right of the conversation rather than
  * pushing the sidebar toward the centre.
+ *
+ * Card insets match Figma `ds:152:97` (`px-[48px] py-[64px]`):
+ * 64 px top + bottom, 48 px left + right on tablet / desktop.
  */
 .layout {
   flex: 1 1 auto;
@@ -108,15 +111,16 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2xl);
-  padding: var(--space-3xl) var(--space-2xl) 0;
+  padding: var(--space-3xl) var(--space-2xl);
   width: 100%;
   box-sizing: border-box;
 }
 
 /*
  * AC-92c (mobile <640px, PD-05) — tighter padding so the Q+A column
- * isn't starved on narrow viewports. The bottom of the surface is
- * owned by `.inputWrapper`, hence `0` bottom padding here.
+ * isn't starved on narrow viewports. Bottom padding is dropped on
+ * mobile and `.inputWrapper` owns the bottom edge there, matching the
+ * existing mobile composition.
  */
 @media (max-width: 639px) {
   .layout {
@@ -149,7 +153,7 @@
 .title {
   font-family: var(--font-family-bold);
   font-weight: 700;
-  font-size: 20px;
+  font-size: 24px;
   line-height: normal;
   color: var(--black-500);
   margin: 0;
@@ -174,10 +178,17 @@
     display: none;
   }
 
+  /*
+   * Close button position pinned to Figma `ds:217:3024` (32 × 32
+   * button at 24 px from the top and right edge of the white card).
+   * Since AC-20d's amended hit-target rule treats the visible
+   * 32 × 32 surface as the click target itself (no wrapping buffer),
+   * the button can land at Figma's offset directly.
+   */
   .closeButton {
     position: absolute;
-    top: var(--space-lg);
-    right: var(--space-lg);
+    top: 24px;
+    right: 24px;
     z-index: 1;
   }
 
@@ -186,13 +197,17 @@
   }
 }
 
+/*
+ * Body (Figma `ds:191:584`) is a plain flex row with no gap — the
+ * column spacing is owned by `.divider`'s 32px symmetric padding
+ * (Figma `ds:195:843`) so the 1px line lands on a 32 + 1 + 32 band.
+ */
 .body {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  gap: var(--space-2xl);
   width: 100%;
 }
 
@@ -208,14 +223,17 @@
 
 /*
  * AC-33 (Lane J) — 1 px vertical divider between the sidebar column
- * and the conversation column. Hidden on mobile (the sidebar moves
- * into the AC-33d drawer at that breakpoint, so the divider has
- * nothing to divide).
+ * and the conversation column. The 32 px horizontal margin matches
+ * Figma `ds:195:843`'s `px-[32px]` padding around the line so the
+ * 1 px sits in the centre of a 32 + 1 + 32 band. Hidden on mobile
+ * (the sidebar moves into the AC-33d drawer at that breakpoint, so
+ * the divider has nothing to divide).
  */
 .divider {
   flex: 0 0 1px;
   align-self: stretch;
   background: var(--gray-500);
+  margin: 0 var(--space-xl);
 }
 
 @media (max-width: 639px) {
@@ -228,6 +246,13 @@
   }
 }
 
+/*
+ * Conversation column (Figma `ds:202:254`) — `max-width: 900px`,
+ * `gap-[64px]` between the messages stream and the bottom-pinned
+ * textarea. The messages container is its own overflow surface
+ * (AC-28c) and grows to fill the column; the input is a fixed-size
+ * sibling at the bottom of the flex column.
+ */
 .contentColumn {
   flex: 1 1 auto;
   min-width: 0;
@@ -235,6 +260,7 @@
   max-width: var(--content-width);
   display: flex;
   flex-direction: column;
+  gap: var(--space-3xl);
   align-self: stretch;
 }
 
@@ -283,20 +309,27 @@
  * AC-28 — `.inputWrapper` is the bottom-pinned input slot inside the
  * conversation column. It sits as a normal flex item below
  * `.messages`; the column's flex layout pins it to the bottom because
- * `.messages` flexes (`flex: 1 1 auto`). Solid white background so
- * the band under the mask-image fade reads as a clean surface.
+ * `.messages` flexes (`flex: 1 1 auto`). The vertical breathing room
+ * above and below the textarea is owned by the column's `gap`
+ * (top, 64 px) and `.layout`'s bottom padding (64 px desktop card
+ * inset per Figma `py-[64px]`). Solid white background so the band
+ * under the mask-image fade reads as a clean surface.
  */
 .inputWrapper {
   flex: 0 0 auto;
   width: 100%;
-  padding: var(--space-lg) 0 var(--space-3xl);
   background: var(--white-500);
   box-sizing: border-box;
 }
 
 @media (max-width: 639px) {
+  /*
+   * Mobile keeps the `.layout` bottom padding at 0 and re-introduces
+   * a small bottom buffer here so the textarea doesn't slam against
+   * the viewport edge on phones.
+   */
   .inputWrapper {
-    padding: var(--space-sm) 0 var(--space-xl);
+    padding-bottom: var(--space-xl);
   }
 }
 
