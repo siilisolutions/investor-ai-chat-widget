@@ -19,7 +19,7 @@
 .divider {
   height: 1px;
   width: 100%;
-  background: var(--gray-500);
+  background: var(--gray-600);
 }
 
 .link {
