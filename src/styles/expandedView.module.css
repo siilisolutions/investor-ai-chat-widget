@@ -95,12 +95,14 @@
 
 /*
  * `.layout` hosts the title row and the body row. It fills the
- * surface card and is left-aligned so the sidebar (and the title
- * directly above it) hug the card's left edge per `site:434:2424`.
- * The conversation column inside `.body` self-caps via its own
- * `max-width: var(--content-width)`, so very wide viewports leave
- * empty whitespace to the right of the conversation rather than
- * pushing the sidebar toward the centre.
+ * surface card so the sidebar (and the title directly above it)
+ * hug the card's left edge per `site:434:2424`. The conversation
+ * column inside `.body` self-caps via its own
+ * `max-width: var(--content-width)` and self-centers within its
+ * slot (`margin-inline: auto`), so very wide viewports balance the
+ * conversation in the available space rather than left-anchoring
+ * it against the divider. The sidebar stays pinned to the card's
+ * left edge regardless because it is a fixed-width flex sibling.
  *
  * Card insets match Figma `ds:152:97` (`px-[48px] py-[64px]`):
  * 64 px top + bottom, 48 px left + right on tablet / desktop.
@@ -247,11 +249,24 @@
 }
 
 /*
- * Conversation column (Figma `ds:202:254`) — `max-width: 900px`,
- * `gap-[64px]` between the messages stream and the bottom-pinned
- * textarea. The messages container is its own overflow surface
- * (AC-28c) and grows to fill the column; the input is a fixed-size
- * sibling at the bottom of the flex column.
+ * Conversation column (Figma `ds:202:254`) — `max-width: 888px`
+ * (Figma `max-w-[888px]`), `gap-[64px]` between the messages stream
+ * and the bottom-pinned textarea. The messages container is its own
+ * overflow surface (AC-28c) and grows to fill the column; the input
+ * is a fixed-size sibling at the bottom of the flex column.
+ *
+ * `margin-inline: auto` self-centers the column within its slot,
+ * matching Figma's new `377:557` wrapper that `items-center`s
+ * `ds:202:254` inside the conversation slot. At ≤1440 viewports the
+ * available slot (= card-inner − sidebar − divider band) is ≤887 px
+ * and the column flex-grows to fill it (no centering side-effect).
+ * Above 1440 the slot exceeds the 888 px self-cap and the excess
+ * splits evenly on both sides instead of piling up to the right of
+ * the column, so the chat reads as visually balanced rather than
+ * left-anchored against the divider. The sidebar stays pinned to
+ * the card's left edge per `site:434:2424` because it is a sibling
+ * flex item with `flex: 0 0 360px` — only `.contentColumn` is
+ * affected.
  */
 .contentColumn {
   flex: 1 1 auto;
@@ -262,6 +277,7 @@
   flex-direction: column;
   gap: var(--space-3xl);
   align-self: stretch;
+  margin-inline: auto;
 }
 
 /*

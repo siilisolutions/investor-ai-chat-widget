@@ -333,6 +333,22 @@ PR.
 > assets) stay clean — the glyph is plain SVG markup; AC-100 gzip
 > total `20.32 kB / 60 kB`.
 >
+> **Update — 2026-05-13 (Lane P follow-up — content-column max-width
+> reconciliation).** Designer pinned an explicit `max-w-[888px]` on
+> `ds:202:254` and wrapped it in a new `ds:377:557` `flex-col
+> items-center` container so the conversation column is centered
+> within the conversation slot at any viewport width. AC-90's §2.5
+> manifest row updates: anchors gain `ds:377:557`, the column
+> self-cap text changes `max-w-[900px]` → `max-w-[888px]`, and the
+> centering wrapper is named in-line. `--content-width` in
+> [`src/styles/variables.css`](src/styles/variables.css) updates
+> `900px → 888px` to match. The previous Lane P bump from 800 → 900
+> in the original sweep narrative above is preserved as historical
+> record (the designer's intermediate value before this 888 pin).
+> AC-90 stays `@stable`; its body still defers visuals to §2.5 so
+> no body edit is needed. Code change ships in the same PR. AC-100
+> gzip total stays clean.
+>
 > **2026-05-11 — Lane M partial-sweep (mobile chip-row promotion).** The
 > AC-92 / AC-92b candidate anchors surfaced in Lane L (`site:591:3203`
 > *Etusivu - Mobile* and `site:608:1855` *Etusivu - Mobile - v2*) are
@@ -592,7 +608,7 @@ PR.
 | AC-72   | `ds:152:129`, `ds:152:131`, `ds:152:133`      | Send button Active / Hover / Pressed             | 2026-04-22   | Lane E full-sweep |
 | AC-73   | — (code-authored)                             | Typography — Everett weights (via `--font-family*` tokens) | 2026-04-22   | Lane E full-sweep (code-authored watch) |
 | AC-73b  | — (code-authored)                             | Typography — sans-serif fallback, no large CLS   | 2026-04-22   | Lane E full-sweep (code-authored watch) |
-| AC-90   | `site:13:527`, `site:434:2424`, `ds:152:97`, `ds:202:254` | Desktop (≥1024px) layout — adopts inset white card + blurred backdrop band per AC-20a; padding and column widths confirmed against `site:434:2424`. White card carries `px-[48px] py-[64px]` symmetric padding per `ds:152:97`; conversation column self-caps at `max-w-[900px]` (`--content-width`) with `gap-[64px]` between the messages stream and the bottom-pinned textarea per `ds:202:254`. | 2026-05-13   | Lane P — Investor agent re-sync (card bottom padding restored from 0 → 64 px; `--content-width` 800 → 900) |
+| AC-90   | `site:13:527`, `site:434:2424`, `ds:152:97`, `ds:202:254`, `ds:377:557` | Desktop (≥1024px) layout — adopts inset white card + blurred backdrop band per AC-20a; padding and column widths confirmed against `site:434:2424`. White card carries `px-[48px] py-[64px]` symmetric padding per `ds:152:97`; conversation column self-caps at `max-w-[888px]` (`--content-width`) with `gap-[64px]` between the messages stream and the bottom-pinned textarea per `ds:202:254`, and is horizontally centered within the conversation slot by the `items-center` wrapper `ds:377:557`. | 2026-05-13   | Lane P follow-up — `--content-width` 900 → 888 to match `ds:202:254` `max-w-[888px]`; centering wrapper `ds:377:557` added to manifest |
 | AC-91   | — (code-authored)                             | Tablet (640–1023px) layout                       | 2026-04-22   | Lane F graduation (code-authored, designer delegation) |
 | AC-92   | `site:608:1855`                               | Mobile (<640px) layout — compact stacks input above chips, each chip taking the full width of the chip container per `site:608:1855` *Etusivu - Mobile - v2*. The alternate iteration `site:591:3203` *Etusivu - Mobile* renders the same input-above-chips structure with multi-line chip labels rather than single-line ellipsis; recorded here for history but not the canonical anchor (designer delegated to v2 in Lane M). | 2026-05-11   | Lane M — promoted from code-authored after `site:608:1855` / `site:591:3203` surfaced in Lane L |
 | AC-92b  | `site:608:1855`                               | Mobile (<640px) — chips stack vertically (column flex) per `site:608:1855`, each chip taking 100% of the chip container's width, with labels truncated by single-line ellipsis (`text-overflow: ellipsis` on the chip surface, AC-12b `white-space: nowrap` preserved). The alternate iteration `site:591:3203` renders the same vertical stack with multi-line chip labels (chip surface grows with content) rather than single-line ellipsis; recorded for history but not the canonical anchor — Lane M chose v2 because Figma's published placeholder strings already exceed the chip surface, so v1's multi-line wrapping would not visibly differ from a single-line ellipsis at the production string lengths, and v2's behaviour is the stricter contract. | 2026-05-11   | Lane M — promoted from code-authored; v2 chosen as canonical, v1 recorded as alternate |
