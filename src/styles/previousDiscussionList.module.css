@@ -30,7 +30,7 @@
  *   - 48 px gap between the AC-35 "Luo uusi keskustelu" CTA at the
  *     top and the rest of the list (`gap-[48px]`)
  * The `.headingSection` wrapper inside provides the inner 16 px gap
- * between the "AIEMMAT KESKUSTELUT" label and the row list itself.
+ * between the "VIIMEISIMMÄT KESKUSTELUT" label and the row list itself.
  */
 .list {
   flex: 0 0 360px;
@@ -51,7 +51,7 @@
 }
 
 /*
- * "AIEMMAT KESKUSTELUT" — Figma `ds:191:259`. 14 px Everett Medium,
+ * "Viimeisimmät keskustelut" — Figma `ds:191:259`. 14 px Everett Medium,
  * uppercase, with letter-spacing `0.224px`. The widget does not ship
  * an Everett Medium binary (font binaries are forbidden by AC-N2);
  * `font-weight: 500` falls through to whatever the host page provides

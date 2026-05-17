@@ -233,7 +233,7 @@ describe('ExpandedView — AC-33 sidebar visibility', () => {
       />,
     )
     expect(
-      screen.getByRole('complementary', { name: 'Aiemmat keskustelut' }),
+      screen.getByRole('complementary', { name: 'Viimeisimmät keskustelut' }),
     ).toBeInTheDocument()
     // The AC-35 start-new CTA is the always-reachable surface that
     // motivates AC-33's amended always-visible rule.
@@ -284,7 +284,7 @@ describe('ExpandedView — AC-33 sidebar visibility', () => {
       />,
     )
     const sidebar = screen.getByRole('complementary', {
-      name: 'Aiemmat keskustelut',
+      name: 'Viimeisimmät keskustelut',
     })
     expect(sidebar).toBeInTheDocument()
     const activeRow = screen.getByRole('button', {
@@ -295,6 +295,11 @@ describe('ExpandedView — AC-33 sidebar visibility', () => {
       name: 'Mikä on yhtiön osinkopolitiikka?',
     })
     expect(inactiveRow).not.toHaveAttribute('aria-current')
+
+    const rows = sidebar.querySelectorAll('ul > li')
+    expect(rows).toHaveLength(2)
+    expect(rows[0]).toHaveTextContent('Mikä on liikevaihdon kasvu?')
+    expect(rows[1]).toHaveTextContent('Mikä on yhtiön osinkopolitiikka?')
   })
 
   it('AC-33b: clicking an inactive row calls onActivateConversation with that id', () => {
