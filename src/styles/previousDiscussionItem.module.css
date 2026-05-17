@@ -16,9 +16,10 @@
  * The active row uses the Pressed variant's surface as its idle
  * treatment (no separate transient "while pressing" state — the click
  * instantly switches the active conversation, so the row stays
- * visibly "depressed" as the AC-33a active-row cue, alongside the
- * label's bold weight). Hovering an already-active row keeps the
- * Pressed surface so the active cue is not bleached back to Hover.
+ * visibly "depressed" against inactive rows). Label typography stays
+ * Everett Regular on every variant per `ds:230:459` (Figma wins over
+ * the earlier code-authored bold cue). Hovering an already-active row
+ * keeps the Pressed surface so the active cue is not bleached to Hover.
  */
 
 /*
@@ -68,10 +69,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.row.active .activate {
-  font-family: var(--font-family-bold);
 }
 
 .activate:focus-visible,

@@ -8,8 +8,9 @@
  *   the conversation, truncated to fit. Empty conversations (created
  *   but never sent) fall back to a neutral default.
  * - The currently-active row is visually distinguished from inactive
- *   rows; the parent list is responsible for telling this row whether
- *   it is the active one (`active` prop).
+ *   rows by the Pressed variant surface (`--gray-600`, Figma
+ *   `ds:230:459`); label weight stays Regular on all variants. The
+ *   parent list passes the `active` prop.
  *
  * Per AC-33b:
  * - Click / keyboard activation of the row label calls `onActivate`
