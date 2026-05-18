@@ -342,7 +342,7 @@ describe('App', () => {
     // spuriously minted a second conversation the sidebar would
     // carry two rows.
     expect(
-      screen.getByRole('complementary', { name: 'Aiemmat keskustelut' }),
+      screen.getByRole('complementary', { name: 'Viimeisimmät keskustelut' }),
     ).toBeInTheDocument()
     const rows = screen.getAllByRole('button', { name: 'first question' })
     // The same text appears twice in the DOM — once in the Q+A
@@ -453,7 +453,7 @@ describe('App', () => {
     // 2026-05) — surviving the removal it now carries exactly one
     // row (conv-B's).
     expect(
-      screen.getByRole('complementary', { name: 'Aiemmat keskustelut' }),
+      screen.getByRole('complementary', { name: 'Viimeisimmät keskustelut' }),
     ).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: 'Question B?' }),
@@ -489,7 +489,7 @@ describe('App', () => {
     // Sidebar visible (AC-33 always-visible amended 2026-05) with
     // exactly one row — the only seeded conversation.
     expect(
-      screen.getByRole('complementary', { name: 'Aiemmat keskustelut' }),
+      screen.getByRole('complementary', { name: 'Viimeisimmät keskustelut' }),
     ).toBeInTheDocument()
 
     // Click the per-row × on the only row.
@@ -522,7 +522,7 @@ describe('App', () => {
     // PreviousDiscussionList's NEUTRAL_LABEL ("Uusi keskustelu") —
     // the freshly-minted replacement has no Q+A pair yet.
     expect(
-      screen.getByRole('complementary', { name: 'Aiemmat keskustelut' }),
+      screen.getByRole('complementary', { name: 'Viimeisimmät keskustelut' }),
     ).toBeInTheDocument()
     const replacementRow = screen.getByRole('button', {
       name: 'Uusi keskustelu',

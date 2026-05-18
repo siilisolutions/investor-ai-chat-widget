@@ -53,6 +53,8 @@ interface PreviousDiscussionListProps {
 
 const NEUTRAL_LABEL = 'Uusi keskustelu'
 const LABEL_MAX = 60
+/** Figma `ds:191:259` — rendered uppercase via `.heading` */
+const HEADING_LABEL = 'Viimeisimmät keskustelut'
 
 function deriveLabel(conversation: Conversation): string {
   const firstUser = conversation.messages.find(
@@ -71,8 +73,12 @@ export function PreviousDiscussionList({
   onStartNew,
   onDelete,
 }: PreviousDiscussionListProps) {
+  // PD-08 stores conversations oldest→newest; the sidebar shows the
+  // most recently stored thread at the top for quicker scanning.
+  const displayConversations = [...conversations].reverse()
+
   return (
-    <aside className={styles.list} aria-label="Aiemmat keskustelut">
+    <aside className={styles.list} aria-label={HEADING_LABEL}>
       <button
         type="button"
         className={styles.newButton}
@@ -91,20 +97,22 @@ export function PreviousDiscussionList({
         </svg>
         Luo uusi keskustelu
       </button>
-      <h3 className={styles.heading}>Aiemmat keskustelut</h3>
-      <ul className={styles.items}>
-        {conversations.map((c) => (
-          <li key={c.id}>
-            <PreviousDiscussionItem
-              id={c.id}
-              label={deriveLabel(c)}
-              active={c.id === activeConversationId}
-              onActivate={onActivate}
-              onDelete={onDelete}
-            />
-          </li>
-        ))}
-      </ul>
+      <div className={styles.headingSection}>
+        <h3 className={styles.heading}>{HEADING_LABEL}</h3>
+        <ul className={styles.items}>
+          {displayConversations.map((c) => (
+            <li key={c.id}>
+              <PreviousDiscussionItem
+                id={c.id}
+                label={deriveLabel(c)}
+                active={c.id === activeConversationId}
+                onActivate={onActivate}
+                onDelete={onDelete}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
     </aside>
   )
 }

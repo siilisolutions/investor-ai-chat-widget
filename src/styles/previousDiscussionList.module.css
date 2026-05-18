@@ -24,26 +24,62 @@
  * still uses `--send-gradient` (AC-72).
  */
 
+/*
+ * Sidebar dimensions match Figma `ds:191:610`:
+ *   - width 360 px (`w-[360px]`)
+ *   - 48 px gap between the AC-35 "Luo uusi keskustelu" CTA at the
+ *     top and the rest of the list (`gap-[48px]`)
+ * The `.headingSection` wrapper inside provides the inner 16 px gap
+ * between the "VIIMEISIMMÄT KESKUSTELUT" label and the row list itself.
+ */
 .list {
-  flex: 0 0 240px;
+  flex: 0 0 360px;
   align-self: stretch;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-2xl);
   box-sizing: border-box;
 }
 
+.headingSection {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/*
+ * "Viimeisimmät keskustelut" — Figma `ds:191:259`. 14 px Everett Medium,
+ * uppercase, with letter-spacing `0.224px`. The widget does not ship
+ * an Everett Medium binary (font binaries are forbidden by AC-N2);
+ * `font-weight: 500` falls through to whatever the host page provides
+ * for Everett, with the existing `var(--font-family)` fallback to
+ * sans-serif when the font is absent.
+ */
 .heading {
-  font-family: var(--font-family-bold);
-  font-size: 16px;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
   line-height: normal;
+  letter-spacing: 0.224px;
+  text-transform: uppercase;
   margin: 0;
   color: var(--black-500);
 }
 
+/*
+ * Content-sized — Figma `ds:191:610` parent uses `items-start` so the
+ * CTA hugs its label rather than spanning the 360 px sidebar. The
+ * `align-self: flex-start` is what stops the parent flex column's
+ * default `align-items: stretch` from blowing the button to full
+ * sidebar width; without it, `display: inline-flex` is overridden
+ * cross-axis and the pill reads as a full-width banner.
+ */
 .newButton {
   display: inline-flex;
+  align-self: flex-start;
   align-items: center;
   justify-content: center;
   gap: var(--space-md);
@@ -98,6 +134,10 @@
   }
 }
 
+/*
+ * Row gap matches Figma `ds:191:610` slot — `gap-[12px]` between
+ * adjacent `PreviousDiscussionItem` rows.
+ */
 .items {
   list-style: none;
   margin: 0;
@@ -106,7 +146,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--space-md);
   overflow-y: auto;
   scrollbar-gutter: stable;
 }

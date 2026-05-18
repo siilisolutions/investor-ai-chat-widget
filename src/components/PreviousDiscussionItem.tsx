@@ -8,8 +8,9 @@
  *   the conversation, truncated to fit. Empty conversations (created
  *   but never sent) fall back to a neutral default.
  * - The currently-active row is visually distinguished from inactive
- *   rows; the parent list is responsible for telling this row whether
- *   it is the active one (`active` prop).
+ *   rows by the Pressed variant surface (`--gray-600`, Figma
+ *   `ds:230:459`); label weight stays Regular on all variants. The
+ *   parent list passes the `active` prop.
  *
  * Per AC-33b:
  * - Click / keyboard activation of the row label calls `onActivate`
@@ -25,8 +26,10 @@
  *   stays valid HTML (no nested interactive elements) and a click
  *   on × does not bubble through the activate button.
  *
- * Visual styling reuses existing widget tokens until the IR-DS frame
- * lands a Figma-confirmed treatment.
+ * The trailing glyph is an inline SVG mirroring Figma `ds:152:88`
+ * (Reset icon — two 1.21 px black bars rotated ±45° in a 24 × 24
+ * frame), inlined so AC-N2 (no font binaries / image assets) and
+ * AC-100 (60 KB gzip budget) stay clean.
  *
  * Used inside: `PreviousDiscussionList`.
  */
@@ -65,9 +68,32 @@ export function PreviousDiscussionItem({
         aria-label={`Poista keskustelu — ${label}`}
         onClick={() => onDelete(id, label)}
       >
-        <span aria-hidden="true" className={styles.deleteGlyph}>
-          ×
-        </span>
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          className={styles.deleteGlyph}
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          fill="none"
+        >
+          <line
+            x1="6"
+            y1="6"
+            x2="18"
+            y2="18"
+            stroke="currentColor"
+            strokeWidth="1.21"
+          />
+          <line
+            x1="18"
+            y1="6"
+            x2="6"
+            y2="18"
+            stroke="currentColor"
+            strokeWidth="1.21"
+          />
+        </svg>
       </button>
     </div>
   )
