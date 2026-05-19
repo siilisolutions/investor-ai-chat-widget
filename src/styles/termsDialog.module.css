@@ -66,6 +66,15 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  /*
+   * Containment hint — scroll past the long-form body's edges must
+   * not chain to any ancestor scroller. The host page is already
+   * locked while the gate is open (see `TermsDialog.tsx`), but this
+   * also prevents chaining into the modal card / backdrop on platforms
+   * that compute composite scroll roots, and avoids macOS-style rubber
+   * banding bleeding into the dialog chrome.
+   */
+  overscroll-behavior: contain;
   font-family: var(--font-family);
   font-size: 16px;
   line-height: 22px;

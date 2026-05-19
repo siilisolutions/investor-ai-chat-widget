@@ -296,6 +296,16 @@
   width: 100%;
   overflow-y: auto;
   scrollbar-gutter: stable;
+  /*
+   * Containment hint — scroll past the conversation stream's edges
+   * must not chain to the `.surface` card or the `.backdrop`
+   * (which would otherwise rubber-band on macOS or trigger the host
+   * page's own scroller on browsers that resolve composite scroll
+   * roots before the JS `html`/`body` lock kicks in). Mirrors the
+   * same hint on the AC-66 `TermsDialog` body so "scroll stays in
+   * the uppermost layer" holds for both modal-like surfaces.
+   */
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
   gap: var(--space-3xl);

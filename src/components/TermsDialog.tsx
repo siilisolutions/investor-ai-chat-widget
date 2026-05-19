@@ -160,6 +160,27 @@ export function TermsDialog({
     }
   }, [open])
 
+  // Host-page scroll lock while the gate is open. `TermsDialog` only
+  // ever opens from compact mode (per the JSDoc invariant — it never
+  // co-occurs with the AC-33e delete modal mounted from expanded), so
+  // unlike `ExpandedView` there is no surrounding scroll-locked layer
+  // we can rely on; without this the host page (sijoittajille.siili.com)
+  // scrolls under the modal as soon as the wheel / touch reaches the
+  // dialog body's edges or lands on the dimmed backdrop band.
+  useEffect(() => {
+    if (!open) return
+    const html = document.documentElement
+    const body = document.body
+    const prevHtmlOverflow = html.style.overflow
+    const prevBodyOverflow = body.style.overflow
+    html.style.overflow = 'hidden'
+    body.style.overflow = 'hidden'
+    return () => {
+      html.style.overflow = prevHtmlOverflow
+      body.style.overflow = prevBodyOverflow
+    }
+  }, [open])
+
   if (!open) return null
 
   const handleBackdropClick = (event: ReactMouseEvent<HTMLDivElement>) => {
