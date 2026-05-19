@@ -15,7 +15,7 @@ describe('CompactView', () => {
     const textarea = screen.getByLabelText('Siili investor chatbot message')
     expect(textarea).toHaveAttribute(
       'placeholder',
-      'Kysy minulta mitä vaan Siilistä sijoituskohteena tai taloustiedoistamme.',
+      'Kysy minulta Siilistä sijoituskohteena.',
     )
   })
 

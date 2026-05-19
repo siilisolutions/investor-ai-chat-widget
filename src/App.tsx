@@ -93,9 +93,9 @@ import type { ChatService, Conversation } from './types/index.ts'
 import styles from './styles/app.module.css'
 
 const SUGGESTIONS = [
-  'Missä liiketoimintasegmenteissä yhtiö toimii, ja mihin kukin segmentti keskittyy?',
+  'Mikä on Siilin strategia ja kuinka sen toteuttaminen on edennyt?',
   'Mikä on yhtiön nykyinen osinkopolitiikka?',
-  'Miten liikevaihdon kasvu kehittyy, ja mitkä tekijät vaikuttavat vuosi vuodelta tapahtuneisiin muutoksiin?',
+  'Mistä löydän lisätietoa yhtiön liikevaihdosta ja tuloksesta?',
 ]
 
 type Mode = 'compact' | 'expanded'

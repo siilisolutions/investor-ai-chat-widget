@@ -578,8 +578,8 @@ PR.
 | AC-10   | `site:13:527`                                 | Compact view layout (hero overlay)               | 2026-04-22   | Lane E full-sweep |
 | AC-10a  | `site:395:5439`                               | Continue-conversation pill — rendering on hero (Etusivu — jatka edellistä keskustelua) | 2026-05-06   | Multi-discussion flow rework |
 | AC-10c  | `site:395:5439`                               | Continue-conversation pill — activation handoff to expanded | 2026-05-06   | Multi-discussion flow rework |
-| AC-11   | `ds:152:121`                                  | Textarea placeholder copy & colour               | 2026-04-22   | Lane E full-sweep |
-| AC-12   | `ds:152:86`                                   | Suggestion chip wording & wrap                   | 2026-04-22   | Lane E full-sweep |
+| AC-11   | `ds:152:121`                                  | Textarea placeholder copy & colour               | 2026-05-19   | Figma copy update — placeholder shortened to "Kysy minulta Siilistä sijoituskohteena." per `ds:152:75` `I152:81;181:146` and `ds:152:121` `152:123` |
+| AC-12   | `ds:152:86`                                   | Suggestion chip wording & wrap                   | 2026-05-19   | Figma copy update — chips #1 and #3 reworded per `ds:152:75` `I152:83;152:87` / `I152:85;152:87` (chip #2 unchanged) |
 | AC-12b  | `ds:152:86`                                   | Suggestion chip labels — single-line (nowrap)    | 2026-04-22   | Lane E full-sweep |
 | AC-16   | `ds:152:129`                                  | Send button — Active (gradient)                  | 2026-04-22   | Lane E full-sweep |
 | AC-20   | `site:434:2424`                               | Expanded view mount / first-frame layout         | 2026-05-05   | Lane E full-sweep + Lane E-1 ID rename |

@@ -56,8 +56,7 @@ interface ChatInputProps {
   continueAffordance?: ReactNode
 }
 
-const DEFAULT_PLACEHOLDER =
-  'Kysy minulta mitä vaan Siilistä sijoituskohteena tai taloustiedoistamme.'
+const DEFAULT_PLACEHOLDER = 'Kysy minulta Siilistä sijoituskohteena.'
 
 export function ChatInput({
   variant,

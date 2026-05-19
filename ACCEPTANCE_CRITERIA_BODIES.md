@@ -170,9 +170,13 @@ Maps to the Investor hero composition and its main component; see
 - **AC-11** — *Placeholder copy* · **@stable**
   - **Given** compact mode is shown,
   - **Then** the textarea displays the placeholder
-    *"Kysy minulta mitä vaan Siilistä sijoituskohteena tai
-    taloustiedoistamme."* styled per the textarea component
-    (see §2.5 row AC-11).
+    *"Kysy minulta Siilistä sijoituskohteena."* styled per the
+    textarea component (see §2.5 row AC-11). The same placeholder
+    is shown by the expanded-mode textarea (`ds:152:121` Default
+    variant) — Figma pins identical copy on both variants of the
+    `ds:181:143` Textarea component set so the widget renders one
+    string across both modes.
+  (amended 2026-05, #PR — Figma copy update: placeholder shortened from "Kysy minulta mitä vaan Siilistä sijoituskohteena tai taloustiedoistamme." to "Kysy minulta Siilistä sijoituskohteena." per `ds:152:75` `I152:81;181:146` and `ds:152:121` `152:123`.)
 
 - **AC-12** — *Suggestion chip content* · **@stable**
   - **Given** compact mode is shown,
