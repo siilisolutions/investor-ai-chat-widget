@@ -9,17 +9,25 @@
  * is transparent (AC-33).
  *
  * AC-33a state surfaces (amended 2026-05) — match the Figma parent
- * set `ds:230:452`:
+ * set `ds:230:452` and the IR-site `site:434:2424` composition:
  *   - Default (idle, inactive)     → `--gray-400` (#efefef, `ds:191:268`)
  *   - Hover (inactive, hovered)    → `--gray-500` (#e5e5e5, `ds:230:453`)
- *   - Pressed / active conversation → `--gray-600` (#c0c0c0, `ds:230:459`)
- * The active row uses the Pressed variant's surface as its idle
- * treatment (no separate transient "while pressing" state — the click
- * instantly switches the active conversation, so the row stays
- * visibly "depressed" against inactive rows). Label typography stays
- * Everett Regular on every variant per `ds:230:459` (Figma wins over
- * the earlier code-authored bold cue). Hovering an already-active row
- * keeps the Pressed surface so the active cue is not bleached to Hover.
+ *   - Active conversation         → `--gray-500` (same Hover surface
+ *     per `site:434:2424` where the active row is rendered with
+ *     `property1="Hover"`; the active row is one step darker than an
+ *     inactive Default row, but not as dark as the Pressed variant).
+ *
+ * Label typography stays Everett Regular on every variant — no
+ * separate bold-label cue; the surface step is the cue. Hovering an
+ * inactive row briefly produces the same surface as the active row,
+ * which is intentional: Figma's Hover variant doubles as the canonical
+ * "active-looking" treatment, so the hover preview reads as "this is
+ * what selecting will look like" (AC-33a amended 2026-05).
+ *
+ * The Pressed variant (`--gray-600` / `ds:230:459`) remains a
+ * documented part of the parent set but is not rendered as a static
+ * row state by the widget — it would be reserved for a future
+ * transient "while pressing" surface if one is ever needed.
  */
 
 /*
@@ -45,13 +53,10 @@
   transition: background-color 120ms ease-out;
 }
 
-.row:hover {
-  background: var(--gray-500);
-}
-
+.row:hover,
 .row.active,
 .row.active:hover {
-  background: var(--gray-600);
+  background: var(--gray-500);
 }
 
 .activate {

@@ -3,14 +3,16 @@
  * `PreviousDiscussionList`. Maps to Figma node `ds:191:268`
  * (Previous discussion item).
  *
- * Per AC-33a:
+ * Per AC-33a (amended 2026-05):
  * - Each row carries a label derived from the first user question of
  *   the conversation, truncated to fit. Empty conversations (created
  *   but never sent) fall back to a neutral default.
  * - The currently-active row is visually distinguished from inactive
- *   rows by the Pressed variant surface (`--gray-600`, Figma
- *   `ds:230:459`); label weight stays Regular on all variants. The
- *   parent list passes the `active` prop.
+ *   rows by carrying the Hover variant's surface (`--gray-500`,
+ *   Figma `ds:230:453`) per `site:434:2424` (`property1="Hover"`
+ *   for the active conversation in Figma's expanded-view composition).
+ *   Label weight stays Everett Regular on every variant — the surface
+ *   step is the cue. The parent list passes the `active` prop.
  *
  * Per AC-33b:
  * - Click / keyboard activation of the row label calls `onActivate`

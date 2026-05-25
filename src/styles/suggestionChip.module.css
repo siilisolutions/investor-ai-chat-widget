@@ -1,3 +1,12 @@
+/*
+ * AC-12c — drop-shadow elevation per Figma component set `ds:230:725`.
+ *   - Default  (`ds:152:86`)  → `0 4 12 rgba(0,0,0,0.1)` (wider envelope)
+ *   - Hover    (`ds:230:726`) → same wider envelope, surface 0.95 white
+ *   - Pressed  (`ds:230:728`) → `0 4 6 rgba(0,0,0,0.1)` (tighter envelope)
+ * The shadow tightens on press to convey pressed-down feedback; idle
+ * and hover share the wider envelope so hovering does not visually
+ * lift the chip further.
+ */
 .chip {
   display: inline-flex;
   align-items: flex-end;
@@ -6,6 +15,7 @@
   background: var(--surface-translucent);
   border: none;
   border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   font-family: var(--font-family);
   font-size: 14px;
   line-height: normal;
@@ -14,7 +24,8 @@
   cursor: pointer;
   outline: 2px solid transparent;
   outline-offset: 2px;
-  transition: background 120ms ease, outline-color 150ms ease;
+  transition: background 120ms ease, box-shadow 120ms ease,
+    outline-color 150ms ease;
   text-align: left;
 }
 
@@ -24,6 +35,7 @@
 
 .chip:active {
   background: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .chip:focus-visible {
@@ -54,3 +66,9 @@
     transition: none;
   }
 }
+
+/*
+ * AC-12c — under `prefers-reduced-motion: reduce` the shadow does not
+ * animate between states (per the AC body's reduced-motion clause). The
+ * static envelopes still apply, only the transition is suppressed.
+ */

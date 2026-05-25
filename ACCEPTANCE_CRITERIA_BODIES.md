@@ -195,6 +195,25 @@ Maps to the Investor hero composition and its main component; see
     wrap on tablet, horizontal scroll or wrap on mobile), not by
     breaking chip labels.
 
+- **AC-12c** — *Suggestion chip elevation* · **@evolving**
+  - **Given** compact mode is shown,
+  - **Then** each suggestion chip carries a subtle drop shadow on
+    every visual state (idle, hovered, pressed) so the chips read
+    as elevated cards against the hero image, matching the
+    predefined-question component's shadow declarations (see §2.5
+    row AC-12c).
+  - **Given** the user hovers a chip,
+  - **Then** the chip retains its shadow envelope while the surface
+    shifts to the Hover variant's slightly more opaque white per
+    AC-12 / §2.5 row AC-12c.
+  - **Given** the user presses a chip,
+  - **Then** the chip's shadow tightens (smaller blur radius) to
+    convey pressed-down feedback per the Pressed variant's tighter
+    envelope in Figma (see §2.5 row AC-12c).
+  - **And** under `prefers-reduced-motion: reduce` the shadow does
+    not animate between states — only the surface colour swaps.
+  (added 2026-05, #PR — Figma sweep surfaced that all three variants of `ds:230:725` declare drop shadows; the widget was rendering chips without any elevation.)
+
 - **AC-13** — *Sending from the textarea* · **@stable**
   - **Given** the user has typed a non-empty, non-whitespace question,
   - **When** they press `Enter` (without `Shift`) or click the send button,
@@ -586,25 +605,34 @@ Maps to the Investor agent composition and its main component; see
     from the first user question in that conversation, truncated
     to fit the row), so the user can recognise which thread is
     which.
-  - **Given** an inactive row is hovered or activated,
-  - **Then** the row's idle, hovered, and active surfaces come from
-    the same Default / Hover / Pressed variant family in Figma (see
-    §2.5 row AC-33a) so the four observable states (idle-inactive,
-    hovered-inactive, idle-active, hovered-active) read as a coherent
-    set rather than four unrelated greys.
+  - **Given** an inactive row is hovered,
+  - **Then** the row's idle and hovered surfaces come from the
+    Default and Hover variants of the parent set in Figma (see
+    §2.5 row AC-33a) so the two observable inactive states read
+    as a coherent neutral pair rather than two unrelated greys.
   - **Given** the active conversation is also tracked in the same
     store,
-  - **Then** the active row is visually distinguished from the
-    inactive rows by **two** cues working together: a typographic
-    weight cue on the row label (bold), and the row's surface set
-    to the Pressed variant's neutral surface (see §2.5 row AC-33a).
-    The active row therefore reads as visibly "depressed" against
-    the lighter Default and Hover surfaces of inactive rows. No
-    separate transient "while pressing" surface is rendered because
-    the click instantly switches the active conversation; hovering
-    an already-active row keeps the Pressed surface so the active
-    cue is not bleached back to Hover.
-  (added 2026-04, Figma component drift; amended 2026-05, #PR — graduated @aspirational → @evolving; visual states pinned to the `ds:230:452` parent set's Default / Hover / Pressed variants with active row using the Pressed surface as the AC-33a active-row cue alongside the bold-label cue; specifics live in §2.5 row AC-33a.)
+  - **Then** the active row is visually distinguished from inactive
+    rows by carrying the **Hover** variant's neutral surface (see
+    §2.5 row AC-33a) as its idle treatment — one step darker than
+    an inactive Default row, matching the active-row treatment
+    Figma applies in `site:434:2424` (`property1="Hover"` for the
+    active conversation). Row label typography stays Everett
+    Regular on every variant per the parent set (no separate bold
+    cue is rendered — the surface step is the cue). The strong
+    disambiguator for "which conversation am I looking at?" is the
+    right-column Q+A stream itself; the sidebar surface step is
+    a secondary confirmation that the right row corresponds to the
+    visible conversation.
+  - **And** hovering an inactive row briefly produces the same
+    surface as the active row. This is intentional: Figma's Hover
+    variant doubles as the canonical "active-looking" treatment,
+    so the hover preview reads as "this is what selecting will
+    look like". The Pressed variant remains a documented part of
+    the parent set but is not rendered as a static row state by
+    the widget — it would be reserved for a future transient
+    "while pressing" surface if one is ever needed.
+  (added 2026-04, Figma component drift; amended 2026-05, #PR — graduated @aspirational → @evolving; visual states pinned to the `ds:230:452` parent set's Default / Hover / Pressed variants with active row using the Pressed surface as the AC-33a active-row cue alongside the bold-label cue; specifics live in §2.5 row AC-33a; amended 2026-05, #PR — active row reconciled to the Hover variant's surface (one step darker than Default), and the bold-label cue dropped, per `site:434:2424` Figma context placing the active row at `property1="Hover"`. The Pressed variant is no longer rendered as a static row state.)
 
 - **AC-33b** — *Previous discussion item — activation* · **@aspirational**
   - **Given** the sidebar lists prior conversations (per AC-33a),
