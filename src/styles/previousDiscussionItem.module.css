@@ -12,7 +12,7 @@
  * set `ds:230:452` and the IR-site `site:434:2424` composition:
  *   - Default (idle, inactive)     → `--gray-400` (#efefef, `ds:191:268`)
  *   - Hover (inactive, hovered)    → `--gray-500` (#e5e5e5, `ds:230:453`)
- *   - Active conversation         → `--gray-500` (same Hover surface
+ *   - Active conversation         → `--gray-500` (Hover surface
  *     per `site:434:2424` where the active row is rendered with
  *     `property1="Hover"`; the active row is one step darker than an
  *     inactive Default row, but not as dark as the Pressed variant).
@@ -50,7 +50,7 @@
   background: var(--gray-400);
   border-radius: var(--radius);
   overflow: hidden;
-  transition: background-color 120ms ease-out;
+  transition: background-color var(--duration-fast) var(--ease-out);
 }
 
 .row:hover,
@@ -67,20 +67,13 @@
   border: none;
   padding: 0;
   font-family: var(--font-family);
-  font-size: 14px;
-  line-height: 24px;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-base);
   color: var(--black-500);
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.activate:focus-visible,
-.delete:focus-visible {
-  outline: 2px solid var(--black-500);
-  outline-offset: 2px;
-  border-radius: var(--radius);
 }
 
 /*
@@ -90,23 +83,33 @@
  * is just a transparent 24 × 24 hit slot.
  */
 .delete {
-  flex: 0 0 24px;
+  flex: 0 0 var(--size-icon-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
   background: transparent;
   border: none;
+  border-radius: 50%;
   padding: 0;
   cursor: pointer;
   color: var(--black-500);
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.delete:hover {
+  background: var(--gray-300);
+}
+
+.delete:active {
+  background: var(--gray-500);
 }
 
 .deleteGlyph {
   display: block;
-  width: 24px;
-  height: 24px;
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
 }
 
 @media (prefers-reduced-motion: reduce) {

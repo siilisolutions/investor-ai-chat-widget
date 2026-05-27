@@ -13,7 +13,7 @@ Host page (siili.com)
   └─ <div id="siili-chatbot">
        └─ SiiliChatbot.init({ container, apiUrl?, interceptBackNavigation? })
             └─ App (state machine: compact | expanded; multi-conversation store per PD-08)
-                 ├─ CompactView (hero input + chips)
+                 ├─ CompactView (hero headline + input + chips + scroll cue)
                  │    └─ ChatInput
                  │         └─ ContinuePill (AC-10a / site:395:5439 — rendered when prior history exists)
                  └─ ExpandedView (chat messages + input + close button + sidebar)
@@ -90,6 +90,8 @@ Implemented in the widget:
 | `152:137` | Loading spinner animation (variants `Start` `152:138` / `End` `152:140`) | part of `ChatMessage.tsx` (loading state) |
 | `152:142` | Loading information | part of `ChatMessage.tsx` (loading state) |
 | `152:86` | Predefined question (chip) | `src/components/SuggestionChip.tsx` |
+| `166:94` | Scroll-to-content button (compact hero footer) | `src/components/HeroScrollCue.tsx` |
+| `152:95` | Arrow (chevron inside `166:94`) | inlined in `HeroScrollCue.tsx` |
 | `1:2` | Siili Brand Colors swatches | — (reference for `src/styles/variables.css`) |
 
 Widget-scope supporting components:
@@ -115,8 +117,6 @@ Widget-scope supporting components:
 | `152:27` | Header link |
 | `152:29` | Footer category title |
 | `152:31` | Footer category link |
-| `166:94` | Scroll-to-content button |
-| `152:95` | Arrow (used inside `166:94`) |
 
 **Deprecated, do not use:**
 
@@ -158,8 +158,10 @@ All tokens live in `src/styles/variables.css` as CSS custom properties. These va
 | `--red-600` | `#d20000` | Destructive action surface (AC-33e confirm-delete button, Figma `ds:242:444`) |
 | `--cta-gradient` | `linear-gradient(117.63deg, var(--violet-500) 0%, var(--blue-500) 100%)` | "Luo uusi keskustelu" CTA pill (AC-35, Figma `ds:237:323`); also the *Hyväksyn käyttöehdot* primary button on the AC-66 terms gate (Figma `ds:257:1096` / `ds:242:551`). Intentionally distinct from `--send-gradient` so AC-72 send-button states stay untouched |
 | `--font-family` | `'Everett', sans-serif` | All text |
-| `--radius` | `20px` | All interactive elements |
-| `--textarea-shadow` | `0px 4px 12px rgba(0,0,0,0.2)` | Expanded mode textarea |
+| `--radius` | `1.25rem` (20 px) | All interactive elements |
+| `--textarea-shadow` | `0 0.25rem 0.75rem rgba(0,0,0,0.2)` | Expanded mode textarea |
+| `--space-lg` | `1rem` (16 px) | Standard gap / padding step |
+| `--textarea-max-height` | `15rem` (240 px, PD-06) | Textarea auto-grow cap |
 
 ## File Map
 
@@ -170,7 +172,7 @@ All tokens live in `src/styles/variables.css` as CSS custom properties. These va
 | `src/widget.tsx` | Library entry point — exports `init()` for embedding |
 | `src/main.tsx` | Dev entry point — calls `init()` for local development |
 | `src/App.tsx` | Root component — manages compact/expanded mode, the multi-conversation store (per PD-08), back-navigation interceptor (AC-20c / AC-20g / AC-20i), and dismiss flow (AC-20j / AC-31) |
-| `src/components/CompactView.tsx` | Hero mode: input + suggestion chips + optional continue-pill |
+| `src/components/CompactView.tsx` | Hero mode: centred headline, input, chips, optional continue-pill, scroll cue (`ds:152:75`) |
 | `src/components/ContinuePill.tsx` | "Jatka edellistä keskustelua" affordance inside the compact textarea shell (AC-10a / AC-10c, Figma `site:395:5439`) |
 | `src/components/ExpandedView.tsx` | Chat mode: messages list + input + close button + sidebar (2-column layout, sidebar always rendered per AC-33 amended 2026-05). Below the §12.1 PD-05 mobile breakpoint the sidebar collapses behind a hamburger toggle (AC-33d, Figma `ds:230:656`) that opens the `MobileMenu` drawer (`ds:214:1214`); the close button moves into the mobile top-bar row alongside the hamburger and title per `site:435:2904`. |
 | `src/components/ChatInput.tsx` | Shared textarea + send button (compact/expanded variants) |
@@ -365,7 +367,9 @@ When you add a new React component that has a corresponding main component in IR
 - [x] **Previous discussion sidebar (`ds:191:258` / `ds:191:268`)** — `PreviousDiscussionList` + `PreviousDiscussionItem` ship in `ExpandedView`'s 2-column layout, are connected in Figma, and are backed by `src/services/conversationStore.ts` (PD-08 localStorage). The sidebar is now always rendered in expanded mode (AC-33 amended 2026-05 from `@aspirational` → `@evolving`; the earlier "≥ 2 conversations to render" rule, AC-33c, is tombstoned). AC-33a graduated to `@evolving` 2026-05-06 with row visual states pinned to the `ds:230:452` parent set's Default / Hover / Pressed variants; **amended 2026-05-25** (Figma sweep): the active-conversation cue is now the Hover variant's surface (`--gray-500`) per `site:434:2424`, and the bold-label cue has been dropped (Regular weight on every variant matches Figma). AC-33b remains `@aspirational` until Figma confirms the activation flow; AC-33d graduated to `@evolving` 2026-05-06 with the mobile drawer landing (see "Mobile drawer" entry below); AC-35 graduated to `@stable` separately.
 - [x] **Mobile drawer for the AC-33 sidebar (`ds:214:1214` / `ds:230:656` / `site:435:2914`)** — landed 2026-05-06 (Lane K). `src/components/MenuButton.tsx` is the 24×24 hamburger toggle (Code Connect `ds:230:656`) and `src/components/MobileMenu.tsx` is the left-anchored slide-in drawer (Code Connect `ds:214:1214`) that hosts the existing `PreviousDiscussionList` over a translucent dark + blurred backdrop. The chat-level `CloseButton` is rendered once and re-positioned per breakpoint (in-flow inside the mobile top-bar at <640 px, `position: absolute` against `.surface` corner ≥640 px). Drawer dismiss paths: internal × / `Esc` / backdrop tap / row activation / start-new — focus returns to the hamburger on close; the AC-33e per-row delete `×` does NOT close the drawer (its modal renders over). AC-33d graduated `@aspirational → @evolving`, anchored in §2.5 to `ds:214:1214` / `ds:230:656` / `site:435:2914`. AC-21 body extended for the mobile top-bar layout. New token `--gray-300: #f4f4f4` for the hamburger Hover state.
 - [x] **Hero textarea variant (`ds:181:144`)** — the widget renders both variants via `ChatInput`'s `compact` prop and the variant resolves through the `181:143` Code Connect parent set.
-- [ ] **Everett font loading** — assumes host page loads the font; may need `@font-face` fallback
+- [ ] **Everett font loading** — assumes host page loads the font; may need `@font-face` fallback. **Lane R (candidate)** — bundle subsetted Everett inside the IIFE if product approves relaxing **AC-N2** (see lane entry below); avoids per-host font coordination cost.
+- [x] **Lane Q — rem / responsive token pass (2026-05-26)** — Designer QA asked for breakpoints and sizing in `rem`. Scope: convert `src/styles/variables.css` spacing + typography tokens to `rem` (16 px root), audit media queries against §12.1 PD-05 / PD-06 / PD-07, reconcile component modules that still hardcode `px`, Figma pass on `site:608:1855` / `site:435:2904` / `site:435:2914`. Compact hero vertical centring + headline now ship in `CompactView` (`ds:152:75`, 2026-05-26). Depends on: none. Gates: visual sign-off on staging; `npm run verify` (AC-100). **Landed 2026-05-27:** rem token system in `variables.css`; PD-05 breakpoints as `39.9375rem` / `40rem` / `64rem`; PD-06 `--textarea-max-height: 15rem`; PD-07 `--duration-*` tokens; all CSS modules reconciled. Gzip 21.41 kB / 60 kB.
+- [ ] **Lane R — bundled Everett fonts (candidate, 2026-05-26)** — **Not started.** Product question: ship Regular + Bold (+ Light if needed) inside `dist/` so embedders need not load Everett on the host page. **Blockers:** (1) **AC-N2** is `@stable` non-goal — needs explicit human approval + AC amend (tombstone AC-N2 or mint `AC-N2b` allowing widget-hosted `@font-face` with a byte budget); (2) **AC-100** — subsetted `woff2` for three weights may cost ~15–35 KB gzip (measure before merge); (3) **licence** — confirm Siili may redistribute Everett in a public npm/CDN artefact; (4) **change-boundary** — embedding contract: host pages could drop their Everett `<link>` but must still load `siili-chatbot.css`. Implementation sketch: `src/assets/fonts/` + `?inline` or Vite asset pipeline, `@font-face` only in scoped `.siiliChatbot` rules, update `verify.mjs` AC-N2 guard, README embed section. **Cheaper alternative:** document a single shared jsDelivr/HubSpot font URL hosts reuse (no AC-N2 change, still host-dependent once).
 - [ ] **Streaming responses** — current interface is request/response; add SSE/WebSocket support
 - [x] **Reset / new conversation** — three paths exist: (1) every compact-mode send mints a fresh conversation when prior history exists (AC-31f); (2) the AC-33 sidebar's "Luo uusi keskustelu" button starts a new thread without leaving expanded mode (AC-35); (3) clearing site storage in browser tooling wipes the PD-08 store (AC-31e). The `ds:152:88` Reset button is still unmapped; if the designer wants a single-button reset surface inside expanded mode, that needs a separate AC.
 - [x] **Start-new-conversation button — visual parity with `ds:237:398`** — `PreviousDiscussionList.tsx` now renders the "Luo uusi keskustelu" CTA at the top of the sidebar with the brand violet→blue gradient (`--send-gradient`), 8×20 px padding, 20 px radius, leading 11×11 inline-SVG plus icon, white Everett 14 px / 24 px label, and Hover / Pressed darken-overlays sourced from the shared `--send-overlay-*` tokens. Code Connect parent set `237:398` is mapped, persisted per-variant on `237:323` / `237:399` / `237:411`. Verified via `npm run verify` (gzip 15.41 kB / 60 kB AC-100 budget) and `npm run test` (78 pass, including the renamed AC-35 test in `tests/expandedView.test.tsx`).

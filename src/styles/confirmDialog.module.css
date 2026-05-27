@@ -27,7 +27,7 @@
   justify-content: center;
   padding: var(--space-lg);
   z-index: 2147483646;
-  animation: confirmDialogFadeIn 200ms ease;
+  animation: confirmDialogFadeIn var(--duration-slow) var(--ease-default);
 }
 
 .card {
@@ -38,27 +38,27 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-xl);
-  max-width: 520px;
+  max-width: var(--dialog-max-width);
   width: 100%;
   box-sizing: border-box;
-  animation: confirmDialogScaleIn 200ms ease;
+  animation: confirmDialogScaleIn var(--duration-slow) var(--ease-default);
 }
 
 .title {
   margin: 0;
   font-family: var(--font-family-bold);
-  font-size: 24px;
-  line-height: 24px;
-  letter-spacing: 0.216px;
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-base);
+  letter-spacing: var(--letter-spacing-dialog-title);
   color: var(--black-500);
   text-align: center;
 }
 
 .description {
   font-family: var(--font-family);
-  font-size: 16px;
-  line-height: 22px;
-  letter-spacing: 0.144px;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-body);
+  letter-spacing: var(--letter-spacing-dialog-body);
   color: var(--black-500);
   width: 100%;
   word-break: break-word;
@@ -80,21 +80,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-sm) 20px;
+  padding: var(--space-sm) var(--button-padding-inline);
   border-radius: var(--radius);
   font-family: var(--font-family);
-  font-size: 14px;
-  line-height: 24px;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-base);
   white-space: nowrap;
   cursor: pointer;
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  transition: outline-color 150ms ease, filter 120ms ease;
+  transition: filter var(--duration-fast) var(--ease-default);
 }
 
 .cancel {
   background: transparent;
-  border: 1px solid var(--black-500);
+  border: var(--hairline) solid var(--black-500);
   color: var(--black-500);
 }
 
@@ -102,11 +100,6 @@
   background: var(--red-600);
   border: none;
   color: var(--white-500);
-}
-
-.cancel:focus-visible,
-.confirm:focus-visible {
-  outline-color: var(--blue-500);
 }
 
 .confirm:hover {
@@ -129,7 +122,7 @@
 @keyframes confirmDialogScaleIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(var(--motion-offset-sm));
   }
   to {
     opacity: 1;

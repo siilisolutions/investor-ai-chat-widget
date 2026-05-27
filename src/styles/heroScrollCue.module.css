@@ -1,0 +1,33 @@
+/*
+ * Figma `ds:166:94` — 16 px Everett Medium (approximated with Regular +
+ * letter-spacing), white copy, 32 px gap above the chevron icon frame.
+ */
+
+.cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xl);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--white-500);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: normal;
+  letter-spacing: var(--letter-spacing-dialog-body);
+  text-align: center;
+  cursor: pointer;
+}
+
+.label {
+  max-width: 100%;
+}
+
+.icon {
+  display: block;
+  width: 2.375rem;
+  height: 0.875rem;
+}

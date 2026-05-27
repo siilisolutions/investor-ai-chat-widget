@@ -13,53 +13,35 @@
         margin: 0;
         padding: 0;
         font-family: 'Everett', sans-serif;
-        background: #f5e8d8;
+        font-weight: 400;
+        -webkit-font-smoothing: antialiased;
       }
-      .hero {
-        position: relative;
-        min-height: 900px;
+      .harness {
+        min-height: 100dvh;
         background-image: url('/hero-bg.jpg');
         background-size: cover;
         background-position: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 204px 48px 64px;
-      }
-      .hero__title {
-        font-size: 64px;
-        font-weight: 400;
-        color: #ffffff;
-        text-align: center;
-        max-width: 728px;
-        margin: 0 0 96px;
-        line-height: normal;
       }
       #siili-chatbot {
         width: 100%;
-        max-width: 780px;
-        display: flex;
-        justify-content: center;
       }
       .note {
-        margin-top: 80px;
-        font-size: 14px;
+        margin: 0;
+        padding: 1rem;
+        font-size: 0.875rem;
         color: #333;
         text-align: center;
         background: rgba(255, 255, 255, 0.6);
-        padding: 8px 16px;
-        border-radius: 20px;
       }
     </style>
   </head>
   <body>
-    <main class="hero">
-      <h1 class="hero__title">Siili on nyt myös sijoittajille AI-avusteinen.</h1>
+    <main class="harness">
       <div id="siili-chatbot"></div>
       <p class="note">
-        Dev harness — the widget mounts inside the div above. On the real host
-        site, only the div exists and the widget IIFE is loaded via
-        <code>&lt;script&gt;</code>.
+        Dev harness — hero copy, centring, and scroll cue ship inside the widget
+        (<code>CompactView</code>). This page only supplies the background image
+        and mount node; production hosts do the same.
       </p>
     </main>
     <script type="module" src="/src/main.tsx"></script>

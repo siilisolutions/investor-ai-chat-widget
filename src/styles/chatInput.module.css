@@ -6,13 +6,11 @@
   border-radius: var(--radius);
   width: 100%;
   cursor: text;
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  transition: outline-color 150ms ease;
 }
 
 .shell:has(textarea:focus-visible) {
-  outline-color: var(--blue-500);
+  outline: var(--focus-ring-outline);
+  box-shadow: var(--focus-ring-shadow);
 }
 
 .shellCompact {
@@ -28,8 +26,8 @@
   display: flex;
   gap: var(--space-xs);
   align-items: flex-start;
-  min-height: 24px;
-  max-height: 240px;
+  min-height: var(--input-row-min-height);
+  max-height: var(--textarea-max-height);
   width: 100%;
 }
 
@@ -41,11 +39,11 @@
   background: transparent;
   resize: none;
   font-family: var(--font-family);
-  font-size: 20px;
+  font-size: var(--font-size-md);
   line-height: normal;
   color: var(--black-500);
   padding: 0;
-  max-height: 240px;
+  max-height: var(--textarea-max-height);
   overflow-y: auto;
 }
 
@@ -73,14 +71,8 @@
   border-radius: var(--radius-pill);
   background: var(--send-gradient);
   cursor: pointer;
-  transition: filter 120ms ease, outline-color 150ms ease;
+  transition: filter var(--duration-fast) var(--ease-default);
   color: var(--white-500);
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-}
-
-.sendButton:focus-visible {
-  outline-color: var(--blue-500);
 }
 
 .sendButton:hover:not(:disabled) {
@@ -107,8 +99,8 @@
 }
 
 .sendIcon {
-  width: 16px;
-  height: 16px;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
   display: block;
 }
 

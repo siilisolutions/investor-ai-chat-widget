@@ -6,10 +6,11 @@
  * ("Etusivu — jatka edellistä keskustelua") which adds the
  * continue-pill inside the textarea shell.
  *
- * The surrounding hero title and background image are provided by the
- * host page, so this component only renders the interactive widget
- * content: a translucent textarea, optional continue-pill (AC-10a),
- * and three suggestion chips.
+ * The widget owns the full compact-hero layout per `ds:152:75`:
+ * vertically centred headline, textarea + chips, and the scroll-to-
+ * content cue (`ds:166:94`). The host page (or dev harness) supplies
+ * only the mount node and the photographic hero background — the
+ * asset is not bundled (AC-100 / AC-76).
  *
  * Sending a message (either by typing or clicking a chip) triggers
  * the transition to `ExpandedView` and, per AC-31f, mints a fresh
@@ -20,8 +21,12 @@
 
 import { ChatInput } from './ChatInput.tsx'
 import { ContinuePill } from './ContinuePill.tsx'
+import { HeroScrollCue } from './HeroScrollCue.tsx'
 import { SuggestionChip } from './SuggestionChip.tsx'
 import styles from '../styles/compactView.module.css'
+
+const HERO_TITLE_LINE_1 = 'Siilillä tekoäly on totta -'
+const HERO_TITLE_LINE_2 = 'myös sijoittajille.'
 
 interface CompactViewProps {
   suggestions: string[]
@@ -54,19 +59,32 @@ export function CompactView({
 }: CompactViewProps) {
   const showContinue = hasHistory && typeof onContinue === 'function'
   return (
-    <div className={styles.compact}>
-      <ChatInput
-        variant="compact"
-        onSend={onSend}
-        continueAffordance={
-          showContinue ? <ContinuePill onClick={onContinue} /> : undefined
-        }
-      />
-      <div className={styles.chips}>
-        {suggestions.map((label) => (
-          <SuggestionChip key={label} label={label} onClick={onSend} />
-        ))}
+    <section className={styles.hero} aria-label="Sijoittaja-AI hero">
+      <div className={styles.heroContainer}>
+        <div className={styles.heroMain}>
+          <h1 className={styles.heroTitle}>
+            <span className={styles.heroTitleLine}>{HERO_TITLE_LINE_1}</span>
+            <span className={styles.heroTitleLine}>{HERO_TITLE_LINE_2}</span>
+          </h1>
+          <div className={styles.interactive}>
+            <ChatInput
+              variant="compact"
+              onSend={onSend}
+              continueAffordance={
+                showContinue ? (
+                  <ContinuePill onClick={onContinue} />
+                ) : undefined
+              }
+            />
+            <div className={styles.chips}>
+              {suggestions.map((label) => (
+                <SuggestionChip key={label} label={label} onClick={onSend} />
+              ))}
+            </div>
+          </div>
+        </div>
+        <HeroScrollCue />
       </div>
-    </div>
+    </section>
   )
 }

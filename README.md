@@ -30,7 +30,7 @@ npm install
 npm run dev
 ```
 
-Opens at `http://localhost:5173` with a simulated hero section.
+Opens at `http://localhost:5173`. The dev harness supplies only a full-bleed hero background image and the `#siili-chatbot` mount node — headline, vertical centring, input, chips, and scroll cue all ship inside the widget bundle (see § Compact hero on the host page).
 
 ## Build
 
@@ -87,6 +87,28 @@ If the host has its own asset pipeline (e.g. HubSpot `/hubfs/`), download the tw
 
 For local development against the real backend, copy the endpoint into `.env.local` as `VITE_API_URL=…` (the file is git-ignored) and run `npm run dev`. To surface a real privacy-policy link in the dev harness's terms gate, also add `VITE_PRIVACY_POLICY_URL=…` to the same file.
 
+### Compact hero on the host page
+
+In compact mode the widget renders the full Figma **Investor hero** composition (`ds:152:75` / `site:13:527`): Finnish headline, vertically centred textarea + suggestion chips, and the scroll-to-content cue at the bottom of the hero band. The host page is **not** responsible for centring that block.
+
+**Host supplies:**
+
+| Responsibility | Notes |
+|----------------|-------|
+| Mount node | A single block-level container (e.g. `<div id="siili-chatbot"></div>`) spanning the hero width. The widget fills it. |
+| Hero background | The photographic / gradient hero image **behind** the mount node (CSS `background-image` on a wrapper, or equivalent). The widget does **not** bundle the asset (AC-100 / AC-76). |
+| Everett font | Load Regular (+ Bold for dialogs) on the host page. The widget references `font-family: 'Everett', sans-serif` but does not ship font files (AC-N2). |
+| Site chrome | Header, footer, and global navigation remain host-owned (see `AGENTS.md` § Host-page chrome). |
+
+**Do not duplicate in HubSpot / CMS HTML** (these now come from the bundle):
+
+- A separate hero `<h1>` with *"Siilillä tekoäly on totta…"*
+- A separate *"Haluatko tarkastella perinteisempiä Siilin sijoittajasivuja?"* line or chevron below the widget
+
+Leaving duplicates will show two headlines or two scroll cues.
+
+**Expanded mode:** entering chat still covers the hero (AC-20b). Only the compact band uses the layout above.
+
 ### Option C — Staging: auto-track latest release
 
 Staging deliberately follows whatever was tagged most recently, so a new release surfaces there without a host-page edit. Use jsDelivr's `@latest` alias:
@@ -137,7 +159,7 @@ The `apiUrl` is configured on the host page's `SiiliChatbot.init({ … })` call,
 
 ## Widget Modes
 
-**Compact (Hero)** — Text input with suggestion chips. Shown initially inside the hero section.
+**Compact (Hero)** — Full hero layout from the widget: headline, centred input + suggestion chips, scroll cue. Host provides background + mount node only (see § Compact hero on the host page).
 
 **Expanded (Chat)** — Full conversation view with Q&A pairs, source references, and sticky input. Activates when the user sends a message.
 

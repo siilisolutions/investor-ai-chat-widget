@@ -73,6 +73,14 @@ export interface ChatService {
 }
 
 /**
+ * Locales the widget's own string table supports. The widget-owned
+ * strings (placeholder, error fallback, sidebar copy, *Käyttöehdot*
+ * shell strings, etc.) switch with this value; backend answers switch
+ * separately via AC-63b once that contract lands.
+ */
+export type WidgetLocale = 'fi' | 'en'
+
+/**
  * Options passed to `SiiliChatbot.init()` when the widget is embedded
  * on the host page.
  *
@@ -95,10 +103,18 @@ export interface ChatService {
  *   stands alone with no broken-looking placeholder. The URL itself
  *   lives on the host page so it can be rotated without a widget
  *   rebuild — same posture as `apiUrl`.
+ * - `locale` — optional widget UI locale (AC-04b / AC-63). Resolution
+ *   per §12.1 PD-09: explicit `locale` wins; otherwise
+ *   `document.documentElement.lang` is matched against `WidgetLocale`;
+ *   otherwise falls back to `'fi'`. Resolved once at `init()` time —
+ *   runtime locale switching is out of scope (mid-conversation
+ *   switches would mix languages, which AC-63 itself calls out as a
+ *   bug).
  */
 export interface WidgetOptions {
   container: string | HTMLElement
   apiUrl?: string
   interceptBackNavigation?: boolean
   privacyPolicyUrl?: string
+  locale?: WidgetLocale
 }

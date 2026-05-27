@@ -61,13 +61,13 @@
   justify-content: stretch;
   background: rgba(255, 255, 255, 0.7);
   box-sizing: border-box;
-  animation: expandedMount 200ms ease-out;
+  animation: expandedMount var(--duration-slow) var(--ease-out);
 }
 
 @keyframes expandedMount {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(var(--motion-offset-sm));
   }
   to {
     opacity: 1;
@@ -124,7 +124,7 @@
  * mobile and `.inputWrapper` owns the bottom edge there, matching the
  * existing mobile composition.
  */
-@media (max-width: 639px) {
+@media (max-width: 39.9375rem) {
   .layout {
     padding: var(--space-lg) var(--space-lg) 0;
     gap: var(--space-lg);
@@ -155,7 +155,7 @@
 .title {
   font-family: var(--font-family-bold);
   font-weight: 700;
-  font-size: 24px;
+  font-size: var(--font-size-lg);
   line-height: normal;
   color: var(--black-500);
   margin: 0;
@@ -175,7 +175,7 @@
  * is taken out of flex flow and the title's `flex: 1 1 auto` fills
  * the row.
  */
-@media (min-width: 640px) {
+@media (min-width: 40rem) {
   .menuButton {
     display: none;
   }
@@ -189,8 +189,8 @@
    */
   .closeButton {
     position: absolute;
-    top: 24px;
-    right: 24px;
+    top: var(--close-inset);
+    right: var(--close-inset);
     z-index: 1;
   }
 
@@ -232,13 +232,13 @@
  * the divider has nothing to divide).
  */
 .divider {
-  flex: 0 0 1px;
+  flex: 0 0 var(--hairline);
   align-self: stretch;
   background: var(--gray-500);
   margin: 0 var(--space-xl);
 }
 
-@media (max-width: 639px) {
+@media (max-width: 39.9375rem) {
   .desktopSidebar {
     display: none;
   }
@@ -314,13 +314,13 @@
   mask-image: linear-gradient(
     to bottom,
     black 0,
-    black calc(100% - 32px),
+    black calc(100% - var(--space-xl)),
     transparent 100%
   );
   -webkit-mask-image: linear-gradient(
     to bottom,
     black 0,
-    black calc(100% - 32px),
+    black calc(100% - var(--space-xl)),
     transparent 100%
   );
 }
@@ -328,7 +328,7 @@
 .messagesEnd {
   flex-shrink: 0;
   width: 100%;
-  height: 1px;
+  height: var(--hairline);
 }
 
 /*
@@ -348,7 +348,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 639px) {
+@media (max-width: 39.9375rem) {
   /*
    * Mobile keeps the `.layout` bottom padding at 0 and re-introduces
    * a small bottom buffer here so the textarea doesn't slam against
@@ -360,17 +360,17 @@
 }
 
 /*
- * Desktop band (PD-05 ≥ 1024 px) — inset white card + visible
+ * Desktop band (PD-05 ≥64rem) — inset white card + visible
  * blurred backdrop sibling per AC-20a / AC-90 (Lane J).
  */
-@media (min-width: 1024px) {
+@media (min-width: 64rem) {
   .backdrop {
     padding: var(--space-xl);
   }
 
   .surface {
     border-radius: var(--radius);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--surface-elevation-desktop);
   }
 
   /*
@@ -384,8 +384,8 @@
   ) {
     .backdrop {
       background: rgba(255, 255, 255, 0.5);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(var(--blur-backdrop-desktop));
+      -webkit-backdrop-filter: blur(var(--blur-backdrop-desktop));
     }
   }
 }

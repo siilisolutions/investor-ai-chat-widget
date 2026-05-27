@@ -76,6 +76,7 @@ describe('AC-80 — keyboard focus contract', () => {
       'button[Kysymys 1]',
       'button[Kysymys 2]',
       'button[Kysymys 3]',
+      'button[Haluatko tarkastella perinteisempiä Siilin sijoittajasivuja?]',
     ])
   })
 

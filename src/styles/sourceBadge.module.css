@@ -5,8 +5,8 @@
   background: var(--gray-400);
   border-radius: var(--radius);
   font-family: var(--font-family);
-  font-size: 14px;
-  line-height: normal;
+  font-size: var(--font-size-chip);
+  line-height: var(--line-height-chip);
   color: var(--black-500);
   white-space: nowrap;
   text-decoration: none;
@@ -19,17 +19,11 @@
 
 .badgeLink {
   cursor: pointer;
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  transition: background 120ms ease, outline-color 150ms ease;
+  transition: background var(--duration-fast) var(--ease-default);
 }
 
 .badgeLink:hover {
   background: var(--gray-500);
-}
-
-.badgeLink:focus-visible {
-  outline-color: var(--blue-500);
 }
 
 @media (prefers-reduced-motion: reduce) {

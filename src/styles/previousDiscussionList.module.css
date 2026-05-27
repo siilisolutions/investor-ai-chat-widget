@@ -33,7 +33,7 @@
  * between the "VIIMEISIMMÄT KESKUSTELUT" label and the row list itself.
  */
 .list {
-  flex: 0 0 360px;
+  flex: 0 0 var(--sidebar-width);
   align-self: stretch;
   min-height: 0;
   display: flex;
@@ -61,9 +61,9 @@
 .heading {
   font-family: var(--font-family);
   font-weight: 500;
-  font-size: 14px;
+  font-size: var(--font-size-xs);
   line-height: normal;
-  letter-spacing: 0.224px;
+  letter-spacing: var(--letter-spacing-sidebar-heading);
   text-transform: uppercase;
   margin: 0;
   color: var(--black-500);
@@ -84,19 +84,17 @@
   justify-content: center;
   gap: var(--space-md);
   max-width: 100%;
-  padding: var(--space-sm) 20px;
+  padding: var(--space-sm) var(--button-padding-inline);
   border: none;
   border-radius: var(--radius);
   background: var(--cta-gradient);
   color: var(--white-500);
   font-family: var(--font-family);
-  font-size: 14px;
-  line-height: 24px;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-base);
   white-space: nowrap;
   cursor: pointer;
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  transition: filter 120ms ease, outline-color 150ms ease;
+  transition: filter var(--duration-fast) var(--ease-default);
   flex-shrink: 0;
 }
 
@@ -116,10 +114,6 @@
       var(--send-overlay-pressed) 100%
     ),
     var(--cta-gradient);
-}
-
-.newButton:focus-visible {
-  outline-color: var(--blue-500);
 }
 
 .newButtonIcon {

@@ -8,11 +8,19 @@
  * for screen-level context. If a token here disagrees with Figma,
  * Figma wins -- update this file rather than the component styles.
  *
+ * Sizing uses `rem` at a 16 px root (Lane Q, 2026-05-26 designer QA).
+ * §12.1 PD-05 breakpoints are expressed below as rem equivalents of the
+ * canonical px values (mobile <40rem, tablet 40rem–63.9375rem, desktop
+ * ≥64rem). Motion durations stay in `ms` per PD-07.
+ *
  * The widget root element receives the `.siiliChatbot` class which
  * scopes these variables so they don't leak into the host page.
  */
 
 .siiliChatbot {
+  /* 16 px = 1 rem — explicit root for rem token math inside the widget */
+  font-size: 16px;
+
   /* Brand colors */
   --white-500: #ffffff;
   --black-500: #000000;
@@ -56,26 +64,90 @@
   --font-family: 'Everett', sans-serif;
   --font-family-light: 'Everett Light', 'Everett', sans-serif;
   --font-family-bold: 'Everett Bold', 'Everett', sans-serif;
+  --font-size-xs: 0.875rem; /* 14px */
+  --font-size-base: 1rem; /* 16px */
+  --font-size-md: 1.25rem; /* 20px — expanded textarea */
+  --font-size-lg: 1.5rem; /* 24px — section titles */
+  --font-size-hero: 4rem; /* 64px — compact hero headline */
+  --font-size-hero-mobile: 2.5rem; /* 40px — mobile hero per site:608:1855 */
+  --line-height-tight: 1rem; /* 16px — continue-pill link */
+  --line-height-base: 1.5rem; /* 24px */
+  --line-height-body: 1.375rem; /* 22px — dialog body */
+  --font-size-chip: 1rem; /* 16px — chips, reference tags */
+  --line-height-chip: 1.25rem; /* 20px */
+  --letter-spacing-dialog-title: 0.0135rem; /* 0.216px at 24px */
+  --letter-spacing-dialog-body: 0.009rem; /* 0.144px at 16px */
+  --letter-spacing-sidebar-heading: 0.014rem; /* 0.224px at 14px */
+
+  /*
+   * Focus ring — matches sijoittajille.siili.com host focus treatment
+   * (`outline: 1px solid transparent` + blue glow). Applied on
+   * `:focus-visible` inside the widget (AC-80).
+   */
+  --focus-ring-outline: 1px solid transparent;
+  --focus-ring-shadow: 0 0 0.25rem 0.25rem rgba(50, 50, 255, 0.5);
+
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
 
   /* Geometry */
-  --radius: 20px;
-  --radius-pill: 100px;
+  --radius: 1.25rem; /* 20px */
+  --radius-pill: 6.25rem; /* 100px */
 
   /* Elevations */
-  --textarea-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  --textarea-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.2);
+  --chip-shadow-default: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+  --chip-shadow-pressed: 0 0.25rem 0.375rem rgba(0, 0, 0, 0.1);
+  --surface-elevation-desktop: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.12);
+  --drawer-drop-shadow: 0 0.25rem 0.375rem rgba(0, 0, 0, 0.25);
 
   /* Spacing tokens (from Figma auto-layout values) */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 12px;
-  --space-lg: 16px;
-  --space-xl: 32px;
-  --space-2xl: 48px;
-  --space-3xl: 64px;
+  --space-xs: 0.25rem; /* 4px */
+  --space-sm: 0.5rem; /* 8px */
+  --space-md: 0.75rem; /* 12px */
+  --space-lg: 1rem; /* 16px */
+  --space-xl: 2rem; /* 32px */
+  --space-2xl: 3rem; /* 48px */
+  --space-3xl: 4rem; /* 64px */
 
-  /* Widget layout */
-  --content-width: 888px;
-  --compact-textarea-width: 780px;
+  /* Layout (PD-05 / Figma screen compositions) */
+  --content-width: 55.5rem; /* 888px */
+  --compact-textarea-width: 48.75rem; /* 780px */
+  --sidebar-width: 22.5rem; /* 360px */
+  --dialog-max-width: 32.5rem; /* 520px */
+  --dialog-max-height: 37.5rem; /* 600px */
+  --mobile-drawer-max-width: 18.25rem; /* 292px on 390px frame */
+  --button-padding-inline: 1.25rem; /* 20px — dialog / CTA pills */
+  --close-inset: 1.5rem; /* 24px — AC-20d absolute position */
+  --textarea-max-height: 15rem; /* 240px — PD-06 */
+
+  /* Component hit-targets & icons */
+  --size-icon-sm: 1rem; /* 16px */
+  --size-icon-md: 1.5rem; /* 24px */
+  --size-close-button: 2rem; /* 32px */
+  --size-close-glyph-padding: 0.25rem; /* 4px inside 32px close */
+  --size-menu-button: 2.75rem; /* 44px */
+  --size-loading-blob: 1.75rem; /* 28px */
+  --input-row-min-height: 1.5rem; /* 24px */
+  --hamburger-stripe-height: 0.15rem; /* 2.4px */
+  --hairline: 1px;
+
+  /* Motion (PD-07: 120–300 ms interactive band) */
+  --duration-fast: 120ms;
+  --duration-medium: 150ms;
+  --duration-slow: 200ms;
+  --duration-drawer-slide: 220ms;
+  --duration-loading-pulse: 1400ms;
+  --ease-default: ease;
+  --ease-out: ease-out;
+  --ease-drawer: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --motion-offset-sm: 0.5rem; /* 8px — mount / scale-in keyframes */
+
+  /* Backdrop blur radii (visual only; not layout breakpoints) */
+  --blur-backdrop-desktop: 1.25rem; /* 20px */
+  --blur-drawer: 0.125rem; /* 2px */
 
   font-family: var(--font-family);
   color: var(--black-500);
@@ -101,15 +173,30 @@
  * in Lane N (2026-05-11). Specificity here is 0,1,1 — beats the host
  * rules' 0,1,0 deterministically regardless of stylesheet load order.
  */
-.siiliChatbot :focus,
-.siiliChatbot :focus-visible {
+.siiliChatbot :focus:not(:focus-visible) {
   /*
    * Defends against `:focus { box-shadow: 0 0 4px 4px rgba(50,50,255,.5); outline: 1px solid transparent }`
-   * in `template_styles-2026.min.css`. Without this, a focused
-   * `<textarea>` / `<button>` / `<a>` inside the widget gets a 4 px
-   * blue host-page focus glow that stacks underneath our own
-   * outline-based focus rings (visible as a "double focus" on
-   * staging vs. local in dev harness).
+   * in `template_styles-2026.min.css`. Mouse clicks must not inherit
+   * the host glow; keyboard `:focus-visible` restores the Siili ring
+   * via the rule below.
    */
   box-shadow: none;
+}
+
+.siiliChatbot :where(button, a):focus-visible {
+  outline: var(--focus-ring-outline);
+  box-shadow: var(--focus-ring-shadow);
+}
+
+/*
+ * Host pages sometimes set global button / input font stacks and
+ * weights that make Everett read a step heavier than Figma (designer
+ * QA 2026-05). Scope inheritance to the widget root only.
+ */
+.siiliChatbot button,
+.siiliChatbot input,
+.siiliChatbot textarea {
+  font-family: inherit;
+  font-weight: inherit;
+  font-synthesis: inherit;
 }

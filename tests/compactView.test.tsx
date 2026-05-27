@@ -10,6 +10,13 @@ import { CompactView } from '../src/components/CompactView'
 const CHIPS = ['Kysymys 1', 'Kysymys 2', 'Kysymys 3']
 
 describe('CompactView', () => {
+  it('AC-10: renders the Investor hero headline from the Figma composition', () => {
+    render(<CompactView suggestions={CHIPS} onSend={() => {}} />)
+    const heading = screen.getByRole('heading', { level: 1 })
+    expect(heading).toHaveTextContent('Siilillä tekoäly on totta -')
+    expect(heading).toHaveTextContent('myös sijoittajille.')
+  })
+
   it('AC-11: textarea placeholder is the exact Finnish copy required by the AC', () => {
     render(<CompactView suggestions={CHIPS} onSend={() => {}} />)
     const textarea = screen.getByLabelText('Siili investor chatbot message')
@@ -24,7 +31,7 @@ describe('CompactView', () => {
     for (const label of CHIPS) {
       expect(screen.getByRole('button', { name: label })).toBeInTheDocument()
     }
-    expect(screen.getAllByRole('button')).toHaveLength(CHIPS.length + 1)
+    expect(screen.getAllByRole('button')).toHaveLength(CHIPS.length + 2)
   })
 
   it('AC-13: pressing Enter on a non-empty textarea fires onSend with the trimmed value and clears the field', () => {

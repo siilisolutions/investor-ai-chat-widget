@@ -19,8 +19,8 @@
   background: var(--gray-500);
   border-radius: var(--radius);
   font-family: var(--font-family);
-  font-size: 16px;
-  line-height: 24px;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
   color: var(--black-500);
   max-width: 100%;
   word-break: break-word;
@@ -36,8 +36,8 @@
 
 .answer {
   font-family: var(--font-family);
-  font-size: 16px;
-  line-height: 24px;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
   color: var(--black-500);
   margin: 0;
   width: 100%;
@@ -52,19 +52,19 @@
 
 .loadingText {
   font-family: var(--font-family);
-  font-size: 16px;
-  line-height: 24px;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
   color: var(--black-500);
   margin: 0;
 }
 
 .loadingBlob {
-  width: 28px;
-  height: 28px;
+  width: var(--size-loading-blob);
+  height: var(--size-loading-blob);
   border-radius: 50%;
   background: var(--gray-500);
   flex-shrink: 0;
-  animation: loadingBlobPulse 1400ms ease-in-out infinite;
+  animation: loadingBlobPulse var(--duration-loading-pulse) ease-in-out infinite;
   transform-origin: center;
   will-change: transform, opacity;
 }
@@ -99,8 +99,8 @@
 .referencesLabel {
   font-family: var(--font-family-light);
   font-weight: 300;
-  font-size: 14px;
-  line-height: 24px;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-base);
   color: var(--black-500);
   margin: 0;
 }
@@ -114,8 +114,8 @@
 
 .error {
   font-family: var(--font-family);
-  font-size: 16px;
-  line-height: 24px;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
   color: #c0392b;
   margin: 0;
 }

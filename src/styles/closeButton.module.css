@@ -1,51 +1,40 @@
 /*
- * Close button styles — matches Figma component set `ds:223:739`
- * (Close discussion) with variants Default `ds:196:853` /
- * Hover `ds:223:740` / Pressed `ds:224:820`.
+ * Close discussion button — Figma `ds:196:853` / parent set `ds:223:739`.
  *
- * Sizing (AC-20d, amended 2026-05 — Lane P follow-up):
- *   - 32 × 32 visible *and* clickable surface — the button element
- *     is exactly the shape Figma renders, no wrapping hit-area
- *     buffer. Meets WCAG 2.5.8 (AA, ≥24 × 24); no longer reaches
- *     2.5.5 (AAA, ≥44 × 44). Trade-off recorded in the AC-20d
- *     amend log.
- *   - `border-radius: 50%` so the rounded surface matches Figma's
- *     pill / circular Hover and Pressed treatments exactly.
+ * Hit target:
+ *   - 32 × 32 px visible surface per AC-20d amended 2026-05 (the
+ *     button itself is the click target; no extra wrapping buffer).
  *
- * Tokens:
- *   - Hover surface: `--gray-300` (#f4f4f4) — matches `ds:223:740`.
- *   - Pressed surface: `--gray-500` (#e5e5e5) — matches `ds:224:820`.
- *   - Default has no surface fill (transparent), matching
- *     `ds:196:853`.
+ * States (parent set):
+ *   - Default — transparent background
+ *   - Hover   — `--gray-300` (`ds:223:740`)
+ *   - Pressed — `--gray-500` (`ds:224:820`)
  *
  * Glyph:
  *   - 16 × 16 inline SVG (`ds:197:1108`) — two strokes
- *     corner-to-corner of the viewBox at 1.8 px stroke width,
+ *     corner-to-corner of the viewBox at 2 px stroke width,
  *     `currentColor` (defaults to `--black-500` via `.closeButton`'s
  *     `color`).
  *
- * Reduced motion: hover / focus transitions are dropped under
- * `prefers-reduced-motion: reduce` so the dismiss path stays instant
- * (AC-20k).
+ * Placement is owned by the parent (`expandedView` absolute on tablet /
+ * desktop, in-flow in the mobile top-bar per `site:435:2904`, or
+ * inside the AC-33d drawer card per `ds:214:1214`).
  */
-
 .closeButton {
-  width: 32px;
-  height: 32px;
-  padding: 4px;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--black-500);
-  cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: var(--size-close-button);
+  height: var(--size-close-button);
+  padding: var(--size-close-glyph-padding);
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--black-500);
+  cursor: pointer;
   flex-shrink: 0;
   font-family: var(--font-family);
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  transition: background-color 120ms ease-out, outline-color 150ms ease;
+  transition: background-color var(--duration-fast) var(--ease-out);
 }
 
 .closeButton:hover {
@@ -56,14 +45,10 @@
   background: var(--gray-500);
 }
 
-.closeButton:focus-visible {
-  outline-color: var(--black-500);
-}
-
 .glyph {
   display: block;
-  width: 16px;
-  height: 16px;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
 }
 
 @media (prefers-reduced-motion: reduce) {

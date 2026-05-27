@@ -117,6 +117,21 @@ that tests and PR descriptions can reference.
   - The URL is **not** baked into the production bundle; it is
     supplied by the host page at `init()` time.
 
+- **AC-04b** — *`locale` option selects widget UI language* · **@aspirational**
+  - **Given** the host page calls `SiiliChatbot.init({ locale })`
+    with a value from `WidgetLocale`,
+  - **When** the widget mounts,
+  - **Then** the explicit option wins and the resolved locale drives
+    every widget-owned string per AC-63.
+  - **When** `locale` is omitted,
+  - **Then** the widget resolves the locale per §12.1 PD-09 —
+    `document.documentElement.lang` matched against `WidgetLocale`,
+    falling back to `'fi'`.
+  - The option is **not** baked into the production bundle; the host
+    page passes it at `init()` time. Runtime locale switching is out
+    of scope at this AC (a future AC may add a `setLocale` method).
+  (added 2026-05, #PR — AC-63 split + locale plumb)
+
 ### 3.2 Compact (Hero) Mode
 
 Maps to the Investor hero composition and its main component; see
@@ -125,9 +140,14 @@ Maps to the Investor hero composition and its main component; see
 - **AC-10** — *Initial state* · **@stable**
   - **Given** the page has just loaded and `messages.length === 0`,
   - **When** the widget renders for the first time,
-  - **Then** it shows the compact mode: one textarea plus the
-    predefined suggestion chips (count per §12.1 PD-01), overlaid on
-    the hero section in the layout defined in Figma.
+  - **Then** it shows the compact mode per the `ds:152:75` Investor
+    hero composition: the Finnish headline, one textarea, and the
+    predefined suggestion chips (count per §12.1 PD-01) are
+    vertically centred together inside the hero band, with the
+    scroll-to-content cue anchored at the bottom of that band (see
+    §2.5 row AC-10). The photographic background is supplied by the
+    host page, not the widget bundle.
+  (amended 2026-05-26 — compact hero layout owned by `CompactView`, not the host chrome.)
 
 - **AC-10a** — *Continue-conversation pill — rendering* · **@evolving**
   - **Given** the PD-08 conversation store contains at least one
@@ -632,7 +652,10 @@ Maps to the Investor agent composition and its main component; see
     the parent set but is not rendered as a static row state by
     the widget — it would be reserved for a future transient
     "while pressing" surface if one is ever needed.
-  (added 2026-04, Figma component drift; amended 2026-05, #PR — graduated @aspirational → @evolving; visual states pinned to the `ds:230:452` parent set's Default / Hover / Pressed variants with active row using the Pressed surface as the AC-33a active-row cue alongside the bold-label cue; specifics live in §2.5 row AC-33a; amended 2026-05, #PR — active row reconciled to the Hover variant's surface (one step darker than Default), and the bold-label cue dropped, per `site:434:2424` Figma context placing the active row at `property1="Hover"`. The Pressed variant is no longer rendered as a static row state.)
+  - **And** the trailing × delete button on each row exposes Hover /
+    Pressed surface treatments on its 24 × 24 hit target (mirrors
+    the `CloseButton` family).
+  (added 2026-04, Figma component drift; amended 2026-05, #PR — graduated @aspirational → @evolving; visual states pinned to the `ds:230:452` parent set's Default / Hover / Pressed variants with active row using the Pressed surface as the AC-33a active-row cue alongside the bold-label cue; specifics live in §2.5 row AC-33a; amended 2026-05, #PR — active row reconciled to the Hover variant's surface (one step darker than Default), and the bold-label cue dropped, per `site:434:2424` Figma context placing the active row at `property1="Hover"`. The Pressed variant is no longer rendered as a static row state.; amended 2026-05-26 — × button hover states + host-aligned focus ring; active-row colour stays Hover per Figma conflict resolution.)
 
 - **AC-33b** — *Previous discussion item — activation* · **@aspirational**
   - **Given** the sidebar lists prior conversations (per AC-33a),
@@ -983,19 +1006,53 @@ financial decisions. They apply primarily to the backend, but the
 
   (amended 2026-04, GOV-16 Cluster 10)
 
-- **AC-63** — *Language parity* · **@aspirational (externally gated)**
-  - **Given** the host site toggles `FI ↔ EN`,
-  - **Then** the widget UI strings (placeholder, header, chips,
-    *"Lähteet:"*, *"Haetaan tietoa..."*, error copy) and the backend
-    prompt locale are both switched. A Finnish UI answering in English
-    (or vice-versa) is a bug.
-  - **Owner:** product + backend — requires a host-site `FI ↔ EN`
-    toggle convention (not yet defined as a product decision) and
-    a backend prompt-locale switch; the widget string table is
-    Finnish-only today and a locale plumb would be a small,
-    self-contained change once the contract lands.
+- **AC-63** — *Language parity — widget string table + locale plumbing* · **@aspirational**
+  - **Given** the host page has configured a locale (explicitly via
+    `WidgetOptions.locale` or implicitly via `<html lang>`, resolved
+    per §12.1 PD-09),
+  - **When** the widget renders any user-visible string it owns
+    (e.g. placeholder, send-button aria-label, *"Lähteet:"*,
+    *"Haetaan tietoa..."*, the AC-44 safe-error fallback, chip
+    labels, sidebar copy, AC-33e confirm-delete dialog, AC-66 /
+    AC-66b *Käyttöehdot* shell strings),
+  - **Then** the string is sourced from a single locale-keyed string
+    table (e.g. `src/i18n/strings.ts`) and the bundle ships entries
+    for every supported `WidgetLocale` for every key. A missing key
+    in the active locale is a bug, not a silent fall-through to
+    Finnish.
+  - Answer copy returned by the backend is **not** translated by the
+    widget — answer locale is owned by AC-63b. Until AC-63b ships, an
+    English-locale widget may render Finnish answers; this AC covers
+    only the widget-owned strings.
+  - Legally vetted body content (notably the AC-66b long-form
+    *Käyttöehdot* copy) is **not** an engineer translation — it is
+    sourced from designer / legal in each locale. Until an English
+    translation lands, an English-locale widget renders the Finnish
+    body with a visible cue that an English translation is pending.
 
-  (amended 2026-04, GOV-16 Cluster 10)
+  (amended 2026-04, GOV-16 Cluster 10; amended 2026-05, #PR —
+   graduated from @aspirational (externally gated) → @aspirational
+   after the locale contract was defined and the backend half was
+   split off as AC-63b)
+
+- **AC-63b** — *Backend prompt-locale switch* · **@aspirational (externally gated)**
+  - **Given** the widget has resolved a locale per §12.1 PD-09,
+  - **Then** the resolved locale is communicated to the chat backend
+    on every request and the backend's answer is in that locale. A
+    Finnish-locale widget receiving an English answer (or vice-versa)
+    is a bug.
+  - The concrete on-wire shape (request-body field on `ChatTurn`,
+    sibling field on the POST body, or HTTP header) is pinned by an
+    amendment to AC-52 once the backend contract is fixed — that
+    amendment is a separate stop-and-ask gate per
+    [`change-boundary.mdc`](.cursor/rules/change-boundary.mdc).
+  - **Owner:** backend team — requires a prompt-locale switch in the
+    backend and the AC-52 amendment above. The widget side will pass
+    the resolved locale as soon as the contract lands.
+
+  (added 2026-05, #PR — split off from AC-63 to make the
+   internally-actionable string-table plumb separable from the
+   backend prompt-locale dependency)
 
 - **AC-64** — *Timestamp / freshness cue (recommended)* · **@aspirational (externally gated)**
   - **Given** an answer cites a dated document,
@@ -1048,21 +1105,26 @@ financial decisions. They apply primarily to the backend, but the
   - **When** the user activates the *Lue lisää* link inside the
     dialog body,
   - **Then** the body swaps in-place to the long-form *Käyttöehdot*
-    copy (canonical Finnish; English parity follows AC-63) inside a
-    scrollable region; the dialog card height does not grow to
-    accommodate it, and the surrounding scrollbar consumes its own
-    column space. The toggle becomes *Näytä vähemmän* and returns
-    to the short form on activation. Section headings (e.g.
-    *Tietojen luonne ja ajantasaisuus*, *Oikeudelliset rajoitukset*,
-    *Tekoälyjärjestelmän rajoitukset*, *Henkilötietojen käsittely*)
-    are emphasised with `<strong>`. When the host page passes
-    `WidgetOptions.privacyPolicyUrl`, the long form's
-    privacy-policy sentence renders that URL as an anchor with
-    `target="_blank" rel="noopener noreferrer"` (mirrors AC-25b's
-    link semantics); when absent, the sentence stands alone with
-    no broken-looking placeholder. Per AC-N1 all body copy is plain
-    text and `<strong>` only — no Markdown, no HTML injection.
-  (added 2026-05, #PR — Käyttöehdot terms gate landed)
+    copy (canonical Finnish; English long-form body sourced from
+    designer / legal per AC-63, not from an engineer translation —
+    until that translation lands, an English-locale widget renders
+    the Finnish body with a visible "translation pending" cue per
+    AC-63) inside a scrollable region; the dialog card height does
+    not grow to accommodate it, and the surrounding scrollbar
+    consumes its own column space. The toggle becomes *Näytä
+    vähemmän* and returns to the short form on activation. Section
+    headings (e.g. *Tietojen luonne ja ajantasaisuus*,
+    *Oikeudelliset rajoitukset*, *Tekoälyjärjestelmän rajoitukset*,
+    *Henkilötietojen käsittely*) are emphasised with `<strong>`.
+    When the host page passes `WidgetOptions.privacyPolicyUrl`, the
+    long form's privacy-policy sentence renders that URL as an
+    anchor with `target="_blank" rel="noopener noreferrer"` (mirrors
+    AC-25b's link semantics); when absent, the sentence stands alone
+    with no broken-looking placeholder. Per AC-N1 all body copy is
+    plain text and `<strong>` only — no Markdown, no HTML injection.
+  (added 2026-05, #PR — Käyttöehdot terms gate landed; amended
+   2026-05, #PR — AC-63 split clarified the legal-translation
+   ownership of the long-form body)
 
 - **AC-66c** — *Terms acceptance persists across sessions* · **@evolving**
   - **Given** the user has previously activated *Hyväksyn

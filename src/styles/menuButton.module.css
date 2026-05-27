@@ -14,8 +14,8 @@
  */
 
 .menuButton {
-  width: 44px;
-  height: 44px;
+  width: var(--size-menu-button);
+  height: var(--size-menu-button);
   padding: 0;
   border: none;
   background: transparent;
@@ -28,18 +28,13 @@
   flex-shrink: 0;
 }
 
-.menuButton:focus-visible {
-  outline: 2px solid var(--black-500);
-  outline-offset: 2px;
-}
-
 .icon {
   position: relative;
   display: block;
-  width: 24px;
-  height: 24px;
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
   border-radius: var(--radius-pill);
-  transition: background-color 120ms ease-out;
+  transition: background-color var(--duration-fast) var(--ease-out);
 }
 
 .menuButton:hover .icon {
@@ -52,22 +47,22 @@
 
 .stripe {
   position: absolute;
-  left: 2px;
-  right: 2px;
-  height: 2.4px;
+  left: 0.125rem;
+  right: 0.125rem;
+  height: var(--hamburger-stripe-height);
   background: var(--black-500);
 }
 
 .stripe:nth-child(1) {
-  top: 4px;
+  top: 0.25rem;
 }
 
 .stripe:nth-child(2) {
-  top: 11.2px;
+  top: 0.7rem;
 }
 
 .stripe:nth-child(3) {
-  top: 18.4px;
+  top: 1.15rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

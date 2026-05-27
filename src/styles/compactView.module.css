@@ -1,39 +1,97 @@
-.compact {
+/*
+ * Compact hero layout — Figma `ds:152:75` / `site:13:527` /
+ * `site:608:1855` (mobile). AC-10 owns the full hero composition
+ * (amended 2026-05-26): vertically centred headline + interactive
+ * column, scroll cue `ds:166:94` anchored at the bottom of the band.
+ * Lane Q (2026-05-26) — sizing in rem at the 16 px widget root.
+ */
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  box-sizing: border-box;
+}
+
+.heroContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: var(--compact-textarea-width);
+  padding: var(--space-2xl) var(--space-2xl) var(--space-3xl);
+  box-sizing: border-box;
+  gap: var(--space-3xl);
+}
+
+.heroMain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3xl);
+  width: 100%;
+}
+
+.heroTitle {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: var(--font-size-hero);
+  line-height: normal;
+  color: var(--white-500);
+  text-align: center;
+  margin: 0;
+  max-width: 45.5rem;
+  width: 100%;
+}
+
+.heroTitleLine {
+  display: block;
+}
+
+.interactive {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-lg);
-  width: var(--compact-textarea-width);
-  max-width: 100%;
+  width: 100%;
 }
 
 .chips {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm) var(--space-sm);
-  align-items: flex-end;
+  align-items: center;
+  width: 100%;
 }
 
 /*
- * AC-92b (mobile <640px, PD-05) — chips stack vertically with single-line
+ * AC-92b (mobile <40rem, PD-05) — chips stack vertically with single-line
  * ellipsis truncation per Figma `site:608:1855` *Etusivu - Mobile - v2*
  * (Lane M, 2026-05-11). Each chip takes the full width of the chip
  * container and any label that exceeds that width is ellipsized — see
- * the `<640px` rule in `suggestionChip.module.css` for the chip-side
+ * the `<40rem` rule in `suggestionChip.module.css` for the chip-side
  * truncation. AC-12b `white-space: nowrap` is preserved (chips stay
- * single-line). The previous `overflow-x: auto` horizontal-scroll
- * pattern is retired because the hidden scrollbar gave users no
- * affordance that further chips existed behind the right edge.
+ * single-line).
  *
- * AC-91 (tablet 640–1023 px) and AC-90 (desktop ≥1024 px) keep the
- * default `flex-wrap: wrap` from `.chips` above — those bands are
- * not Figma-anchored (Lane F's designer-delegated code-authored
- * stability still applies).
+ * AC-91 (tablet 40rem–63.9375rem) and AC-90 (desktop ≥64rem) keep the
+ * default `flex-wrap: wrap` from `.chips` above.
  */
-@media (max-width: 639px) {
+@media (max-width: 39.9375rem) {
+  .heroContainer {
+    padding-inline: var(--space-lg);
+  }
+
+  .heroTitle {
+    font-size: var(--font-size-hero-mobile);
+  }
+
   .chips {
     flex-direction: column;
     align-items: stretch;
-    width: 100%;
   }
 }

@@ -18,7 +18,7 @@
  * Pressed (`--gray-500`) background per `ds:223:740` / `ds:224:820`,
  * with the SVG glyph centred inside. The X glyph is inlined (per
  * AC-N2 / AC-100) — two strokes corner-to-corner of a 16 × 16
- * viewBox at 1.8 px stroke width, matching `ds:197:1108`.
+ * viewBox at 2 px stroke width, matching `ds:197:1108`.
  *
  * Activation is delegated to `onClick`; the parent (`ExpandedView`)
  * wires this to `App`'s dismiss flow per AC-20j (returns to compact
@@ -64,7 +64,7 @@ export function CloseButton({ onClick, className }: CloseButtonProps) {
         <path
           d="M1 1L15 15M15 1L1 15"
           stroke="currentColor"
-          strokeWidth="1.8"
+          strokeWidth="2"
         />
       </svg>
     </button>

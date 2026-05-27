@@ -17,7 +17,7 @@
 }
 
 .divider {
-  height: 1px;
+  height: var(--hairline);
   width: 100%;
   background: var(--gray-600);
 }
@@ -31,26 +31,13 @@
   width: 100%;
   text-align: right;
   font-family: var(--font-family);
-  font-size: 16px;
-  line-height: 16px;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-tight);
   color: var(--blue-700);
   cursor: pointer;
-  outline: 2px solid transparent;
-  outline-offset: 2px;
   border-radius: var(--space-xs);
-  transition: outline-color 150ms ease;
-}
-
-.link:focus-visible {
-  outline-color: var(--blue-500);
 }
 
 .link:hover {
   text-decoration: underline;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .link {
-    transition: none;
-  }
 }
