@@ -16,8 +16,58 @@
         font-weight: 400;
         -webkit-font-smoothing: antialiased;
       }
+      .siteHeader {
+        align-items: center;
+        background: rgba(244, 244, 244, 0.8);
+        display: flex;
+        height: 5rem;
+        justify-content: center;
+        padding: 0 1.75rem;
+      }
+      .siteHeaderInner {
+        align-items: center;
+        display: flex;
+        gap: 2.5625rem;
+        height: 100%;
+        max-width: 90rem;
+        width: 100%;
+      }
+      .siteLogo {
+        color: #000;
+        font-size: 2.25rem;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        margin: 0;
+        text-transform: uppercase;
+      }
+      .siteLogoMark {
+        font-size: 0.625rem;
+        margin-left: 0.125rem;
+        vertical-align: super;
+      }
+      .siteHeaderMenu {
+        align-items: center;
+        display: flex;
+        flex: 1 0 0;
+        justify-content: flex-end;
+        min-width: 0;
+      }
+      .menuButton {
+        align-items: center;
+        background: rgba(244, 244, 244, 0.8);
+        border: none;
+        border-radius: 31.25rem;
+        color: #000;
+        cursor: default;
+        display: inline-flex;
+        font-family: inherit;
+        font-size: 1.125rem;
+        line-height: normal;
+        padding: 0.5rem 1rem;
+        text-transform: uppercase;
+      }
       .harness {
-        min-height: 100dvh;
+        min-height: calc(100dvh - 5rem);
         background-image: url('/hero-bg.jpg');
         background-size: cover;
         background-position: center;
@@ -36,6 +86,16 @@
     </style>
   </head>
   <body>
+    <header class="siteHeader" aria-label="Host page header">
+      <div class="siteHeaderInner">
+        <p class="siteLogo">Siili<span class="siteLogoMark">®</span></p>
+        <div class="siteHeaderMenu">
+          <button class="menuButton" type="button" aria-label="Menu" tabindex="-1">
+            MENU →
+          </button>
+        </div>
+      </div>
+    </header>
     <main class="harness">
       <div id="siili-chatbot"></div>
       <p class="note">
