@@ -104,6 +104,8 @@ interface ExpandedViewProps {
   onActivateConversation: (id: string) => void
   onStartNewConversation: () => void
   onDeleteConversation: (id: string, label: string) => void
+  /** Bumped by `App` when AC-35 start-new runs so the textarea refocuses. */
+  inputFocusSignal?: number
 }
 
 export function ExpandedView({
@@ -118,6 +120,7 @@ export function ExpandedView({
   onActivateConversation,
   onStartNewConversation,
   onDeleteConversation,
+  inputFocusSignal,
 }: ExpandedViewProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
@@ -216,6 +219,7 @@ export function ExpandedView({
                   variant="expanded"
                   disabled={loading}
                   autoFocus
+                  focusSignal={inputFocusSignal}
                   value={draft}
                   onValueChange={onDraftChange}
                   onSend={onSend}

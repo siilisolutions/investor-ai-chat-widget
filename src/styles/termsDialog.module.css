@@ -20,8 +20,8 @@
  * scrollbar (`ds:242:578`); short form (`ds:257:1096`) has nothing
  * to scroll so the same overflow rule is a no-op there.
  *
- * Z-index sits one above `.expanded` (which uses 2147483000) so the
- * dialog is always over the chat surface but below the absolute-max
+ * Z-index sits one above `.expanded` so the dialog is always over the
+ * chat surface but below the absolute-max
  * int (some host pages reserve that for their own top-level UI).
  */
 
@@ -33,7 +33,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-lg);
-  z-index: 2147483646;
+  z-index: 2147483647;
   animation: termsDialogFadeIn var(--duration-slow) var(--ease-default);
 }
 

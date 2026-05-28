@@ -633,29 +633,24 @@ Maps to the Investor agent composition and its main component; see
   - **Given** the active conversation is also tracked in the same
     store,
   - **Then** the active row is visually distinguished from inactive
-    rows by carrying the **Hover** variant's neutral surface (see
-    §2.5 row AC-33a) as its idle treatment — one step darker than
-    an inactive Default row, matching the active-row treatment
-    Figma applies in `site:434:2424` (`property1="Hover"` for the
-    active conversation). Row label typography stays Everett
+    rows by carrying the **Pressed** variant's neutral surface (see
+    §2.5 row AC-33a) as its idle treatment — darker than both
+    inactive Default and inactive Hover (designer QA 2026-05-28).
+    Row label typography stays Everett
     Regular on every variant per the parent set (no separate bold
     cue is rendered — the surface step is the cue). The strong
     disambiguator for "which conversation am I looking at?" is the
     right-column Q+A stream itself; the sidebar surface step is
     a secondary confirmation that the right row corresponds to the
     visible conversation.
-  - **And** hovering an inactive row briefly produces the same
-    surface as the active row. This is intentional: Figma's Hover
-    variant doubles as the canonical "active-looking" treatment,
-    so the hover preview reads as "this is what selecting will
-    look like". The Pressed variant remains a documented part of
-    the parent set but is not rendered as a static row state by
-    the widget — it would be reserved for a future transient
-    "while pressing" surface if one is ever needed.
+  - **And** hovering an inactive row previews selection by stepping
+    from Default to Hover; the active row remains darker (Pressed),
+    so the currently-selected conversation stays unambiguous even
+    while the user scans other rows.
   - **And** the trailing × delete button on each row exposes Hover /
     Pressed surface treatments on its 24 × 24 hit target (mirrors
     the `CloseButton` family).
-  (added 2026-04, Figma component drift; amended 2026-05, #PR — graduated @aspirational → @evolving; visual states pinned to the `ds:230:452` parent set's Default / Hover / Pressed variants with active row using the Pressed surface as the AC-33a active-row cue alongside the bold-label cue; specifics live in §2.5 row AC-33a; amended 2026-05, #PR — active row reconciled to the Hover variant's surface (one step darker than Default), and the bold-label cue dropped, per `site:434:2424` Figma context placing the active row at `property1="Hover"`. The Pressed variant is no longer rendered as a static row state.; amended 2026-05-26 — × button hover states + host-aligned focus ring; active-row colour stays Hover per Figma conflict resolution.)
+  (added 2026-04, Figma component drift; amended 2026-05, #PR — graduated @aspirational → @evolving; visual states pinned to the `ds:230:452` parent set's Default / Hover / Pressed variants with active row using the Pressed surface as the AC-33a active-row cue alongside the bold-label cue; specifics live in §2.5 row AC-33a; amended 2026-05, #PR — active row reconciled to the Hover variant's surface (one step darker than Default), and the bold-label cue dropped, per `site:434:2424` Figma context placing the active row at `property1="Hover"`. The Pressed variant is no longer rendered as a static row state.; amended 2026-05-26 — × button hover states + host-aligned focus ring; amended 2026-05, #PR — active-row colour changed to the Pressed surface (`--gray-600`) per designer QA 2026-05-28.)
 
 - **AC-33b** — *Previous discussion item — activation* · **@aspirational**
   - **Given** the sidebar lists prior conversations (per AC-33a),

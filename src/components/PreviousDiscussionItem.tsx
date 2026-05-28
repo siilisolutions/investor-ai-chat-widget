@@ -8,9 +8,8 @@
  *   the conversation, truncated to fit. Empty conversations (created
  *   but never sent) fall back to a neutral default.
  * - The currently-active row is visually distinguished from inactive
- *   rows by carrying the Hover variant's surface (`--gray-500`,
- *   Figma `ds:230:453`) per `site:434:2424` (`property1="Hover"`
- *   for the active conversation in Figma's expanded-view composition).
+ *   rows by carrying the Pressed variant's surface (`--gray-600`,
+ *   Figma `ds:230:459`; designer QA 2026-05-28).
  *   Label weight stays Everett Regular on every variant — the surface
  *   step is the cue. The parent list passes the `active` prop.
  *

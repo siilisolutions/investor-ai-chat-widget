@@ -12,10 +12,9 @@
  * set `ds:230:452` and the IR-site `site:434:2424` composition:
  *   - Default (idle, inactive)     → `--gray-400` (#efefef, `ds:191:268`)
  *   - Hover (inactive, hovered)    → `--gray-500` (#e5e5e5, `ds:230:453`)
- *   - Active conversation         → `--gray-500` (Hover surface
- *     per `site:434:2424` where the active row is rendered with
- *     `property1="Hover"`; the active row is one step darker than an
- *     inactive Default row, but not as dark as the Pressed variant).
+ *   - Active conversation         → `--gray-600` (Pressed surface
+ *     `ds:230:459`; designer QA 2026-05-28 — darker than Hover so
+ *     the active row reads clearly against inactive Default rows).
  *
  * Label typography stays Everett Regular on every variant — no
  * separate bold-label cue; the surface step is the cue. Hovering an
@@ -53,10 +52,30 @@
   transition: background-color var(--duration-fast) var(--ease-out);
 }
 
-.row:hover,
+.row:hover:not(.active) {
+  background: var(--gray-500);
+}
+
 .row.active,
 .row.active:hover {
-  background: var(--gray-500);
+  background: var(--gray-600);
+}
+
+/*
+ * AC-80 — keyboard focus on the row's activate control uses the same
+ * Siili ring as other widget controls, drawn on the full pill (`.row`)
+ * rather than hugging the label text only. The inner button suppresses
+ * the global `:where(button):focus-visible` rule so the ring is not
+ * clipped to the text box.
+ */
+.row:has(.activate:focus-visible) {
+  outline: var(--focus-ring-outline);
+  box-shadow: var(--focus-ring-shadow);
+}
+
+.row:has(.activate:focus-visible) .activate {
+  outline: none;
+  box-shadow: none;
 }
 
 .activate {
@@ -65,7 +84,8 @@
   text-align: left;
   background: transparent;
   border: none;
-  padding: 0;
+  padding: var(--space-xs);
+  margin: calc(-1 * var(--space-xs));
   font-family: var(--font-family);
   font-size: var(--font-size-xs);
   line-height: var(--line-height-base);

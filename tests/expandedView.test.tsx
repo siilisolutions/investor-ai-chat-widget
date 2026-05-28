@@ -9,7 +9,8 @@
  *             both single-conversation and multi-conversation cases).
  *   AC-33b — per-row activation calls `onActivateConversation`.
  *   AC-33e — per-row × calls `onDeleteConversation` with id + label.
- *   AC-35  — start-new-conversation button calls `onStartNewConversation`.
+ *   AC-35  — start-new-conversation button calls `onStartNewConversation`
+ *            and `inputFocusSignal` refocuses the textarea.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/preact'
@@ -425,5 +426,47 @@ describe('ExpandedView — AC-33 sidebar visibility', () => {
       screen.getByRole('button', { name: 'Luo uusi keskustelu' }),
     )
     expect(onStartNew).toHaveBeenCalledTimes(1)
+  })
+
+  it('AC-35: inputFocusSignal refocuses the expanded textarea', () => {
+    const { rerender } = render(
+      <ExpandedView
+        messages={SINGLE_CONVERSATIONS[0].messages}
+        loading={false}
+        draft=""
+        onDraftChange={NOOP}
+        onSend={NOOP}
+        onClose={NOOP}
+        conversations={SINGLE_CONVERSATIONS}
+        activeConversationId={ACTIVE_ID}
+        onActivateConversation={NOOP}
+        onStartNewConversation={NOOP}
+        onDeleteConversation={NOOP}
+        inputFocusSignal={0}
+      />,
+    )
+    const textarea = screen.getByLabelText(
+      'Siili investor chatbot message',
+    ) as HTMLTextAreaElement
+    screen.getByRole('button', { name: 'Sulje keskustelu' }).focus()
+    expect(document.activeElement).not.toBe(textarea)
+
+    rerender(
+      <ExpandedView
+        messages={SINGLE_CONVERSATIONS[0].messages}
+        loading={false}
+        draft=""
+        onDraftChange={NOOP}
+        onSend={NOOP}
+        onClose={NOOP}
+        conversations={SINGLE_CONVERSATIONS}
+        activeConversationId={ACTIVE_ID}
+        onActivateConversation={NOOP}
+        onStartNewConversation={NOOP}
+        onDeleteConversation={NOOP}
+        inputFocusSignal={1}
+      />,
+    )
+    expect(document.activeElement).toBe(textarea)
   })
 })

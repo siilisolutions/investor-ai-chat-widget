@@ -12,7 +12,7 @@
  * no `backdrop-filter: blur` at the modal layer, so the
  * implementation here drops the previous 8 px modal-side blur.
  *
- * Z-index sits one above `.expanded` (which uses 2147483000) so
+ * Z-index sits one above `.expanded` so
  * the modal is always over the chat surface but below the
  * absolute-max int (some host pages reserve that for their own
  * top-level UI).
@@ -26,7 +26,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-lg);
-  z-index: 2147483646;
+  z-index: 2147483647;
   animation: confirmDialogFadeIn var(--duration-slow) var(--ease-default);
 }
 

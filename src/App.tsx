@@ -35,7 +35,8 @@
  *   the active conversation's draft on every render so re-activation
  *   restores it.
  * - Starting a new conversation from inside expanded mode (AC-35)
- *   mints an id, saves an empty entry, and sets it as active.
+ *   mints an id, saves an empty entry, sets it as active, and moves
+ *   focus to the expanded textarea.
  *   Previous conversations remain in the store and surface as
  *   additional rows in the AC-33 sidebar (which is always
  *   rendered in expanded mode, amended 2026-05).
@@ -153,6 +154,9 @@ export function App({
     getTermsAcceptance,
   )
   const [pendingQuestion, setPendingQuestion] = useState<string | null>(null)
+  // AC-35 — incremented when start-new runs so expanded `ChatInput`
+  // refocuses the textarea after the new conversation becomes active.
+  const [inputFocusSignal, setInputFocusSignal] = useState(0)
   const pushedRef = useRef(false)
 
   // Memoized so each derived reference is stable when neither the
@@ -392,6 +396,7 @@ export function App({
       conversations: [...prev.conversations, fresh],
       activeId: fresh.id,
     }))
+    setInputFocusSignal((n) => n + 1)
   }, [])
 
   // AC-33e — open the confirmation modal for a row's `×` activation.
@@ -469,6 +474,7 @@ export function App({
           onActivateConversation={handleActivateConversation}
           onStartNewConversation={handleStartNewConversation}
           onDeleteConversation={handleDeleteConversation}
+          inputFocusSignal={inputFocusSignal}
         />
       )}
       <ConfirmDialog

@@ -352,6 +352,42 @@ describe('App', () => {
     expect(rows[0]).toHaveAttribute('aria-current', 'true')
   })
 
+  it('AC-35: start-new-conversation moves focus to the expanded textarea', async () => {
+    saveConversation({
+      id: 'conv-A',
+      messages: [{ id: 'mA', question: 'Question A?', answer: 'answer A' }],
+      draft: '',
+    })
+    saveConversation({
+      id: 'conv-B',
+      messages: [{ id: 'mB', question: 'Question B?', answer: 'answer B' }],
+      draft: '',
+    })
+
+    const service = makeService(async () => ({
+      id: 'never',
+      question: 'q',
+      answer: 'never',
+      loading: false,
+    }))
+    render(<App chatService={service} />)
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Jatka edellistä keskustelua' }),
+    )
+
+    const textarea = screen.getByLabelText(
+      'Siili investor chatbot message',
+    ) as HTMLTextAreaElement
+    screen.getByRole('button', { name: 'Sulje keskustelu' }).focus()
+    expect(document.activeElement).not.toBe(textarea)
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Luo uusi keskustelu' }),
+    )
+    expect(document.activeElement).toBe(textarea)
+  })
+
   it('AC-33e: × on a row opens the confirmation dialog showing the row\u2019s label and a cancel does nothing', async () => {
     saveConversation({
       id: 'conv-A',

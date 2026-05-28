@@ -34,6 +34,11 @@ interface ChatInputProps {
   placeholder?: string
   disabled?: boolean
   autoFocus?: boolean
+  /**
+   * When this counter increments, focus moves to the textarea (AC-35
+   * start-new-conversation hands off to the primary input).
+   */
+  focusSignal?: number
   value?: string
   onValueChange?: (next: string) => void
   /**
@@ -63,6 +68,7 @@ export function ChatInput({
   placeholder = DEFAULT_PLACEHOLDER,
   disabled = false,
   autoFocus = false,
+  focusSignal,
   value: controlledValue,
   onValueChange,
   onSend,
@@ -86,6 +92,11 @@ export function ChatInput({
       textareaRef.current?.focus()
     }
   }, [autoFocus])
+
+  useEffect(() => {
+    if (focusSignal === undefined || focusSignal < 1) return
+    textareaRef.current?.focus()
+  }, [focusSignal])
 
   // Keep textarea height synced when the controlled value changes
   // out-of-band (e.g. activeId switch restores another conversation's
