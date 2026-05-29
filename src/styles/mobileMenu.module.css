@@ -1,9 +1,10 @@
 /*
  * Mobile menu drawer — matches Figma component `ds:214:1214` and
  * its in-context placement inside `site:435:2914`. Per AC-33d the
- * drawer is mounted only at viewports below the §12.1 PD-05 mobile
- * breakpoint; the parent (`ExpandedView`) is responsible for not
- * rendering this component above that breakpoint.
+ * drawer is mounted only at viewports below the §12.1 PD-05 desktop
+ * threshold (lg / 1024 px; Figma `ds:152:97` Code Connect); the parent
+ * (`ExpandedView`) is responsible for not rendering this component at
+ * or above that threshold.
  *
  * Visual contract:
  * - `.backdrop` is an absolutely-positioned overlay covering the

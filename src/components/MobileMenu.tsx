@@ -1,7 +1,8 @@
 /**
  * `MobileMenu` — left-anchored slide-in drawer that hosts the AC-33
- * `PreviousDiscussionList` at viewports below the §12.1 PD-05 mobile
- * breakpoint. Maps to Figma component `ds:214:1214` (Mobile menu) and
+ * `PreviousDiscussionList` at viewports below the §12.1 PD-05 desktop
+ * threshold (lg / 1024 px; Figma `ds:152:97` Code Connect). Maps to
+ * Figma component `ds:214:1214` (Mobile menu) and
  * appears in screen context inside `site:435:2914` (AI-agentti -
  * Menu open - Mobile).
  *

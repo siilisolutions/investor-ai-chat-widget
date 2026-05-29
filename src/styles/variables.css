@@ -9,9 +9,15 @@
  * Figma wins -- update this file rather than the component styles.
  *
  * Sizing uses `rem` at a 16 px root (Lane Q, 2026-05-26 designer QA).
- * §12.1 PD-05 breakpoints are expressed below as rem equivalents of the
- * canonical px values (mobile <40rem, tablet 40rem–63.9375rem, desktop
- * ≥64rem). Motion durations stay in `ms` per PD-07.
+ * §12.1 PD-05 layout bands map onto the Figma / host breakpoint scale
+ * (`Layout primitives/Breakpoints/*` in WordPress Oma Teema Base File):
+ * xs 320, sm 640, md 768, lg 1024, xl 1280, 2xl 1536 px — see
+ * `--breakpoint-*` below. Compact hero: mobile <sm, tablet sm–(lg−1),
+ * desktop ≥lg. Expanded view (`ds:152:97` Code Connect): drawer + mobile
+ * chrome below lg; inline sidebar + inset card at ≥lg. `@media` rules use
+ * the rem literals (not `var()`) because
+ * custom properties are not valid in media-query predicates in this
+ * bundle. Motion durations stay in `ms` per PD-07.
  *
  * The widget root element receives the `.siiliChatbot` class which
  * scopes these variables so they don't leak into the host page.
@@ -111,6 +117,22 @@
   --space-xl: 2rem; /* 32px */
   --space-2xl: 3rem; /* 48px */
   --space-3xl: 4rem; /* 64px */
+
+  /*
+   * Breakpoints — Figma WordPress Oma Teema `Layout primitives/Breakpoints/*`
+   * (imported 2026-05). Min-width tokens; `*-max` companions are one step
+   * below the next band for `max-width` queries.
+   */
+  --breakpoint-xs: 20rem; /* 320px */
+  --breakpoint-sm: 40rem; /* 640px — PD-05 tablet lower bound */
+  --breakpoint-md: 48rem; /* 768px */
+  --breakpoint-lg: 64rem; /* 1024px — PD-05 desktop lower bound */
+  --breakpoint-xl: 80rem; /* 1280px */
+  --breakpoint-2xl: 96rem; /* 1536px */
+  --breakpoint-xs-max: 19.9375rem; /* 319px */
+  --breakpoint-sm-max: 39.9375rem; /* 639px — PD-05 compact mobile upper bound */
+  --breakpoint-md-max: 47.9375rem; /* 767px */
+  --breakpoint-lg-max: 63.9375rem; /* 1023px — PD-05 tablet upper bound */
 
   /* Layout (PD-05 / Figma screen compositions) */
   --content-width: 55.5rem; /* 888px */

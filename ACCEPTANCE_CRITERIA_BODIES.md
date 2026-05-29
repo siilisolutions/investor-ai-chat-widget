@@ -401,8 +401,8 @@ Maps to the Investor agent composition and its main component; see
     breakpoint,
   - **Then** the header sits left-aligned with the AC-33 sidebar
     column.
-  - **Given** the viewport is below the §12.1 PD-05 mobile
-    breakpoint,
+  - **Given** the viewport is below the §12.1 PD-05 desktop
+    threshold (lg, per Figma `ds:152:97` Code Connect),
   - **Then** the header sits inside a single top-bar row that also
     holds the AC-33d hamburger affordance (left edge) and the
     AC-20d close button (right edge), per `site:435:2904` /
@@ -411,7 +411,7 @@ Maps to the Investor agent composition and its main component; see
     "left-aligned with the sidebar column" rule does not apply at
     this breakpoint — instead the title flexes to fill the row
     between the hamburger and close button.
-  (amended 2026-05, #PR — Mobile drawer landed: pin the mobile top-bar layout co-anchoring the title with the AC-33d hamburger and the AC-20d close button per `site:435:2904` / `site:435:2914`.)
+  (amended 2026-05, #PR — Mobile drawer landed: pin the mobile top-bar layout co-anchoring the title with the AC-33d hamburger and the AC-20d close button per `site:435:2904` / `site:435:2914`; amended 2026-05, Code Connect — mobile top-bar below lg / 1024 px.)
 
 - **AC-22** — *Question bubble* · **@stable**
   - **Given** any Q+A pair,
@@ -600,8 +600,8 @@ Maps to the Investor agent composition and its main component; see
     conversation is always one of the rows — the "expanded always
     has an active conversation" invariant guarantees the row list
     is never empty.
-  - **Given** the viewport is below the §12.1 PD-05 mobile
-    breakpoint,
+  - **Given** the viewport is below the §12.1 PD-05 desktop
+    threshold (lg),
   - **Then** the always-visible rule is satisfied by the AC-33d
     discoverable affordance (drawer / overflow toggle) — the
     sidebar's *contents* remain reachable in one tap; AC-33d owns
@@ -675,9 +675,9 @@ Maps to the Investor agent composition and its main component; see
   (added 2026-04, Figma component drift; deprecated 2026-05, #PR — sidebar made always-visible.)
 
 - **AC-33d** — *Previous discussion list — mobile responsive treatment* · **@evolving**
-  - **Given** the viewport is below the §12.1 PD-05 mobile
-    breakpoint and the sidebar would otherwise be rendered (per
-    AC-33),
+  - **Given** the viewport is below the §12.1 PD-05 desktop
+    threshold (lg, per Figma `ds:152:97` Code Connect) and the
+    sidebar would otherwise be rendered (per AC-33),
   - **Then** the sidebar collapses behind a hamburger toggle
     (Figma component `ds:230:656` — Menu button, 24×24 with
     three horizontal stripes) anchored at the left edge of the
@@ -726,7 +726,7 @@ Maps to the Investor agent composition and its main component; see
     above the §12.1 PD-05 desktop breakpoint the AC-33 sidebar
     renders inline as a column inside the conversation card and
     the hamburger is absent.
-  (added 2026-04, Figma component drift; amended 2026-05, #PR — Mobile drawer landed: graduated @aspirational → @evolving, anchored to `ds:214:1214` / `ds:230:656` / `site:435:2914` (see §2.5 row AC-33d), pinned the slide-in drawer + blurred backdrop + dismiss paths.)
+  (added 2026-04, Figma component drift; amended 2026-05, #PR — Mobile drawer landed: graduated @aspirational → @evolving, anchored to `ds:214:1214` / `ds:230:656` / `site:435:2914` (see §2.5 row AC-33d), pinned the slide-in drawer + blurred backdrop + dismiss paths; amended 2026-05, Code Connect — drawer band is below lg / 1024 px, not below sm / 640 px.)
 
 - **AC-33e** — *Previous discussion item — per-row delete with confirmation* · **@evolving**
   - **Given** the AC-33 sidebar is rendered (i.e. the widget is in
@@ -1312,12 +1312,12 @@ These criteria exist to satisfy P2's competition-entry ambition.
     history but is not the canonical anchor.
   (added 2026-04, GOV-12 split; amended 2026-04, Lane F — graduated to @stable as code-authored after designer delegated responsive judgment; amended 2026-05, #PR — promoted from `— (code-authored)` after designer published `site:608:1855` / `site:591:3203` mobile candidate frames in Lane L; recontracted from "horizontal scroll OR wrap" to "vertical stack with single-line ellipsis" per `site:608:1855` v2; demoted @stable → @evolving until the implementation lands and the designer signs off on v2 vs v1)
 
-- **AC-92c** — *Mobile (<640px) — expanded view full width with Figma padding* · **@stable**
-  - **Given** a viewport narrower than the mobile breakpoint
-    (§12.1 PD-05) and the widget is in expanded mode,
+- **AC-92c** — *Below desktop (<1024px) — expanded view full width with Figma padding* · **@stable**
+  - **Given** a viewport narrower than the §12.1 PD-05 desktop
+    threshold (lg) and the widget is in expanded mode,
   - **Then** the expanded view uses `100%` container width with
-    padding per Figma mobile guidance (or a tasteful scale-down of
-    the desktop frame if mobile frames are not yet designed).
+    padding per Figma mobile guidance (`site:435:2904`).
+  (amended 2026-05, Code Connect — expanded mobile padding below lg; anchor promoted to `site:435:2904` in §2.5.)
 
 - **AC-93** — *Textarea auto-grow* · **@stable**
   - **Given** the user types multi-line content,

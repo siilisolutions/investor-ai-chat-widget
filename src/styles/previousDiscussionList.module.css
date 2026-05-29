@@ -1,7 +1,7 @@
 /*
  * Sidebar shell for the AC-33 previous-discussion list. Anchored to
  * the left of the expanded-view content column on desktop. Below the
- * §12.1 PD-05 mobile breakpoint the sidebar is hidden by
+ * §12.1 PD-05 desktop threshold (lg) the inline sidebar is hidden by
  * `expandedView.module.css` and the AC-33d `MobileMenu` drawer hosts
  * this same component verbatim — no mobile-specific styles live in
  * this module any more (the drawer card supplies its own padding /

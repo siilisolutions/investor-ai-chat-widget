@@ -5,7 +5,8 @@
  *
  * Per AC-33d (amended 2026-05): the button sits at the left edge of
  * the AC-21 mobile top-bar row and is rendered only at viewports
- * below the §12.1 PD-05 mobile breakpoint. Activating it opens the
+ * below the §12.1 PD-05 desktop threshold (lg / 1024 px; Figma
+ * `ds:152:97` Code Connect). Activating it opens the
  * left-anchored drawer that hosts the AC-33 `PreviousDiscussionList`.
  *
  * The visual is three horizontal stripes (16×2.4 px each, 7.2 px

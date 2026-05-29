@@ -70,7 +70,7 @@
 }
 
 /*
- * AC-92b (mobile <40rem, PD-05) — chips stack vertically with single-line
+ * AC-92b (mobile <sm / --breakpoint-sm-max, PD-05) — chips stack vertically with single-line
  * ellipsis truncation per Figma `site:608:1855` *Etusivu - Mobile - v2*
  * (Lane M, 2026-05-11). Each chip takes the full width of the chip
  * container and any label that exceeds that width is ellipsized — see
@@ -78,10 +78,11 @@
  * truncation. AC-12b `white-space: nowrap` is preserved (chips stay
  * single-line).
  *
- * AC-91 (tablet 40rem–63.9375rem) and AC-90 (desktop ≥64rem) keep the
- * default `flex-wrap: wrap` from `.chips` above.
+ * AC-91 (tablet sm–lg-max) and AC-90 (desktop ≥lg) keep the default
+ * `flex-wrap: wrap` from `.chips` above.
  */
 @media (max-width: 39.9375rem) {
+  /* --breakpoint-sm-max */
   .heroContainer {
     padding-inline: var(--space-lg);
   }

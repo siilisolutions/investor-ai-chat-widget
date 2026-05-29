@@ -1,15 +1,15 @@
 /*
  * Expanded-view layout (amended 2026-05, Lane J — Figma re-align;
  * amended 2026-05, AC-33d Mobile drawer — added mobile top-bar
- * layout + hides inline sidebar at <640 px so the AC-33d drawer
- * owns mobile presentation).
+ * layout + hides inline sidebar below lg (`--breakpoint-lg-max`) so the AC-33d drawer
+ * owns presentation per Figma `ds:152:97` Code Connect userRules).
  *
  * Outer chrome
  * ------------
- * `.backdrop` is the full-viewport overlay (AC-20a). On mobile / tablet
- * (<1024 px) it sits flush against the viewport edges and the inner
- * `.surface` fills it edge-to-edge, satisfying AC-92c. At or above the
- * §12.1 PD-05 desktop breakpoint (≥1024 px) the backdrop adds padding
+ * `.backdrop` is the full-viewport overlay (AC-20a). Below lg
+ * (`--breakpoint-lg-max`) it sits flush against the viewport edges and the
+ * inner `.surface` fills it edge-to-edge, satisfying AC-92c. At or above the
+ * §12.1 PD-05 desktop breakpoint (`--breakpoint-lg`, 1024 px) the backdrop adds padding
  * (becoming the visible "blurred backdrop sibling" band around the
  * inset white card per `site:434:2424`) and applies
  * `backdrop-filter: blur(...)` over a slightly translucent white wash.
@@ -20,7 +20,7 @@
  * Internal layout
  * ---------------
  * `.surface` is the white card (position: relative so the close
- * button can absolute-position to its corner on tablet / desktop).
+ * button can absolute-position to its corner at desktop (≥lg).
  * Inside it sits a centred `.layout` wrapper that bounds the title
  * row + body to a comfortable max-width.
  *
@@ -28,9 +28,8 @@
  * the AC-21 title (flex-1), and the AC-20d `CloseButton`. The close
  * button is rendered ONCE in the DOM and re-positioned per
  * breakpoint:
- * - Mobile (<640 px): in-flow at the right of `.topBar` per
- *   `site:435:2904`.
- * - Tablet / Desktop (≥640 px): `position: absolute` against
+ * - Below lg (<1024 px): in-flow at the right of `.topBar` per `site:435:2904`.
+ * - Desktop (≥lg): `position: absolute` against
  *   `.surface`'s top-right corner per `site:434:2424` (the title
  *   then visually left-aligns with the sidebar column because the
  *   close button is taken out of flex flow).
@@ -124,12 +123,13 @@
 }
 
 /*
- * AC-92c (mobile <640px, PD-05) — tighter padding so the Q+A column
+ * AC-92c (below lg, PD-05 expanded layout) — tighter padding so the Q+A column
  * isn't starved on narrow viewports. Bottom padding is dropped on
  * mobile and `.inputWrapper` owns the bottom edge there, matching the
  * existing mobile composition.
  */
-@media (max-width: 39.9375rem) {
+@media (max-width: 63.9375rem) {
+  /* --breakpoint-lg-max */
   .layout {
     padding: var(--space-lg) var(--space-lg) 0;
     gap: var(--space-lg);
@@ -137,12 +137,11 @@
 }
 
 /*
- * Mobile (<640 px) default — top-bar row holds the hamburger
- * (left), title (flex-1), and AC-20d close (right) per
- * `site:435:2904`. The hamburger and the in-flow close are CSS-only
- * affordances at this breakpoint (the hamburger is `display: none`
- * above 640 px; the close jumps to `position: absolute` above
- * 640 px — see the desktop block below).
+ * Below lg default — top-bar row holds the hamburger (left), title
+ * (flex-1), and AC-20d close (right) per `site:435:2904`. The hamburger
+ * and the in-flow close are CSS-only affordances in this band (the
+ * hamburger is `display: none` at ≥lg; the close jumps to
+ * `position: absolute` — see the desktop block below).
  */
 .topBar {
   display: flex;
@@ -173,14 +172,13 @@
 }
 
 /*
- * Tablet / Desktop (≥640 px) — the hamburger is hidden and the
- * close button jumps to `position: absolute` against `.surface`
- * (top-right corner per AC-20d / `site:434:2424`). The title then
- * visually left-aligns with the sidebar column because the close
- * is taken out of flex flow and the title's `flex: 1 1 auto` fills
- * the row.
+ * Desktop (≥lg) — the hamburger is hidden and the close button jumps
+ * to `position: absolute` against `.surface` (top-right corner per
+ * AC-20d / `site:434:2424`). The title then visually left-aligns with
+ * the sidebar column because the close is taken out of flex flow.
  */
-@media (min-width: 40rem) {
+@media (min-width: 64rem) {
+  /* --breakpoint-lg */
   .menuButton {
     display: none;
   }
@@ -250,7 +248,8 @@
   margin: 0 var(--space-xl);
 }
 
-@media (max-width: 39.9375rem) {
+@media (max-width: 63.9375rem) {
+  /* --breakpoint-lg-max */
   .desktopSidebar {
     display: none;
   }
@@ -360,9 +359,10 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 39.9375rem) {
+@media (max-width: 63.9375rem) {
+  /* --breakpoint-lg-max */
   /*
-   * Mobile keeps the `.layout` bottom padding at 0 and re-introduces
+   * Below lg keeps the `.layout` bottom padding at 0 and re-introduces
    * a small bottom buffer here so the textarea doesn't slam against
    * the viewport edge on phones.
    */
@@ -372,10 +372,11 @@
 }
 
 /*
- * Desktop band (PD-05 ≥64rem) — inset white card + visible
+ * Desktop band (PD-05 ≥lg / `--breakpoint-lg`) — inset white card + visible
  * blurred backdrop sibling per AC-20a / AC-90 (Lane J).
  */
 @media (min-width: 64rem) {
+  /* --breakpoint-lg */
   .backdrop {
     padding: var(--space-xl);
   }

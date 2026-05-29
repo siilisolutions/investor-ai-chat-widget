@@ -33,12 +33,13 @@
 }
 
 /*
- * AC-92b (mobile <40rem, PD-05) — at the mobile breakpoint each chip
+ * AC-92b (mobile <sm / --breakpoint-sm-max, PD-05) — at the mobile breakpoint each chip
  * takes the full width of the chip container (the `.chips` flex column
  * in `compactView.module.css`). `min-width: 0` lets flex children shrink
  * below their content width so `text-overflow: ellipsis` can engage.
  */
 @media (max-width: 39.9375rem) {
+  /* --breakpoint-sm-max */
   .chip {
     width: 100%;
     min-width: 0;

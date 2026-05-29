@@ -3,16 +3,16 @@
  * message is sent. Maps to Figma nodes `ds:152:97` ("Investor agent"
  * main component) and `site:434:2424` ("AI-agentti" screen frame).
  *
- * Desktop layout (≥1024 px, amended 2026-05, Lane J — Figma re-align):
+ * Desktop layout (≥lg / 1024 px, amended 2026-05, Lane J — Figma re-align):
  * - `.backdrop` — full-viewport `position: fixed` overlay. Adds
  *   padding so the inner `.surface` reads as a margin-around card,
  *   and applies `backdrop-filter: blur(...)` over a translucent
  *   white wash so the host page is visibly defocused (AC-20a, with
  *   a solid `rgba(255, 255, 255, 0.7)` fallback for browsers that
  *   do not support `backdrop-filter`).
- * - `.surface` — the white card. Edge-to-edge below 1024 px
- *   (AC-92c), inset with `border-radius` + subtle elevation at or
- *   above 1024 px. Hosts an absolutely-positioned `CloseButton`
+ * - `.surface` — the white card. Edge-to-edge below lg (AC-92c),
+ *   inset with `border-radius` + subtle elevation at or above lg.
+ *   Hosts an absolutely-positioned `CloseButton`
  *   (AC-20d, Figma `ds:196:853`) at the top-right plus a centred
  *   `.layout` wrapper that bounds the title row and body to a
  *   comfortable max-width.
@@ -31,7 +31,8 @@
  *   nearest scrollable ancestor is `.messages` itself, so the scroll
  *   never leaks to the page.
  *
- * Mobile layout (<640 px, amended 2026-05, AC-33d Mobile drawer):
+ * Mobile layout (below lg / 1024 px, Figma `ds:152:97` Code Connect —
+ * amended 2026-05, AC-33d Mobile drawer):
  * - The title sits in a `.topBar` row alongside the AC-33d
  *   `MenuButton` (left edge) and the AC-20d `CloseButton` (right
  *   edge), per `site:435:2904`. The desktop absolute close button
