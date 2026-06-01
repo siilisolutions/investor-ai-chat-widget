@@ -34,7 +34,14 @@
   align-items: flex-start;
 }
 
-.answer {
+/*
+ * AC-112 / AC-24 — Figma `ds:152:115` answer copy is 16 px / 24 px
+ * leading. HubSpot host rules such as `.entry-content p` (0,1,1) beat
+ * a lone `.answer` module class (0,1,0) and squeeze line-height; the
+ * parent + `p` compound mirrors the `.heroMain h1.heroTitle` pattern
+ * in `compactView.module.css`.
+ */
+.answerContainer p.answer {
   font-family: var(--font-family);
   font-size: var(--font-size-base);
   line-height: var(--line-height-base);
@@ -50,7 +57,7 @@
   gap: var(--space-md);
 }
 
-.loadingText {
+.answerContainer p.loadingText {
   font-family: var(--font-family);
   font-size: var(--font-size-base);
   line-height: var(--line-height-base);
@@ -96,7 +103,7 @@
   width: 100%;
 }
 
-.referencesLabel {
+.answerContainer p.referencesLabel {
   font-family: var(--font-family-light);
   font-weight: 300;
   font-size: var(--font-size-xs);
@@ -112,7 +119,7 @@
   align-items: flex-start;
 }
 
-.error {
+.answerContainer p.error {
   font-family: var(--font-family);
   font-size: var(--font-size-base);
   line-height: var(--line-height-base);

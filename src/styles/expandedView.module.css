@@ -132,7 +132,15 @@
   /* --breakpoint-lg-max */
   .layout {
     padding: var(--space-lg) var(--space-lg) 0;
-    gap: var(--space-lg);
+    /*
+     * Figma `site:435:2904` — 48 px between the mobile top bar and
+     * the conversation column (`gap-[48px]` on the white surface).
+     */
+    gap: var(--space-2xl);
+  }
+
+  .title {
+    font-size: var(--font-size-md);
   }
 }
 
@@ -296,10 +304,9 @@
  * `scrollbar-gutter: stable` reserves the scrollbar slot so showing /
  * hiding the scrollbar mid-session does not shift the divider, the
  * sidebar, the title, or the inset card's margin. The bottom
- * `mask-image` is the AC-28c "vertical opacity fade" between the
- * conversation stream and the input — content scrolling into the last
- * 32 px fades into transparency, so the conversation reads as if it
- * scrolls behind the input shell.
+ * AC-28c fade is owned by `.inputWrapper::before` (see below), not
+ * a mask on this scroller, so message content and focus rings are
+ * not clipped at the scrollport edge.
  */
 .messages {
   flex: 1 1 auto;
@@ -322,18 +329,6 @@
   gap: var(--space-3xl);
   align-items: flex-start;
   padding-bottom: var(--space-lg);
-  mask-image: linear-gradient(
-    to bottom,
-    black 0,
-    black calc(100% - var(--space-xl)),
-    transparent 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    black 0,
-    black calc(100% - var(--space-xl)),
-    transparent 100%
-  );
 }
 
 .messagesEnd {
@@ -349,14 +344,36 @@
  * `.messages` flexes (`flex: 1 1 auto`). The vertical breathing room
  * above and below the textarea is owned by the column's `gap`
  * (top, 64 px) and `.layout`'s bottom padding (64 px desktop card
- * inset per Figma `py-[64px]`). Solid white background so the band
- * under the mask-image fade reads as a clean surface.
+ * inset per Figma `py-[64px]`). Solid white background; the AC-28c
+ * fade band sits in `::before` so it does not mask the scroller.
  */
 .inputWrapper {
+  position: relative;
   flex: 0 0 auto;
   width: 100%;
   background: var(--white-500);
   box-sizing: border-box;
+}
+
+/*
+ * AC-28c — vertical opacity fade between the conversation stream and
+ * the bottom-pinned input (`ds:152:97` / `site:434:2424`). A
+ * gradient overlay above the input shell — not a `mask-image` on
+ * `.messages` — so scrollbars and focus rings stay intact.
+ */
+.inputWrapper::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: var(--space-xl);
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--white-500)
+  );
 }
 
 @media (max-width: 63.9375rem) {
@@ -378,7 +395,8 @@
 @media (min-width: 64rem) {
   /* --breakpoint-lg */
   .backdrop {
-    padding: var(--space-xl);
+    /* Figma `ds:152:97` — `p-[16px]` viewport inset around the card */
+    padding: var(--space-lg);
   }
 
   .surface {

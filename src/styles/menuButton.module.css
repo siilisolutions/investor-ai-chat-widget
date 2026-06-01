@@ -33,7 +33,7 @@
   display: block;
   width: var(--size-icon-md);
   height: var(--size-icon-md);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius);
   transition: background-color var(--duration-fast) var(--ease-out);
 }
 
@@ -45,24 +45,37 @@
   background: var(--gray-500);
 }
 
+/*
+ * Stripe stack — Figma `ds:217:1905` Menu icon: 20 × 16 px group
+ * centred inside the 24 × 24 frame; stripes at y = 0 / 7.2 / 14.4 px.
+ */
+.stripeGroup {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1.25rem;
+  height: 1rem;
+  transform: translate(-50%, -50%);
+}
+
 .stripe {
   position: absolute;
-  left: 0.125rem;
-  right: 0.125rem;
+  left: 0;
+  right: 0;
   height: var(--hamburger-stripe-height);
   background: var(--black-500);
 }
 
 .stripe:nth-child(1) {
-  top: 0.25rem;
+  top: 0;
 }
 
 .stripe:nth-child(2) {
-  top: 0.7rem;
+  top: 0.45rem;
 }
 
 .stripe:nth-child(3) {
-  top: 1.15rem;
+  top: 0.9rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

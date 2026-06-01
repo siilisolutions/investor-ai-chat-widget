@@ -23,10 +23,9 @@
  * "active-looking" treatment, so the hover preview reads as "this is
  * what selecting will look like" (AC-33a amended 2026-05).
  *
- * The Pressed variant (`--gray-600` / `ds:230:459`) remains a
- * documented part of the parent set but is not rendered as a static
- * row state by the widget — it would be reserved for a future
- * transient "while pressing" surface if one is ever needed.
+ * Pressed (`--gray-600` / `ds:230:459`) — transient surface while
+ * the activate control is held on an inactive row; the active row
+ * keeps the same surface at rest.
  */
 
 /*
@@ -48,12 +47,15 @@
   padding: var(--space-xs) var(--space-lg);
   background: var(--gray-400);
   border-radius: var(--radius);
-  overflow: hidden;
   transition: background-color var(--duration-fast) var(--ease-out);
 }
 
 .row:hover:not(.active) {
   background: var(--gray-500);
+}
+
+.row:active:not(.active) {
+  background: var(--gray-600);
 }
 
 .row.active,

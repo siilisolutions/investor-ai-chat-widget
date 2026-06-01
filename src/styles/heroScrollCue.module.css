@@ -9,7 +9,8 @@
   align-items: center;
   gap: var(--space-xl);
   width: 100%;
-  margin: 0;
+  flex-shrink: 0;
+  margin: auto 0 0;
   padding: 0;
   border: none;
   background: transparent;

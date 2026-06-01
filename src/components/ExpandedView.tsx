@@ -19,9 +19,10 @@
  * - `.body` — flex row of `PreviousDiscussionList` (AC-33, Figma
  *   `ds:191:258`), a 1 px vertical `.divider`, and `.contentColumn`.
  * - `.contentColumn` — flex column with `.messages` (own overflow
- *   container, `scrollbar-gutter: stable`, bottom `mask-image`
- *   opacity fade per AC-28c) and `.inputWrapper` (bottom-pinned via
- *   the column's flex layout, AC-28). Self-caps at
+ *   container, `scrollbar-gutter: stable`) and `.inputWrapper`
+ *   (bottom-pinned via the column's flex layout, AC-28; AC-28c fade
+ *   band on `.inputWrapper::before`, not a `mask-image` on
+ *   `.messages`). Self-caps at
  *   `var(--content-width)` per `ds:202:254` and self-centers within
  *   its slot via `margin-inline: auto`, so on viewports wider than
  *   the Figma 1440 baseline the conversation balances in the

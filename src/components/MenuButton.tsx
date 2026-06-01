@@ -49,9 +49,11 @@ export const MenuButton = forwardRef<HTMLButtonElement, MenuButtonProps>(
         onClick={onClick}
       >
         <span aria-hidden="true" className={styles.icon}>
-          <span className={styles.stripe} />
-          <span className={styles.stripe} />
-          <span className={styles.stripe} />
+          <span className={styles.stripeGroup}>
+            <span className={styles.stripe} />
+            <span className={styles.stripe} />
+            <span className={styles.stripe} />
+          </span>
         </span>
       </button>
     )

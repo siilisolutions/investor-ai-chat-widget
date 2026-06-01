@@ -66,6 +66,12 @@
   gap: var(--space-xs);
   padding: var(--space-lg);
   box-sizing: border-box;
+  /*
+   * Figma `ds:214:1214` — left edge flush; 20 px radius on the
+   * trailing corners only (`rounded-tr` / `rounded-br`).
+   */
+  border-top-right-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
   animation: drawerSlideIn var(--duration-drawer-slide) var(--ease-drawer);
 }
 
