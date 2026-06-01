@@ -1,7 +1,7 @@
 {
   "name": "siili_sijoittaja_site_botti_fe",
   "private": true,
-  "version": "0.8.5",
+  "version": "0.8.6",
   "type": "module",
   "scripts": {
     "dev": "vite",
