@@ -5,10 +5,13 @@
  *           most-recent conversation as active and fires no network call.
  *   AC-29 — follow-ups append without mutating prior Q+A pairs.
  *   AC-30 — input and send button are disabled while a request is in flight.
+ *   AC-32 — focus returns to the expanded textarea when the response
+ *           completes and the input re-enables.
  *   AC-31f — compact-mode send with prior messages mints a fresh conversation;
  *           compact-mode send into an empty active conversation appends.
  *   AC-33b — switching between conversations restores each one's draft
- *           and does not fire a service call.
+ *           and does not fire a service call; activation refocuses
+ *           the expanded textarea.
  *   AC-42 — raw `err.message` from a ChatService throw is never forwarded
  *           to the DOM; the rendered error row shows the fixed SAFE_ERROR
  *           copy instead.
@@ -97,6 +100,31 @@ describe('App', () => {
     await waitFor(() => expect(textarea).toBeEnabled())
   })
 
+  it('AC-32: focus returns to the expanded textarea when the assistant response completes', async () => {
+    let resolve!: (message: ChatMessage) => void
+    const service = makeService(
+      () => new Promise<ChatMessage>((r) => (resolve = r)),
+    )
+    render(<App chatService={service} />)
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Mikä on yhtiön nykyinen osinkopolitiikka?',
+      }),
+    )
+
+    const textarea = (await screen.findByLabelText(
+      'Siili investor chatbot message',
+    )) as HTMLTextAreaElement
+    expect(textarea).toBeDisabled()
+    screen.getByRole('button', { name: 'Sulje keskustelu' }).focus()
+    expect(document.activeElement).not.toBe(textarea)
+
+    resolve({ id: 'ack', question: 'q', answer: 'a', loading: false })
+    await waitFor(() => expect(textarea).toBeEnabled())
+    await waitFor(() => expect(document.activeElement).toBe(textarea))
+  })
+
   it('AC-29: a second send appends a new Q+A pair without mutating the previous one', async () => {
     const answers = ['first answer', 'second answer']
     let call = 0
@@ -177,12 +205,14 @@ describe('App', () => {
 
     // Switch to conv-A by clicking its sidebar row. conv-A's seeded
     // draft is empty, so the textarea should clear.
+    screen.getByRole('button', { name: 'Sulje keskustelu' }).focus()
     fireEvent.click(screen.getByRole('button', { name: 'Question A?' }))
     await waitFor(() => {
       const ta = screen.getByLabelText(
         'Siili investor chatbot message',
       ) as HTMLTextAreaElement
       expect(ta.value).toBe('')
+      expect(document.activeElement).toBe(ta)
     })
 
     // Type a draft for conv-A.

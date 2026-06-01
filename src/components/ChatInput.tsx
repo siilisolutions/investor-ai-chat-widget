@@ -79,6 +79,7 @@ export function ChatInput({
   const value = isControlled ? controlledValue : internalValue
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const sendButtonRef = useRef<HTMLButtonElement>(null)
+  const wasDisabledRef = useRef(disabled)
 
   const setValue = (next: string) => {
     if (!isControlled) {
@@ -95,8 +96,18 @@ export function ChatInput({
 
   useEffect(() => {
     if (focusSignal === undefined || focusSignal < 1) return
+    if (disabled) return
     textareaRef.current?.focus()
-  }, [focusSignal])
+  }, [focusSignal, disabled])
+
+  // AC-32 — when AC-30 re-enables the input after a response lands,
+  // return focus to the textarea so the user can type the follow-up.
+  useEffect(() => {
+    if (wasDisabledRef.current && !disabled) {
+      textareaRef.current?.focus()
+    }
+    wasDisabledRef.current = disabled
+  }, [disabled])
 
   // Keep textarea height synced when the controlled value changes
   // out-of-band (e.g. activeId switch restores another conversation's

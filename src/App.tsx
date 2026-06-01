@@ -381,12 +381,14 @@ export function App({
   // AC-33b — activate a previous conversation. State only; no
   // network call.
   const handleActivateConversation = useCallback((id: string) => {
+    if (id === activeId) return
     setStore((prev) =>
       prev.conversations.some((c) => c.id === id)
         ? { ...prev, activeId: id }
         : prev,
     )
-  }, [])
+    setInputFocusSignal((n) => n + 1)
+  }, [activeId])
 
   // AC-35 — start a fresh conversation. Mints an id via the store,
   // appends to the array, and flips the active id.
