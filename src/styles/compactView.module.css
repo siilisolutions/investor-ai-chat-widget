@@ -37,7 +37,12 @@
   width: 100%;
 }
 
-.heroTitle {
+/*
+ * Two-class + h1 beats HubSpot `.hero-ir h1 { font-size: revert }`
+ * (0,1,1) which otherwise wins over a lone `.heroTitle` (0,1,0) and
+ * shrinks the Figma 64 px headline on the staging embed.
+ */
+.heroMain h1.heroTitle {
   font-family: var(--font-family);
   font-weight: 400;
   font-size: var(--font-size-hero);
@@ -87,7 +92,7 @@
     padding-inline: var(--space-lg);
   }
 
-  .heroTitle {
+  .heroMain h1.heroTitle {
     font-size: var(--font-size-hero-mobile);
   }
 

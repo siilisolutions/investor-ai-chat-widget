@@ -199,10 +199,21 @@
   /*
    * Defends against `:focus { box-shadow: 0 0 4px 4px rgba(50,50,255,.5); outline: 1px solid transparent }`
    * in `template_styles-2026.min.css`. Mouse clicks must not inherit
-   * the host glow; keyboard `:focus-visible` restores the Siili ring
-   * via the rule below.
+   * the host glow.
    */
   box-shadow: none;
+}
+
+.siiliChatbot textarea:focus,
+.siiliChatbot textarea:focus-visible {
+  /*
+   * Same host `:focus { box-shadow: … }` rule. Textarea shells paint the
+   * single AC-80 ring on `.shell:has(textarea:focus-visible)`; leaving
+   * the host glow on the inner field reads as a nested "double focus"
+   * on HubSpot staging (`template_styles-2026.min.css`).
+   */
+  box-shadow: none;
+  outline: none;
 }
 
 .siiliChatbot :where(button, a):focus-visible {
