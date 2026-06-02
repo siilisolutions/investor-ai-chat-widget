@@ -26,6 +26,7 @@
   max-width: var(--compact-textarea-width);
   padding: var(--space-2xl) var(--space-2xl) var(--space-3xl);
   box-sizing: border-box;
+  overflow: visible;
 }
 
 .heroMain {
@@ -37,6 +38,7 @@
   gap: var(--space-3xl);
   width: 100%;
   min-height: 0;
+  overflow: visible;
 }
 
 /*
@@ -60,12 +62,21 @@
   display: block;
 }
 
+/*
+ * AC-80 / AC-112 — the textarea shell paints its focus ring via outer
+ * `box-shadow`. Padding + negative margin reserves bleed room inside
+ * this box so flex scrollports and host `overflow: hidden` mount nodes
+ * do not clip the glow (same pattern as AC-33a row focus on `.row`).
+ */
 .interactive {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-lg);
   width: 100%;
+  padding: var(--focus-ring-bleed);
+  margin: calc(-1 * var(--focus-ring-bleed));
+  overflow: visible;
 }
 
 .chips {

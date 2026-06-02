@@ -347,12 +347,21 @@
  * inset per Figma `py-[64px]`). Solid white background; the AC-28c
  * fade band sits in `::before` so it does not mask the scroller.
  */
+/*
+ * AC-80 / AC-112 — `.surface` carries `overflow: hidden`, so the
+ * textarea shell's outer focus glow must stay inside this wrapper's
+ * border box. Padding + negative margin reserves bleed room without
+ * shifting the pinned input column layout.
+ */
 .inputWrapper {
   position: relative;
   flex: 0 0 auto;
   width: 100%;
   background: var(--white-500);
   box-sizing: border-box;
+  padding: var(--focus-ring-bleed);
+  margin: calc(-1 * var(--focus-ring-bleed));
+  overflow: visible;
 }
 
 /*
@@ -385,6 +394,7 @@
    */
   .inputWrapper {
     padding-bottom: var(--space-xl);
+    margin-bottom: calc(-1 * var(--space-xl));
   }
 }
 

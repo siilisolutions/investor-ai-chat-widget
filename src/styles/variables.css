@@ -92,6 +92,8 @@
    */
   --focus-ring-outline: 1px solid transparent;
   --focus-ring-shadow: 0 0 0.25rem 0.25rem rgba(50, 50, 255, 0.5);
+  /* spread + blur envelope — keeps AC-80 shell glow inside paint bounds */
+  --focus-ring-bleed: 0.5rem; /* 8px */
 
   font-weight: 400;
   -webkit-font-smoothing: antialiased;

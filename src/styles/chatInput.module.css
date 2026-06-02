@@ -55,6 +55,12 @@
   color: var(--gray-900);
 }
 
+/* Empty + focused: native caret and placeholder share the same origin,
+   so the blink reads as overlapping the first glyph (AC-11 / ds:152:123). */
+.textarea:focus::placeholder {
+  opacity: 0;
+}
+
 .sendRow {
   display: flex;
   justify-content: flex-end;
