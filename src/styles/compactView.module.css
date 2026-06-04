@@ -64,9 +64,16 @@
 
 /*
  * AC-80 / AC-112 — the textarea shell paints its focus ring via outer
- * `box-shadow`. Padding + negative margin reserves bleed room inside
- * this box so flex scrollports and host `overflow: hidden` mount nodes
- * do not clip the glow (same pattern as AC-33a row focus on `.row`).
+ * `box-shadow`. Bleed room is reserved on the vertical axis only
+ * (padding + negative margin) so the glow is not clipped above / below.
+ * Horizontal bleed is intentionally NOT reserved here: with
+ * `box-sizing: border-box` a horizontal padding shrinks the textarea
+ * and chip widths below the container's max-width (designer QA
+ * 2026-06-03 — "maksimileveys on väärä, koska containeriin on
+ * määritetty padding"). The horizontal glow has ample room inside the
+ * `.heroContainer` inline padding (48 px desktop / 16 px mobile), which
+ * is `overflow: visible`, so dropping the horizontal reservation does
+ * not reintroduce clipping.
  */
 .interactive {
   display: flex;
@@ -74,8 +81,8 @@
   align-items: flex-start;
   gap: var(--space-lg);
   width: 100%;
-  padding: var(--focus-ring-bleed);
-  margin: calc(-1 * var(--focus-ring-bleed));
+  padding: var(--focus-ring-bleed) 0;
+  margin: calc(-1 * var(--focus-ring-bleed)) 0;
   overflow: visible;
 }
 

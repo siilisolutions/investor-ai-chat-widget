@@ -134,11 +134,18 @@
 /*
  * Row gap matches Figma `ds:191:610` slot — `gap-[12px]` between
  * adjacent `PreviousDiscussionItem` rows.
+ *
+ * AC-80 / AC-112 — `.items` is an overflow scroller, so a row's
+ * `:focus-visible` glow (an outer `box-shadow`) was clipped at the
+ * scroll-port edges, most visibly on the left and right of each pill
+ * (designer QA 2026-06-03 — "previous discussion item:n outline
+ * klippaantuu"). Reserving `--focus-ring-bleed` of padding inside the
+ * scroller and pulling it back out with a matching negative margin
+ * keeps the rows visually in place while giving the ring room to paint
+ * before the clip edge (same pattern as `.interactive` / `.inputWrapper`).
  */
 .items {
   list-style: none;
-  margin: 0;
-  padding: 0;
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
@@ -146,4 +153,6 @@
   gap: var(--space-md);
   overflow-y: auto;
   scrollbar-gutter: stable;
+  padding: var(--focus-ring-bleed);
+  margin: calc(-1 * var(--focus-ring-bleed));
 }

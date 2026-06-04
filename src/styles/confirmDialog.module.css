@@ -51,7 +51,12 @@
   line-height: var(--line-height-base);
   letter-spacing: var(--letter-spacing-dialog-title);
   color: var(--black-500);
-  text-align: center;
+  /*
+   * Left-aligned per Figma `ds:242:431` (designer QA 2026-06-03 —
+   * reverses the 2026-05-11 Lane L flip to `center`; the shared title
+   * element now renders left-aligned at the card's 32 px inset).
+   */
+  text-align: left;
 }
 
 .description {

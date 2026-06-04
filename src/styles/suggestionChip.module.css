@@ -33,18 +33,22 @@
 }
 
 /*
- * AC-92b (mobile <sm / --breakpoint-sm-max, PD-05) — at the mobile breakpoint each chip
- * takes the full width of the chip container (the `.chips` flex column
- * in `compactView.module.css`). `min-width: 0` lets flex children shrink
- * below their content width so `text-overflow: ellipsis` can engage.
+ * AC-92b (mobile <sm / --breakpoint-sm-max, PD-05) — at the mobile
+ * breakpoint each chip takes the full width of the chip container (the
+ * `.chips` flex column in `compactView.module.css`). A label that does
+ * not fit on one line wraps onto multiple lines rather than being
+ * clipped with an ellipsis (designer QA 2026-06-03 — "predefined
+ * question pitkä teksti klippaantuu. Rivitys useammalle riville, jos
+ * tila ei riitä", Figma `site:591:3203`). This relaxes AC-12b's
+ * `white-space: nowrap` at this breakpoint only; tablet (AC-91) and
+ * desktop (AC-90) keep single-line content-sized chips.
  */
 @media (max-width: 39.9375rem) {
   /* --breakpoint-sm-max */
   .chip {
     width: 100%;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
   }
 }
 

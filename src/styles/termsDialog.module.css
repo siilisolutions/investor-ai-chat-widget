@@ -59,7 +59,11 @@
   line-height: var(--line-height-base);
   letter-spacing: var(--letter-spacing-dialog-title);
   color: var(--black-500);
-  text-align: center;
+  /*
+   * Left-aligned per Figma `site:555:2200` / `ds:242:431` (designer QA
+   * 2026-06-03 — reverses the 2026-05-11 Lane L flip to `center`).
+   */
+  text-align: left;
 }
 
 .body {
@@ -89,8 +93,24 @@
   margin: 0;
 }
 
+/*
+ * Paragraph rhythm per Figma `site:555:2200` (designer QA 2026-06-03 —
+ * "tekstikappaleiden ja otsikoiden marginaalit"). The prior rule put a
+ * uniform 12 px gap between every adjacent paragraph, which inverted the
+ * intent: it spaced section headings away from their own body copy while
+ * leaving no gap before a heading. Figma shows the opposite — a clear
+ * gap *before* each section heading and a tight join *below* it.
+ */
 .body p + p {
-  margin-top: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.body .heading {
+  margin-top: var(--space-lg);
+}
+
+.body .heading + p {
+  margin-top: var(--space-xs);
 }
 
 .body strong {

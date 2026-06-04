@@ -31,4 +31,27 @@
   display: block;
   width: 2.375rem;
   height: 0.875rem;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+/*
+ * Hover affordance on the chevron (designer QA 2026-06-03 — "hover
+ * animaatio on hävinnyt nuolesta"). The arrow nudges down on hover /
+ * keyboard focus to reinforce the "scroll down to the rest of the
+ * investor pages" intent. Motion stays within the PD-07 interactive
+ * band and is suppressed under `prefers-reduced-motion`.
+ */
+.cue:hover .icon,
+.cue:focus-visible .icon {
+  transform: translateY(var(--space-xs));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon {
+    transition: none;
+  }
+  .cue:hover .icon,
+  .cue:focus-visible .icon {
+    transform: none;
+  }
 }

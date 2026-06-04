@@ -207,13 +207,18 @@ Maps to the Investor hero composition and its main component; see
     per §12.1 PD-01.
 
 - **AC-12b** — *Suggestion chip labels do not wrap* · **@stable**
-  - **Given** compact mode is shown,
+  - **Given** compact mode is shown at the tablet (AC-91) or desktop
+    (AC-90) breakpoint,
   - **Then** each chip's label renders on a single line
     (`white-space: nowrap`) matching the predefined-question
     component (see §2.5 row AC-12b); overflow of the chip row
     is handled at the breakpoints defined in AC-91 / AC-92 (row
-    wrap on tablet, horizontal scroll or wrap on mobile), not by
-    breaking chip labels.
+    wrap on tablet), not by breaking chip labels.
+  - **Exception (mobile):** below the §12.1 PD-05 mobile breakpoint the
+    chips are full-width and a long label wraps onto multiple lines per
+    AC-92b — the `white-space: nowrap` rule is intentionally relaxed at
+    that breakpoint only.
+  (amended 2026-06, designer QA — added the mobile multi-line exception cross-referencing AC-92b)
 
 - **AC-12c** — *Suggestion chip elevation* · **@evolving**
   - **Given** compact mode is shown,
@@ -1293,24 +1298,25 @@ These criteria exist to satisfy P2's competition-entry ambition.
   - **Then** the compact view stacks the input above the chips (not
     side-by-side).
 
-- **AC-92b** — *Mobile (<640px) — chips stack vertically with single-line ellipsis* · **@evolving**
+- **AC-92b** — *Mobile (<640px) — chips stack vertically, labels wrap* · **@evolving**
   - **Given** a viewport narrower than the mobile breakpoint
     (§12.1 PD-05),
   - **Then** the suggestion chips stack vertically (column flex), each
     chip taking the full width of the chip container, and any chip
-    label that exceeds that width is truncated with a single-line
-    ellipsis (`…`) — AC-12b's `white-space: nowrap` constraint still
-    holds, so labels never wrap to two lines.
+    label that does not fit on one line wraps onto multiple lines (the
+    chip surface grows with its content) rather than being clipped or
+    truncated. This relaxes AC-12b's `white-space: nowrap` at this
+    breakpoint only.
   - **And** none of the chips overflow the viewport width
     horizontally; the previous `overflow-x: auto` horizontal-scroll
     treatment is retired because the hidden scrollbar gave users no
     affordance that further chips existed behind the right edge.
-  - Visual anchor in §2.5 row AC-92b is `site:608:1855` *Etusivu -
-    Mobile - v2*. The alternate iteration `site:591:3203` *Etusivu -
-    Mobile* (which renders multi-line chip labels rather than
-    single-line ellipsis) is recorded in the §2.5 row prose for
-    history but is not the canonical anchor.
-  (added 2026-04, GOV-12 split; amended 2026-04, Lane F — graduated to @stable as code-authored after designer delegated responsive judgment; amended 2026-05, #PR — promoted from `— (code-authored)` after designer published `site:608:1855` / `site:591:3203` mobile candidate frames in Lane L; recontracted from "horizontal scroll OR wrap" to "vertical stack with single-line ellipsis" per `site:608:1855` v2; demoted @stable → @evolving until the implementation lands and the designer signs off on v2 vs v1)
+  - Visual anchor in §2.5 row AC-92b is `site:591:3203` *Etusivu -
+    Mobile* (multi-line chip labels). The alternate iteration
+    `site:608:1855` *Etusivu - Mobile - v2* (single-line ellipsis) is
+    recorded in the §2.5 row prose for history but is no longer the
+    canonical anchor.
+  (added 2026-04, GOV-12 split; amended 2026-04, Lane F — graduated to @stable as code-authored after designer delegated responsive judgment; amended 2026-05, #PR — promoted from `— (code-authored)` after designer published `site:608:1855` / `site:591:3203` mobile candidate frames in Lane L; recontracted from "horizontal scroll OR wrap" to "vertical stack with single-line ellipsis" per `site:608:1855` v2; demoted @stable → @evolving until the implementation lands and the designer signs off on v2 vs v1; amended 2026-06, designer QA — recontracted from single-line ellipsis to multi-line wrap and switched canonical anchor to v1 `site:591:3203` because the v2 ellipsis clipped long predefined-question labels)
 
 - **AC-92c** — *Below desktop (<1024px) — expanded view full width with Figma padding* · **@stable**
   - **Given** a viewport narrower than the §12.1 PD-05 desktop

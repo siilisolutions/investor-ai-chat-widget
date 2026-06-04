@@ -62,6 +62,20 @@ interface TermsDialogProps {
   privacyPolicyUrl?: string
 }
 
+// Every tabbable surface inside the card, in document order. Used by the
+// focus trap so Tab cycles through the whole dialog — including the
+// scrollable body region, the Lue lisää / Näytä vähemmän toggle, and the
+// optional privacy-policy anchor — not just the two action buttons
+// (designer QA 2026-06-03: "tekstialueeseen ja linkkeihin ei pääse
+// näppäimistöllä käsiksi").
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'textarea:not([disabled])',
+  'input:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',')
+
 const SHORT_BODY =
   'Tämä IR-agentti on tekoälyavusteinen agentti. Agentti ei anna ' +
   'sijoitusneuvontaa eikä se suosittele arvopapereiden ostamista, ' +
@@ -139,8 +153,8 @@ export function TermsDialog({
   onCancel,
   privacyPolicyUrl,
 }: TermsDialogProps) {
+  const cardRef = useRef<HTMLDivElement>(null)
   const cancelRef = useRef<HTMLButtonElement>(null)
-  const confirmRef = useRef<HTMLButtonElement>(null)
   const previouslyFocusedRef = useRef<HTMLElement | null>(null)
   const [expanded, setExpanded] = useState(false)
   const titleId = useId()
@@ -194,22 +208,26 @@ export function TermsDialog({
       return
     }
     if (event.key !== 'Tab') return
-    // Light focus trap covering only the two action buttons. The
-    // Lue lisää / Näytä vähemmän toggle and the optional privacy-
-    // policy anchor are part of the natural Tab order between cancel
-    // and confirm; if the user tabs onto the toggle and then back
-    // out, the regular Tab key carries them to confirm — only the
-    // edges (cancel ⇄ confirm) need to wrap.
-    const cancel = cancelRef.current
-    const confirm = confirmRef.current
-    if (!cancel || !confirm) return
+    // Focus trap spanning every tabbable element in the card (scrollable
+    // body region → toggle → privacy anchor → cancel → confirm), wrapping
+    // only at the boundaries. The earlier two-button trap pinned the
+    // wrap to cancel ⇄ confirm, which made the toggle, the privacy link,
+    // and the keyboard-scrollable body unreachable.
+    const card = cardRef.current
+    if (!card) return
+    const focusables = Array.from(
+      card.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+    )
+    if (focusables.length === 0) return
+    const first = focusables[0]
+    const last = focusables[focusables.length - 1]
     const active = document.activeElement
-    if (event.shiftKey && active === cancel) {
+    if (event.shiftKey && active === first) {
       event.preventDefault()
-      confirm.focus()
-    } else if (!event.shiftKey && active === confirm) {
+      last.focus()
+    } else if (!event.shiftKey && active === last) {
       event.preventDefault()
-      cancel.focus()
+      first.focus()
     }
   }
 
@@ -221,6 +239,7 @@ export function TermsDialog({
       onKeyDown={handleKeyDown}
     >
       <div
+        ref={cardRef}
         className={styles.card}
         role="dialog"
         aria-modal="true"
@@ -230,7 +249,12 @@ export function TermsDialog({
         <p id={titleId} className={styles.title}>
           Käyttöehdot
         </p>
-        <div id={bodyId} className={styles.body}>
+        {/*
+          Scrollable region is keyboard-focusable so users who cannot use
+          a pointer can still scroll the long-form body with the arrow
+          keys (WCAG 2.1.1; designer QA 2026-06-03).
+        */}
+        <div id={bodyId} className={styles.body} tabIndex={0}>
           {expanded ? (
             <LongForm privacyPolicyUrl={privacyPolicyUrl} />
           ) : (
@@ -257,7 +281,6 @@ export function TermsDialog({
             Peruuta
           </button>
           <button
-            ref={confirmRef}
             type="button"
             className={styles.confirm}
             onClick={onAccept}
@@ -276,7 +299,7 @@ function LongForm({ privacyPolicyUrl }: { privacyPolicyUrl?: string }) {
       {LONG_FORM_SECTIONS.map((section, sectionIdx) => (
         <div key={sectionIdx}>
           {section.heading ? (
-            <p>
+            <p className={styles.heading}>
               <strong>{section.heading}</strong>
             </p>
           ) : null}
