@@ -2,6 +2,11 @@ import '@testing-library/jest-dom/vitest'
 import { afterEach, beforeEach } from 'vitest'
 import { cleanup } from '@testing-library/preact'
 import { setAcceptance as setTermsAcceptance } from '../src/services/termsStore'
+import { ensureWorkingLocalStorage } from './localStoragePolyfill'
+
+// Node 22+ can expose a broken global `localStorage` stub; fix before
+// any store read/write (see `localStoragePolyfill.ts`).
+ensureWorkingLocalStorage()
 
 // Clear localStorage between tests so the conversationStore starts
 // from an empty state every time. Without this, conversations created
