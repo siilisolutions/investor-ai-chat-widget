@@ -11,11 +11,13 @@
  *   error message
  * - An optional list of source badges under the "Lähteet:" label
  *
- * The answer body is plain text per AC-N1, with the single narrow
- * exception of inline `[title](URL)` autolinks (AC-24b): tokens whose
- * URL is `http`/`https` become real `<a>` React children (built as
- * JSX, never by injecting raw HTML). Any other scheme, and every
- * other Markdown/HTML construct, stays escaped plain text.
+ * The answer body is plain text per AC-N1, with two narrow exceptions
+ * per AC-24b: (1) `[title](http/https URL)` tokens become `<a
+ * target="_blank">` React children; (2) `[title](mailto:…)` tokens
+ * whose mailbox is a single recipient on `@siili.com` or `@siili.fi`
+ * become same-context `<a>` children. All other schemes, off-domain
+ * mailto, and every other Markdown/HTML construct stay escaped plain
+ * text. Elements are always built as JSX — never via raw HTML injection.
  *
  * Used inside: `ExpandedView`.
  */
@@ -31,17 +33,37 @@ interface ChatMessageProps {
 
 const INLINE_LINK = /\[([^\]\n]+)\]\(([^)\s]+)\)/g
 
-function isSafeHttpUrl(url: string): boolean {
+/** Allowed Siili mail domains for mailto: linkification (AC-24b). */
+const SIILI_MAILBOX = /^[^@\s,]+@(siili\.com|siili\.fi)$/i
+
+function isHttpUrl(url: string): boolean {
   return /^https?:\/\//i.test(url)
 }
 
 /**
+ * Returns true when the mailto: URL contains a single recipient whose
+ * domain is exactly `siili.com` or `siili.fi` (AC-24b).
+ * Subdomains (e.g. `sub.siili.com`) and suffix tricks
+ * (`siili.com.evil.com`) are rejected by the anchored regex.
+ */
+function isSiiliMailto(url: string): boolean {
+  if (!/^mailto:/i.test(url)) return false
+  const mailbox = url.slice(7).split(/[?#&]/)[0]
+  if (mailbox.includes(',')) return false
+  return SIILI_MAILBOX.test(mailbox)
+}
+
+/**
  * Splits an answer string into plain-text segments and `<a>` elements
- * for inline `[title](URL)` tokens (AC-24b). Only `http`/`https` URLs
- * are linkified; every other token — unsafe schemes, `**bold**`, raw
- * HTML, etc. — is left untouched as escaped plain text (AC-N1). Text
- * segments keep their newlines, which the `pre-wrap` answer style
- * renders as paragraph breaks (AC-24).
+ * for inline `[title](URL)` tokens (AC-24b).
+ *
+ * Allowed URL types:
+ *  - `http`/`https` — new tab (`target="_blank"`, `rel="noopener noreferrer"`)
+ *  - `mailto:` on `@siili.com` / `@siili.fi` — same context (no target/rel)
+ *
+ * Everything else — unsafe schemes, off-domain mailto, `**bold**`, raw
+ * HTML, etc. — is left as escaped plain text (AC-N1). Text segments
+ * keep their newlines, rendered as paragraph breaks via `pre-wrap` (AC-24).
  */
 function renderAnswer(answer: string): ReactNode[] {
   const nodes: ReactNode[] = []
@@ -54,20 +76,28 @@ function renderAnswer(answer: string): ReactNode[] {
     match = INLINE_LINK.exec(answer)
   ) {
     const [full, label, url] = match
-    if (!isSafeHttpUrl(url)) continue
+    const isHttp = isHttpUrl(url)
+    const isMailto = !isHttp && isSiiliMailto(url)
+    if (!isHttp && !isMailto) continue
     if (match.index > lastIndex) {
       nodes.push(answer.slice(lastIndex, match.index))
     }
     nodes.push(
-      <a
-        key={`link-${key++}`}
-        className={styles.link}
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {label}
-      </a>,
+      isHttp ? (
+        <a
+          key={`link-${key++}`}
+          className={styles.link}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {label}
+        </a>
+      ) : (
+        <a key={`link-${key++}`} className={styles.link} href={url}>
+          {label}
+        </a>
+      ),
     )
     lastIndex = match.index + full.length
   }

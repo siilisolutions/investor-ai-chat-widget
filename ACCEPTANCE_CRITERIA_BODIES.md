@@ -451,8 +451,22 @@ Maps to the Investor agent composition and its main component; see
     (mirrors AC-25b's source-link semantics). The element is built
     as a React child — never via `dangerouslySetInnerHTML` — so the
     AC-N1 anti-injection posture is preserved.
+  - **Given** the answer body contains an inline `[title](mailto:…)`
+    token whose mailbox address (the part before any `?`, `#`, or
+    `&`) is a **single** recipient on an allowed Siili domain
+    (`@siili.com` or `@siili.fi`, case-insensitive, exact host match),
+  - **Then** that token is rendered as a real `<a href="mailto:…">`
+    element without `target` or `rel` attributes (opens the system
+    mail client in the same context). The full `href` is preserved,
+    including any `?subject=` / `&body=` query parameters.
+  - **Given** a `[title](mailto:…)` token whose mailbox is on any
+    other domain (e.g. `example.com`, a subdomain of `siili.com`,
+    `siili.com.attacker.com`), or contains multiple comma-separated
+    recipients,
+  - **Then** the token is left as escaped plain text and no anchor
+    is emitted, so off-domain addresses cannot reach the DOM.
   - **Given** a `[title](URL)` token whose URL uses any other scheme
-    (e.g. `javascript:`, `data:`, `mailto:`, a bare relative path),
+    (e.g. `javascript:`, `data:`, a bare relative path),
   - **Then** the token is left as escaped plain text and no anchor
     is emitted, so unsafe schemes cannot reach the DOM.
   - **Given** any other Markdown- or HTML-shaped construct in the
@@ -462,7 +476,7 @@ Maps to the Investor agent composition and its main component; see
   - The link's visual treatment (colour, underline) is code-authored
     (no Figma node); it reuses the answer's typography tokens and an
     underlined accent so links are distinguishable from body copy.
-  (added 2026-06, #PR — inline `[title](URL)` autolinks; narrow exception to AC-N1)
+  (added 2026-06, #PR — inline `[title](URL)` autolinks; narrow exception to AC-N1; amended 2026-06, #PR — mailto linkification for @siili.com / @siili.fi; Siili-domain-only allowlist)
 
 - **AC-25** — *Source references — section rendered* · **@stable**
   - **Given** an answer includes one or more `sources`,

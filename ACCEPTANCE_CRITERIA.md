@@ -155,7 +155,7 @@ directly.
 | AC-23 | Loading indicator — semantics and copy | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/chatMessage.test.tsx — `role="status"`, `aria-live="polite"`, "Haetaan tietoa..." copy, answer + sources hidden while loading |
 | AC-23b | Loading indicator — blob visual style | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-23b — soft rounded gray blob, scale/opacity pulse |
 | AC-24 | Answer rendering | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/chatMessage.test.tsx — resolved answer renders as plain text in a paragraph, with inline `[title](URL)` autolinks delegated to AC-24b |
-| AC-24b | Answer rendering — inline links | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @evolving | Automated: tests/chatMessage.test.tsx — an `http`/`https` `[title](URL)` token in an answer renders as an `<a target="_blank" rel="noopener noreferrer">` (no `dangerouslySetInnerHTML`); non-`http(s)` schemes and all other Markdown/HTML render as escaped plain text |
+| AC-24b | Answer rendering — inline links | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @evolving | Automated: tests/chatMessage.test.tsx — `http`/`https` token → `<a target="_blank" rel="noopener noreferrer">`; `mailto:` on `@siili.com`/`@siili.fi` → same-context `<a>`; non-Siili mailto, other schemes, and all other Markdown/HTML render as escaped plain text (no `dangerouslySetInnerHTML`) |
 | AC-25 | Source references — section rendered | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/chatMessage.test.tsx — "Lähteet:" section + one badge per source. Visual: see §2.5 row AC-25 for pill styling |
 | AC-25b | Source references — linked badge opens in new tab | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/chatMessage.test.tsx — linked badge has `href`, `target="_blank"`, `rel="noopener noreferrer"` |
 | AC-25c | Source references — unlinked badge is static | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/chatMessage.test.tsx — unlinked source renders as `<span>`, never as a link |
@@ -763,16 +763,20 @@ The contract:
     tags inside the string. Paragraph separation is the only
     formatting allowed, applied by splitting on newlines and
     rendering separate text nodes — never by injecting raw HTML.
-  - **Exception (answer body only):** AC-24b carves out a single,
-    narrow allowance — inline `[title](URL)` tokens in the **answer
+  - **Exception (answer body only):** AC-24b carves out two narrow
+    allowances — (1) inline `[title](URL)` tokens in the **answer
     body** whose URL is `http:` or `https:` are rendered as real
-    `<a>` React elements (never via `dangerouslySetInnerHTML`). This
-    is the *only* Markdown-shaped construct the widget interprets;
-    `**bold**`, headings, lists, images, raw HTML tags, and links
-    with any other URL scheme continue to render as escaped plain
-    text. The exception does not extend to source labels, error
-    text, or the question echo — those stay strictly plain text.
-  (amended 2026-06, #PR — narrow inline `[title](URL)` http/https autolink exception added, delegated to AC-24b)
+    `<a>` React elements opening in a new tab; (2) `[title](mailto:…)`
+    tokens whose mailbox is a single recipient on `@siili.com` or
+    `@siili.fi` (exact host, case-insensitive) are rendered as
+    same-context `<a>` elements — never via `dangerouslySetInnerHTML`.
+    These are the *only* Markdown-shaped constructs the widget
+    interprets; `**bold**`, headings, lists, images, raw HTML tags,
+    mailto on other domains, and all other URL schemes continue to
+    render as escaped plain text. The exception does not extend to
+    source labels, error text, or the question echo — those stay
+    strictly plain text.
+  (amended 2026-06, #PR — narrow inline `[title](URL)` http/https autolink exception added, delegated to AC-24b; amended 2026-06, #PR — mailto @siili.com/@siili.fi added to AC-24b exception)
 
 - **AC-N2** — *MUST NOT bundle font files with the widget* · **@stable**
   - **Given** a production build of the widget (`npm run build`),

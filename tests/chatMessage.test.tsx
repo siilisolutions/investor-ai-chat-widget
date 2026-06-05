@@ -79,6 +79,54 @@ describe('ChatMessage', () => {
     expect(screen.getByText(payload)).toBeInTheDocument()
   })
 
+  it('AC-24b: a @siili.com mailto [title](URL) token renders as a same-context anchor', () => {
+    render(
+      <ChatMessage
+        message={makeMessage({
+          answer: 'Ota yhteyttä [IR-tiimiin](mailto:ir@siili.com) lisätietoja varten.',
+        })}
+      />,
+    )
+    const link = screen.getByRole('link', { name: 'IR-tiimiin' })
+    expect(link).toHaveAttribute('href', 'mailto:ir@siili.com')
+    expect(link).not.toHaveAttribute('target')
+    expect(link).not.toHaveAttribute('rel')
+  })
+
+  it('AC-24b: a @siili.fi mailto [title](URL) token is also linkified as a same-context anchor', () => {
+    render(
+      <ChatMessage
+        message={makeMessage({
+          answer: 'Lähetä viesti [IR-tiimille](mailto:info@siili.fi).',
+        })}
+      />,
+    )
+    const link = screen.getByRole('link', { name: 'IR-tiimille' })
+    expect(link).toHaveAttribute('href', 'mailto:info@siili.fi')
+    expect(link).not.toHaveAttribute('target')
+    expect(link).not.toHaveAttribute('rel')
+  })
+
+  it('AC-24b + AC-N1: a mailto token on a non-Siili domain stays escaped plain text, no anchor', () => {
+    const payload = 'Ota yhteyttä [tiimiin](mailto:ir@example.com).'
+    const { container } = render(
+      <ChatMessage message={makeMessage({ answer: payload })} />,
+    )
+    expect(screen.queryByRole('link')).toBeNull()
+    expect(container.querySelector('a')).toBeNull()
+    expect(screen.getByText(payload)).toBeInTheDocument()
+  })
+
+  it('AC-24b + AC-N1: a deceptive siili.com subdomain mailto stays escaped plain text', () => {
+    const payload = 'Ota yhteyttä [tiimiin](mailto:ir@evil.siili.com).'
+    const { container } = render(
+      <ChatMessage message={makeMessage({ answer: payload })} />,
+    )
+    expect(screen.queryByRole('link')).toBeNull()
+    expect(container.querySelector('a')).toBeNull()
+    expect(screen.getByText(payload)).toBeInTheDocument()
+  })
+
   it('AC-25 + AC-25b: linked source badge opens in a new tab with rel="noopener noreferrer"', () => {
     render(
       <ChatMessage
