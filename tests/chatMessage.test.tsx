@@ -53,6 +53,32 @@ describe('ChatMessage', () => {
     expect(screen.getByText('Siili on konsulttiyhtiö.')).toBeInTheDocument()
   })
 
+  it('AC-24b: an http(s) [title](URL) token in the answer renders as an anchor opening in a new tab', () => {
+    render(
+      <ChatMessage
+        message={makeMessage({
+          answer: 'Lue lisää [vuosikertomuksesta](https://siili.com/ar.pdf) heti.',
+        })}
+      />,
+    )
+    const link = screen.getByRole('link', { name: 'vuosikertomuksesta' })
+    expect(link).toHaveAttribute('href', 'https://siili.com/ar.pdf')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+    expect(screen.getByText(/Lue lisää/)).toBeInTheDocument()
+    expect(screen.getByText(/heti\./)).toBeInTheDocument()
+  })
+
+  it('AC-24b + AC-N1: a [title](URL) token with a non-http(s) scheme stays escaped plain text, no anchor', () => {
+    const payload = 'Klikkaa [tästä](javascript:alert(1)) nyt.'
+    const { container } = render(
+      <ChatMessage message={makeMessage({ answer: payload })} />,
+    )
+    expect(screen.queryByRole('link')).toBeNull()
+    expect(container.querySelector('a')).toBeNull()
+    expect(screen.getByText(payload)).toBeInTheDocument()
+  })
+
   it('AC-25 + AC-25b: linked source badge opens in a new tab with rel="noopener noreferrer"', () => {
     render(
       <ChatMessage

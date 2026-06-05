@@ -154,7 +154,8 @@ directly.
 | AC-22 | Question bubble | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/chatMessage.test.tsx — question text renders verbatim; Visual: see §2.5 row AC-22 for bubble styling |
 | AC-23 | Loading indicator — semantics and copy | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/chatMessage.test.tsx — `role="status"`, `aria-live="polite"`, "Haetaan tietoa..." copy, answer + sources hidden while loading |
 | AC-23b | Loading indicator — blob visual style | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Visual: see §2.5 row AC-23b — soft rounded gray blob, scale/opacity pulse |
-| AC-24 | Answer rendering | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/chatMessage.test.tsx — resolved answer renders as plain text in a paragraph |
+| AC-24 | Answer rendering | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/chatMessage.test.tsx — resolved answer renders as plain text in a paragraph, with inline `[title](URL)` autolinks delegated to AC-24b |
+| AC-24b | Answer rendering — inline links | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @evolving | Automated: tests/chatMessage.test.tsx — an `http`/`https` `[title](URL)` token in an answer renders as an `<a target="_blank" rel="noopener noreferrer">` (no `dangerouslySetInnerHTML`); non-`http(s)` schemes and all other Markdown/HTML render as escaped plain text |
 | AC-25 | Source references — section rendered | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/chatMessage.test.tsx — "Lähteet:" section + one badge per source. Visual: see §2.5 row AC-25 for pill styling |
 | AC-25b | Source references — linked badge opens in new tab | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/chatMessage.test.tsx — linked badge has `href`, `target="_blank"`, `rel="noopener noreferrer"` |
 | AC-25c | Source references — unlinked badge is static | [§3.3](ACCEPTANCE_CRITERIA_BODIES.md#33-expanded-chat-mode) | active | @stable | Automated: tests/chatMessage.test.tsx — unlinked source renders as `<span>`, never as a link |
@@ -232,7 +233,7 @@ directly.
 | AC-120b | Event emission — no PII in payloads | [§10](ACCEPTANCE_CRITERIA_BODIES.md#10-observability-light-touch-frontend-only) | active | @aspirational (externally gated) | none (externally gated — product sign-off on PII policy / payload shape) |
 | AC-120c | Event emission — `chat_closed` payload | [§10](ACCEPTANCE_CRITERIA_BODIES.md#10-observability-light-touch-frontend-only) | active | @aspirational (externally gated) | none (externally gated — product schema + Lane H internal dep for close button / Esc / back-nav) |
 | AC-121 | No uncontrolled network calls | [§10](ACCEPTANCE_CRITERIA_BODIES.md#10-observability-light-touch-frontend-only) | active | @stable | Manual: DevTools Network — no calls beyond the configured `ChatService` endpoint and host-declared fonts/CSS |
-| AC-N1 | MUST NOT render backend-provided HTML or Markdown | [§12](#12-non-goals--explicit-non-requirements) | active | @stable | Automated: `npm run verify` (grep guard — `dangerouslySetInnerHTML` forbidden in `src/`); tests/chatMessage.test.tsx — HTML / Markdown in answers, source labels, and error messages all render as escaped text with no DOM injection |
+| AC-N1 | MUST NOT render backend-provided HTML or Markdown (except inline `[title](URL)` autolinks per AC-24b) | [§12](#12-non-goals--explicit-non-requirements) | active | @stable | Automated: `npm run verify` (grep guard — `dangerouslySetInnerHTML` forbidden in `src/`); tests/chatMessage.test.tsx — HTML / Markdown in answers, source labels, and error messages all render as escaped text with no DOM injection, with the sole exception of `http`/`https` `[title](URL)` autolinks in answers (AC-24b) |
 | AC-N2 | MUST NOT bundle font files with the widget | [§12](#12-non-goals--explicit-non-requirements) | active | @stable | Automated: `npm run verify` — builds then scans `dist/` for `.woff` / `.woff2` / `.ttf` / `.otf` / `.eot` binaries and any `@font-face` in bundled CSS |
 
 ---
@@ -742,9 +743,10 @@ AC body to cite it.
 Human-friendly summary:
 
 - The widget does **not** render Markdown or HTML from the backend —
-  plain text with paragraph breaks only — to minimise the surface
-  for prompt-injection attacks before moderation is in place. See
-  **AC-N1**.
+  plain text with paragraph breaks only, plus the single narrow
+  inline `[title](URL)` autolink exception carved out by AC-24b — to
+  minimise the surface for prompt-injection attacks before moderation
+  is in place. See **AC-N1**.
 - The widget does **not** ship its own font files; it assumes the
   host site loads Everett (see also AC-73b for fallback behaviour).
   See **AC-N2**.
@@ -761,6 +763,16 @@ The contract:
     tags inside the string. Paragraph separation is the only
     formatting allowed, applied by splitting on newlines and
     rendering separate text nodes — never by injecting raw HTML.
+  - **Exception (answer body only):** AC-24b carves out a single,
+    narrow allowance — inline `[title](URL)` tokens in the **answer
+    body** whose URL is `http:` or `https:` are rendered as real
+    `<a>` React elements (never via `dangerouslySetInnerHTML`). This
+    is the *only* Markdown-shaped construct the widget interprets;
+    `**bold**`, headings, lists, images, raw HTML tags, and links
+    with any other URL scheme continue to render as escaped plain
+    text. The exception does not extend to source labels, error
+    text, or the question echo — those stay strictly plain text.
+  (amended 2026-06, #PR — narrow inline `[title](URL)` http/https autolink exception added, delegated to AC-24b)
 
 - **AC-N2** — *MUST NOT bundle font files with the widget* · **@stable**
   - **Given** a production build of the widget (`npm run build`),

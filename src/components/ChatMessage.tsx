@@ -11,15 +11,70 @@
  *   error message
  * - An optional list of source badges under the "Lähteet:" label
  *
+ * The answer body is plain text per AC-N1, with the single narrow
+ * exception of inline `[title](URL)` autolinks (AC-24b): tokens whose
+ * URL is `http`/`https` become real `<a>` React children (built as
+ * JSX, never by injecting raw HTML). Any other scheme, and every
+ * other Markdown/HTML construct, stays escaped plain text.
+ *
  * Used inside: `ExpandedView`.
  */
 
+import type { ReactNode } from 'react'
 import type { ChatMessage as ChatMessageData } from '../types/index.ts'
 import { SourceBadge } from './SourceBadge.tsx'
 import styles from '../styles/chatMessage.module.css'
 
 interface ChatMessageProps {
   message: ChatMessageData
+}
+
+const INLINE_LINK = /\[([^\]\n]+)\]\(([^)\s]+)\)/g
+
+function isSafeHttpUrl(url: string): boolean {
+  return /^https?:\/\//i.test(url)
+}
+
+/**
+ * Splits an answer string into plain-text segments and `<a>` elements
+ * for inline `[title](URL)` tokens (AC-24b). Only `http`/`https` URLs
+ * are linkified; every other token — unsafe schemes, `**bold**`, raw
+ * HTML, etc. — is left untouched as escaped plain text (AC-N1). Text
+ * segments keep their newlines, which the `pre-wrap` answer style
+ * renders as paragraph breaks (AC-24).
+ */
+function renderAnswer(answer: string): ReactNode[] {
+  const nodes: ReactNode[] = []
+  let lastIndex = 0
+  let key = 0
+  INLINE_LINK.lastIndex = 0
+  for (
+    let match = INLINE_LINK.exec(answer);
+    match !== null;
+    match = INLINE_LINK.exec(answer)
+  ) {
+    const [full, label, url] = match
+    if (!isSafeHttpUrl(url)) continue
+    if (match.index > lastIndex) {
+      nodes.push(answer.slice(lastIndex, match.index))
+    }
+    nodes.push(
+      <a
+        key={`link-${key++}`}
+        className={styles.link}
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {label}
+      </a>,
+    )
+    lastIndex = match.index + full.length
+  }
+  if (lastIndex < answer.length) {
+    nodes.push(answer.slice(lastIndex))
+  }
+  return nodes
 }
 
 export function ChatMessage({ message }: ChatMessageProps) {
@@ -41,7 +96,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
             {error}
           </p>
         ) : (
-          <p className={styles.answer}>{answer}</p>
+          <p className={styles.answer}>{renderAnswer(answer)}</p>
         )}
 
         {!loading && !error && sources && sources.length > 0 && (

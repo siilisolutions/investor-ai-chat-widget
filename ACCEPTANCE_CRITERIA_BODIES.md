@@ -438,7 +438,31 @@ Maps to the Investor agent composition and its main component; see
 - **AC-24** — *Answer rendering* · **@stable**
   - **Given** the chat service resolves with an answer,
   - **Then** the pulsating blob is replaced by the answer text,
-    preserving paragraph breaks from the backend response.
+    preserving paragraph breaks from the backend response. The text
+    is plain text per AC-N1, with the single inline-link exception
+    delegated to AC-24b.
+
+- **AC-24b** — *Answer rendering — inline links* · **@evolving**
+  - **Given** the answer body contains an inline `[title](URL)`
+    token whose URL uses the `http:` or `https:` scheme,
+  - **Then** that token is rendered as a real `<a>` element whose
+    visible text is `title` and whose `href` is `URL`, opening in a
+    new tab with `target="_blank"` and `rel="noopener noreferrer"`
+    (mirrors AC-25b's source-link semantics). The element is built
+    as a React child — never via `dangerouslySetInnerHTML` — so the
+    AC-N1 anti-injection posture is preserved.
+  - **Given** a `[title](URL)` token whose URL uses any other scheme
+    (e.g. `javascript:`, `data:`, `mailto:`, a bare relative path),
+  - **Then** the token is left as escaped plain text and no anchor
+    is emitted, so unsafe schemes cannot reach the DOM.
+  - **Given** any other Markdown- or HTML-shaped construct in the
+    answer (`**bold**`, headings, lists, `<img>`, raw tags),
+  - **Then** it continues to render as escaped plain text per AC-N1
+    — `[title](URL)` autolinking is the *only* construct interpreted.
+  - The link's visual treatment (colour, underline) is code-authored
+    (no Figma node); it reuses the answer's typography tokens and an
+    underlined accent so links are distinguishable from body copy.
+  (added 2026-06, #PR — inline `[title](URL)` autolinks; narrow exception to AC-N1)
 
 - **AC-25** — *Source references — section rendered* · **@stable**
   - **Given** an answer includes one or more `sources`,
@@ -952,8 +976,10 @@ Maps to the Investor agent composition and its main component; see
   - **Then** the adapter maps it to a `ChatMessage` with a
     client-generated `id`, the `question` that was sent, `answer`
     taken verbatim from `response` (plain text, paragraph breaks
-    via `\n`, never parsed as Markdown or HTML per AC-N1), and no
-    `sources` field.
+    via `\n`, never parsed as Markdown or HTML per AC-N1 — except
+    the inline `[title](URL)` autolink exception AC-24b applies at
+    render time; the adapter itself stores the string verbatim and
+    does no parsing), and no `sources` field.
   - **Given** the backend later adds extra fields (e.g. `sources:
     [{ label, href? }]`, `timestamp`, `conversationId`),
   - **Then** the adapter MUST ignore unknown fields it does not yet
