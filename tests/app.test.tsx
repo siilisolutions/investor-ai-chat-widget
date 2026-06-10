@@ -92,9 +92,9 @@ describe('App', () => {
       }),
     )
 
-    const textarea = await screen.findByLabelText('Siili investor chatbot message')
+    const textarea = await screen.findByLabelText('Siilin sijoittajachatbotin viesti')
     expect(textarea).toBeDisabled()
-    expect(screen.getByRole('button', { name: 'Send message' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Lähetä viesti' })).toBeDisabled()
 
     resolve({ id: 'ack', question: 'q', answer: 'a', loading: false })
     await waitFor(() => expect(textarea).toBeEnabled())
@@ -114,7 +114,7 @@ describe('App', () => {
     )
 
     const textarea = (await screen.findByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     )) as HTMLTextAreaElement
     expect(textarea).toBeDisabled()
     screen.getByRole('button', { name: 'Sulje keskustelu' }).focus()
@@ -141,7 +141,7 @@ describe('App', () => {
     render(<App chatService={service} />)
 
     const textarea = screen.getByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     ) as HTMLTextAreaElement
     fireEvent.input(textarea, { target: { value: 'Q1' } })
     fireEvent.keyDown(textarea, { key: 'Enter' })
@@ -152,7 +152,7 @@ describe('App', () => {
     expect(screen.getAllByText('Q1').length).toBeGreaterThan(0)
 
     const expandedTextarea = screen.getByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     ) as HTMLTextAreaElement
     await waitFor(() => expect(expandedTextarea).toBeEnabled())
 
@@ -199,7 +199,7 @@ describe('App', () => {
 
     // Active conversation is conv-B (most recent). Type a draft.
     const textareaB = (await screen.findByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     )) as HTMLTextAreaElement
     fireEvent.input(textareaB, { target: { value: 'half-typed for B' } })
 
@@ -209,7 +209,7 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Question A?' }))
     await waitFor(() => {
       const ta = screen.getByLabelText(
-        'Siili investor chatbot message',
+        'Siilin sijoittajachatbotin viesti',
       ) as HTMLTextAreaElement
       expect(ta.value).toBe('')
       expect(document.activeElement).toBe(ta)
@@ -217,7 +217,7 @@ describe('App', () => {
 
     // Type a draft for conv-A.
     const textareaA = screen.getByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     ) as HTMLTextAreaElement
     fireEvent.input(textareaA, { target: { value: 'half-typed for A' } })
 
@@ -225,7 +225,7 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Question B?' }))
     await waitFor(() => {
       const ta = screen.getByLabelText(
-        'Siili investor chatbot message',
+        'Siilin sijoittajachatbotin viesti',
       ) as HTMLTextAreaElement
       expect(ta.value).toBe('half-typed for B')
     })
@@ -234,7 +234,7 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Question A?' }))
     await waitFor(() => {
       const ta = screen.getByLabelText(
-        'Siili investor chatbot message',
+        'Siilin sijoittajachatbotin viesti',
       ) as HTMLTextAreaElement
       expect(ta.value).toBe('half-typed for A')
     })
@@ -314,7 +314,7 @@ describe('App', () => {
     render(<App chatService={service} />)
 
     const textarea = screen.getByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     ) as HTMLTextAreaElement
     fireEvent.input(textarea, { target: { value: 'a brand-new question' } })
     fireEvent.keyDown(textarea, { key: 'Enter' })
@@ -359,7 +359,7 @@ describe('App', () => {
     render(<App chatService={service} />)
 
     const textarea = screen.getByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     ) as HTMLTextAreaElement
     fireEvent.input(textarea, { target: { value: 'first question' } })
     fireEvent.keyDown(textarea, { key: 'Enter' })
@@ -407,7 +407,7 @@ describe('App', () => {
     )
 
     const textarea = screen.getByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     ) as HTMLTextAreaElement
     screen.getByRole('button', { name: 'Sulje keskustelu' }).focus()
     expect(document.activeElement).not.toBe(textarea)
@@ -572,7 +572,7 @@ describe('App', () => {
     // and the close button is rendered. (Compact mode would render
     // the suggestion chips and no close button.)
     expect(
-      screen.getByLabelText('Siili investor chatbot message'),
+      screen.getByLabelText('Siilin sijoittajachatbotin viesti'),
     ).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: 'Sulje keskustelu' }),
@@ -808,7 +808,7 @@ describe('App — AC-66 Käyttöehdot terms-of-use gate', () => {
     render(<App chatService={service} />)
 
     const textarea = screen.getByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     ) as HTMLTextAreaElement
     fireEvent.input(textarea, { target: { value: 'first ever question' } })
     fireEvent.keyDown(textarea, { key: 'Enter' })
@@ -860,7 +860,7 @@ describe('App — AC-66 Käyttöehdot terms-of-use gate', () => {
     render(<App chatService={service} />)
 
     const textarea = screen.getByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     ) as HTMLTextAreaElement
     fireEvent.input(textarea, { target: { value: 'first ever question' } })
     fireEvent.keyDown(textarea, { key: 'Enter' })
@@ -896,7 +896,7 @@ describe('App — AC-66 Käyttöehdot terms-of-use gate', () => {
     render(<App chatService={service} />)
 
     const textarea = screen.getByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     ) as HTMLTextAreaElement
     fireEvent.input(textarea, { target: { value: 'half-typed thought' } })
     fireEvent.keyDown(textarea, { key: 'Enter' })
@@ -919,7 +919,7 @@ describe('App — AC-66 Käyttöehdot terms-of-use gate', () => {
       }),
     ).toBeInTheDocument()
     const compactTextarea = screen.getByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     ) as HTMLTextAreaElement
     expect(compactTextarea.value).toBe('half-typed thought')
 
@@ -946,7 +946,7 @@ describe('App — AC-66 Käyttöehdot terms-of-use gate', () => {
     render(<App chatService={service} />)
 
     const textarea = screen.getByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     ) as HTMLTextAreaElement
     fireEvent.input(textarea, { target: { value: 'returning question' } })
     fireEvent.keyDown(textarea, { key: 'Enter' })

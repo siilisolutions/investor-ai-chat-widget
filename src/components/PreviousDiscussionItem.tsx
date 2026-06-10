@@ -35,6 +35,7 @@
  * Used inside: `PreviousDiscussionList`.
  */
 
+import { useStrings } from '../i18n/LocaleContext.tsx'
 import styles from '../styles/previousDiscussionItem.module.css'
 
 interface PreviousDiscussionItemProps {
@@ -52,6 +53,7 @@ export function PreviousDiscussionItem({
   onActivate,
   onDelete,
 }: PreviousDiscussionItemProps) {
+  const t = useStrings()
   const rowClassName = active ? `${styles.row} ${styles.active}` : styles.row
   return (
     <div className={rowClassName}>
@@ -66,7 +68,7 @@ export function PreviousDiscussionItem({
       <button
         type="button"
         className={styles.delete}
-        aria-label={`Poista keskustelu — ${label}`}
+        aria-label={t.deleteConversationAriaLabel(label)}
         onClick={() => onDelete(id, label)}
       >
         <svg

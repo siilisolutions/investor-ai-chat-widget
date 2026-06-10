@@ -117,20 +117,23 @@ that tests and PR descriptions can reference.
   - The URL is **not** baked into the production bundle; it is
     supplied by the host page at `init()` time.
 
-- **AC-04b** — *`locale` option selects widget UI language* · **@aspirational**
+- **AC-04b** — *`locale` option selects widget UI language* · **@evolving**
   - **Given** the host page calls `SiiliChatbot.init({ locale })`
     with a value from `WidgetLocale`,
   - **When** the widget mounts,
-  - **Then** the explicit option wins and the resolved locale drives
-    every widget-owned string per AC-63.
+  - **Then** the explicit option wins, the resolved locale drives
+    every widget-owned string per AC-63, and the widget root element
+    carries a matching `lang` attribute.
   - **When** `locale` is omitted,
   - **Then** the widget resolves the locale per §12.1 PD-09 —
-    `document.documentElement.lang` matched against `WidgetLocale`,
-    falling back to `'fi'`.
+    `document.documentElement.lang` matched against `WidgetLocale`
+    by language-tag prefix (`en-US` → `en`), falling back to `'fi'`.
   - The option is **not** baked into the production bundle; the host
     page passes it at `init()` time. Runtime locale switching is out
     of scope at this AC (a future AC may add a `setLocale` method).
-  (added 2026-05, #PR — AC-63 split + locale plumb)
+  (added 2026-05, #PR — AC-63 split + locale plumb; amended 2026-06,
+   #PR — locale plumbing landed: `src/i18n/` table + context +
+   `resolveLocale`, root `lang`)
 
 ### 3.2 Compact (Hero) Mode
 
@@ -1046,34 +1049,41 @@ financial decisions. They apply primarily to the backend, but the
 
   (amended 2026-04, GOV-16 Cluster 10)
 
-- **AC-63** — *Language parity — widget string table + locale plumbing* · **@aspirational**
+- **AC-63** — *Language parity — widget string table + locale plumbing* · **@evolving**
   - **Given** the host page has configured a locale (explicitly via
     `WidgetOptions.locale` or implicitly via `<html lang>`, resolved
     per §12.1 PD-09),
   - **When** the widget renders any user-visible string it owns
-    (e.g. placeholder, send-button aria-label, *"Lähteet:"*,
+    (e.g. placeholder, message + send-button aria-labels, *"Lähteet:"*,
     *"Haetaan tietoa..."*, the AC-44 safe-error fallback, chip
-    labels, sidebar copy, AC-33e confirm-delete dialog, AC-66 /
-    AC-66b *Käyttöehdot* shell strings),
+    labels, sidebar copy, AC-33e confirm-delete dialog, and the
+    AC-66 / AC-66b *Käyttöehdot* dialog — chrome **and** the full
+    legal body),
   - **Then** the string is sourced from a single locale-keyed string
-    table (e.g. `src/i18n/strings.ts`) and the bundle ships entries
-    for every supported `WidgetLocale` for every key. A missing key
-    in the active locale is a bug, not a silent fall-through to
-    Finnish.
+    table (`src/i18n/strings.ts`) and the bundle ships entries for
+    every supported `WidgetLocale` for every key. A missing key in
+    the active locale is a bug, not a silent fall-through to Finnish —
+    enforced mechanically by the `Record<WidgetLocale, WidgetStrings>`
+    type (a missing key fails `npm run build`) plus the runtime
+    parity guard in `tests/i18n.test.tsx`.
   - Answer copy returned by the backend is **not** translated by the
     widget — answer locale is owned by AC-63b. Until AC-63b ships, an
     English-locale widget may render Finnish answers; this AC covers
-    only the widget-owned strings.
-  - Legally vetted body content (notably the AC-66b long-form
-    *Käyttöehdot* copy) is **not** an engineer translation — it is
-    sourced from designer / legal in each locale. Until an English
-    translation lands, an English-locale widget renders the Finnish
-    body with a visible cue that an English translation is pending.
+    only the widget-owned strings. (The bundled dev mock answer is
+    localized for parity; it is not a backend answer.)
+  - The full *Käyttöehdot* legal body (short form + long-form
+    sections) is localized in both locales (2026-06 directive — the
+    earlier "legal body stays Finnish + English-pending cue"
+    carve-out is dropped). The English legal copy is an engineer
+    translation that ships pending a designer / legal review; it is
+    **not** a Finnish fallback.
 
   (amended 2026-04, GOV-16 Cluster 10; amended 2026-05, #PR —
    graduated from @aspirational (externally gated) → @aspirational
    after the locale contract was defined and the backend half was
-   split off as AC-63b)
+   split off as AC-63b; amended 2026-06, #PR — string table + locale
+   context landed, full legal-body translation, @aspirational →
+   @evolving)
 
 - **AC-63b** — *Backend prompt-locale switch* · **@aspirational (externally gated)**
   - **Given** the widget has resolved a locale per §12.1 PD-09,
@@ -1145,11 +1155,10 @@ financial decisions. They apply primarily to the backend, but the
   - **When** the user activates the *Lue lisää* link inside the
     dialog body,
   - **Then** the body swaps in-place to the long-form *Käyttöehdot*
-    copy (canonical Finnish; English long-form body sourced from
-    designer / legal per AC-63, not from an engineer translation —
-    until that translation lands, an English-locale widget renders
-    the Finnish body with a visible "translation pending" cue per
-    AC-63) inside a scrollable region; the dialog card height does
+    copy (localized in both locales via the AC-63 string table — the
+    English long-form is an engineer translation shipping pending a
+    designer / legal review, no longer a Finnish fallback) inside a
+    scrollable region; the dialog card height does
     not grow to accommodate it, and the surrounding scrollbar
     consumes its own column space. The toggle becomes *Näytä
     vähemmän* and returns to the short form on activation. Section
@@ -1164,7 +1173,8 @@ financial decisions. They apply primarily to the backend, but the
     plain text and `<strong>` only — no Markdown, no HTML injection.
   (added 2026-05, #PR — Käyttöehdot terms gate landed; amended
    2026-05, #PR — AC-63 split clarified the legal-translation
-   ownership of the long-form body)
+   ownership of the long-form body; amended 2026-06, #PR — long-form
+   body fully localized in both locales per the AC-63 directive)
 
 - **AC-66c** — *Terms acceptance persists across sessions* · **@evolving**
   - **Given** the user has previously activated *Hyväksyn

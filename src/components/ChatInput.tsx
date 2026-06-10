@@ -27,6 +27,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent, MouseEvent, ReactNode } from 'react'
+import { useStrings } from '../i18n/LocaleContext.tsx'
 import styles from '../styles/chatInput.module.css'
 
 interface ChatInputProps {
@@ -61,11 +62,9 @@ interface ChatInputProps {
   continueAffordance?: ReactNode
 }
 
-const DEFAULT_PLACEHOLDER = 'Kysy minulta Siilistä sijoituskohteena.'
-
 export function ChatInput({
   variant,
-  placeholder = DEFAULT_PLACEHOLDER,
+  placeholder,
   disabled = false,
   autoFocus = false,
   focusSignal,
@@ -74,6 +73,8 @@ export function ChatInput({
   onSend,
   continueAffordance,
 }: ChatInputProps) {
+  const t = useStrings()
+  const resolvedPlaceholder = placeholder ?? t.inputPlaceholder
   const isControlled = controlledValue !== undefined
   const [internalValue, setInternalValue] = useState('')
   const value = isControlled ? controlledValue : internalValue
@@ -164,7 +165,7 @@ export function ChatInput({
         <textarea
           ref={textareaRef}
           className={styles.textarea}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           value={value}
           disabled={disabled}
           rows={1}
@@ -175,7 +176,7 @@ export function ChatInput({
             el.style.height = `${Math.min(el.scrollHeight, 240)}px`
           }}
           onKeyDown={handleKeyDown}
-          aria-label="Siili investor chatbot message"
+          aria-label={t.inputAriaLabel}
         />
       </div>
       <div className={styles.sendRow}>
@@ -185,7 +186,7 @@ export function ChatInput({
           className={styles.sendButton}
           onClick={submit}
           disabled={disabled || value.trim().length === 0}
-          aria-label="Send message"
+          aria-label={t.sendButtonAriaLabel}
         >
           <svg
             className={styles.sendIcon}

@@ -92,6 +92,7 @@ import { CloseButton } from './CloseButton.tsx'
 import { MenuButton } from './MenuButton.tsx'
 import { MobileMenu } from './MobileMenu.tsx'
 import { PreviousDiscussionList } from './PreviousDiscussionList.tsx'
+import { useStrings } from '../i18n/LocaleContext.tsx'
 import styles from '../styles/expandedView.module.css'
 
 interface ExpandedViewProps {
@@ -124,6 +125,7 @@ export function ExpandedView({
   onDeleteConversation,
   inputFocusSignal,
 }: ExpandedViewProps) {
+  const t = useStrings()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -187,7 +189,7 @@ export function ExpandedView({
               controlsId={drawerId}
               className={styles.menuButton}
             />
-            <h2 className={styles.title}>Siili AI-avustaja</h2>
+            <h2 className={styles.title}>{t.expandedTitle}</h2>
             <CloseButton onClick={onClose} className={styles.closeButton} />
           </div>
           <div className={styles.body}>

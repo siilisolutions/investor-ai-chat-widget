@@ -23,10 +23,8 @@ import { ChatInput } from './ChatInput.tsx'
 import { ContinuePill } from './ContinuePill.tsx'
 import { HeroScrollCue } from './HeroScrollCue.tsx'
 import { SuggestionChip } from './SuggestionChip.tsx'
+import { useStrings } from '../i18n/LocaleContext.tsx'
 import styles from '../styles/compactView.module.css'
-
-const HERO_TITLE_LINE_1 = 'Siilillä tekoäly on totta -'
-const HERO_TITLE_LINE_2 = 'myös sijoittajille.'
 
 interface CompactViewProps {
   suggestions: string[]
@@ -57,14 +55,15 @@ export function CompactView({
   hasHistory = false,
   onContinue,
 }: CompactViewProps) {
+  const t = useStrings()
   const showContinue = hasHistory && typeof onContinue === 'function'
   return (
-    <section className={styles.hero} aria-label="Sijoittaja-AI hero">
+    <section className={styles.hero} aria-label={t.heroSectionAriaLabel}>
       <div className={styles.heroContainer}>
         <div className={styles.heroMain}>
           <h1 className={styles.heroTitle}>
-            <span className={styles.heroTitleLine}>{HERO_TITLE_LINE_1}</span>
-            <span className={styles.heroTitleLine}>{HERO_TITLE_LINE_2}</span>
+            <span className={styles.heroTitleLine}>{t.heroTitleLine1}</span>
+            <span className={styles.heroTitleLine}>{t.heroTitleLine2}</span>
           </h1>
           <div className={styles.interactive}>
             <ChatInput

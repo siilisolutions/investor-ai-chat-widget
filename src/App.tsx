@@ -79,7 +79,8 @@ import { ConfirmDialog } from './components/ConfirmDialog.tsx'
 import { ExpandedView } from './components/ExpandedView.tsx'
 import { TermsDialog } from './components/TermsDialog.tsx'
 import { buildHistory } from './chatHistory.ts'
-import { SAFE_ERROR } from './errorCopy.ts'
+import { LocaleProvider } from './i18n/LocaleProvider.tsx'
+import { STRINGS } from './i18n/strings.ts'
 import {
   clearConversation,
   createConversation,
@@ -90,14 +91,8 @@ import {
   getAcceptance as getTermsAcceptance,
   setAcceptance as setTermsAcceptance,
 } from './services/termsStore.ts'
-import type { ChatService, Conversation } from './types/index.ts'
+import type { ChatService, Conversation, WidgetLocale } from './types/index.ts'
 import styles from './styles/app.module.css'
-
-const SUGGESTIONS = [
-  'Mikä on Siilin strategia ja kuinka sen toteuttaminen on edennyt?',
-  'Mikä on yhtiön nykyinen osinkopolitiikka?',
-  'Mistä löydän lisätietoa yhtiön liikevaihdosta ja tuloksesta?',
-]
 
 type Mode = 'compact' | 'expanded'
 
@@ -106,6 +101,8 @@ const nextMessageId = () => `msg-${++messageCounter}`
 
 interface AppProps {
   chatService: ChatService
+  /** Resolved widget UI locale (AC-04b / PD-09). Defaults to `'fi'`. */
+  locale?: WidgetLocale
   interceptBackNavigation?: boolean
   privacyPolicyUrl?: string
 }
@@ -139,9 +136,14 @@ interface PendingDelete {
 
 export function App({
   chatService,
+  locale = 'fi',
   interceptBackNavigation = true,
   privacyPolicyUrl,
 }: AppProps) {
+  // App is the LocaleProvider itself, so it reads its own copy directly
+  // from the table rather than via `useStrings()` (which would resolve
+  // against the default context that sits above this provider).
+  const t = STRINGS[locale]
   const [mode, setMode] = useState<Mode>('compact')
   const [{ conversations, activeId }, setStore] =
     useState<ConversationState>(initializeStore)
@@ -302,12 +304,12 @@ export function App({
         updateConversation(targetId, (c) => ({
           ...c,
           messages: c.messages.map((m) =>
-            m.id === turnId ? { ...m, loading: false, error: SAFE_ERROR } : m,
+            m.id === turnId ? { ...m, loading: false, error: t.safeError } : m,
           ),
         }))
       }
     },
-    [activeId, chatService, messages, mode, updateConversation],
+    [activeId, chatService, messages, mode, updateConversation, t],
   )
 
   // AC-66 — gated wrapper. On the first compact-mode send for a
@@ -455,10 +457,11 @@ export function App({
   }, [pendingDelete, conversations])
 
   return (
-    <div className={`siiliChatbot ${styles.root}`}>
+    <LocaleProvider locale={locale}>
+      <div className={`siiliChatbot ${styles.root}`} lang={locale}>
       {mode === 'compact' ? (
         <CompactView
-          suggestions={SUGGESTIONS}
+          suggestions={t.suggestions}
           onSend={handleSend}
           hasHistory={hasHistory}
           onContinue={handleContinue}
@@ -481,15 +484,16 @@ export function App({
       )}
       <ConfirmDialog
         open={pendingDelete !== null}
-        title="Poista keskustelu"
+        title={t.deleteDialogTitle}
         description={
           <>
-            Haluatko varmasti poistaa keskustelun{' '}
-            <strong>{pendingDelete?.label}</strong>?
+            {t.deleteDialogDescriptionPrefix}
+            <strong>{pendingDelete?.label}</strong>
+            {t.deleteDialogDescriptionSuffix}
           </>
         }
-        cancelLabel="Peruuta"
-        confirmLabel="Poista"
+        cancelLabel={t.cancelLabel}
+        confirmLabel={t.deleteLabel}
         onCancel={handleCancelDelete}
         onConfirm={handleConfirmDelete}
       />
@@ -499,6 +503,7 @@ export function App({
         onCancel={handleCancelTerms}
         privacyPolicyUrl={privacyPolicyUrl}
       />
-    </div>
+      </div>
+    </LocaleProvider>
   )
 }

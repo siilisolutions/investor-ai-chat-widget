@@ -53,6 +53,7 @@ import type {
   KeyboardEvent as ReactKeyboardEvent,
   MouseEvent as ReactMouseEvent,
 } from 'react'
+import { useStrings } from '../i18n/LocaleContext.tsx'
 import styles from '../styles/termsDialog.module.css'
 
 interface TermsDialogProps {
@@ -76,83 +77,13 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',')
 
-const SHORT_BODY =
-  'Tämä IR-agentti on tekoälyavusteinen agentti. Agentti ei anna ' +
-  'sijoitusneuvontaa eikä se suosittele arvopapereiden ostamista, ' +
-  'myymistä eikä hallussapitoa. IR-agentti täydentää Siilin ' +
-  'sijoittajasivuja ja on tarkoitettu yksinomaan avustamaan käyttäjää. ' +
-  'Ethän syötä IR-agentille henkilötietojasi tai muita ' +
-  'luottamuksellisia tietoja. Olen lukenut ja ymmärtänyt IR-agenttia ' +
-  'koskevat ehdot ja hyväksyn ne.'
-
-interface LongFormSection {
-  heading?: string
-  paragraphs: string[]
-}
-
-const LONG_FORM_SECTIONS: LongFormSection[] = [
-  { paragraphs: [SHORT_BODY] },
-  {
-    heading: 'Tietojen luonne ja ajantasaisuus',
-    paragraphs: [
-      'Tämä IR-agentti perustuu yksinomaan Siili Solutions Oyj:n ' +
-        'virallisesti julkistamaan tietoon, kuten pörssitiedotteisiin, ' +
-        'tilinpäätöksiin, osavuosikatsauksiin ja muihin virallisesti ' +
-        'julkistettuihin asiakirjoihin. Palvelu ei sisällä ' +
-        'julkistamatonta tietoa eikä spekuloi tulevista tapahtumista.',
-      'IR-agentin tiedot saattavat viivästyä suhteessa viimeisimpiin ' +
-        'virallisiin julkistuksiin. Käyttäjän on aina tarkistettava ' +
-        'tiedot yhtiön viralliselta sijoittajasivustolta ja ' +
-        'pörssitiedotejärjestelmästä.',
-    ],
-  },
-  {
-    heading: 'Oikeudelliset rajoitukset',
-    paragraphs: [
-      'Palvelu on suunnattu sijoittajille ja analyytikoille ' +
-        'tutustumiskäyttöön. Se ei korvaa itsenäistä ' +
-        'sijoitusanalyysiä, ammattilaisneuvontaa eikä yhtiön ' +
-        'virallisia asiakirjoja. Palvelun tuottama tieto ei muodosta ' +
-        'arvopaperimarkkinalain, EU:n markkinoiden ' +
-        'väärinkäyttöasetuksen (MAR) eikä minkään muun sääntelyn ' +
-        'tarkoittamaa virallista tiedonantoa. Palvelu ei ole ' +
-        'saatavilla käyttäjille, joihin sovelletaan sen käyttöä ' +
-        'rajoittavia paikallisia lakeja tai määräyksiä.',
-    ],
-  },
-  {
-    heading: 'Tekoälyjärjestelmän rajoitukset',
-    paragraphs: [
-      'Tekoälypohjainen järjestelmä saattaa tuottaa virheellisiä, ' +
-        'puutteellisia tai epätäsmällisiä vastauksia. Siili Solutions ' +
-        'Oyj ei vastaa tällaisten vastausten perusteella tehdyistä ' +
-        'päätöksistä eikä niistä mahdollisesti aiheutuvista ' +
-        'vahingoista. Palvelua tulee käyttää ainoastaan alustavana ' +
-        'tietolähteenä. Kaikki sijoituspäätökset tulee perustaa ' +
-        'ajantasaisiin virallisiin asiakirjoihin ja tarvittaessa ' +
-        'asiantuntijaneuvontaan.',
-    ],
-  },
-  {
-    heading: 'Henkilötietojen käsittely',
-    // The closing privacy-policy sentence is rendered separately below
-    // so the optional `privacyPolicyUrl` can be wrapped as an anchor
-    // without splitting the paragraph at render time.
-    paragraphs: [
-      'Palveluun syöttämäsi kysymykset tallennetaan palvelun laadun ' +
-        'varmistamiseksi, väärinkäytösten estämiseksi ja sovellettavan ' +
-        'sääntelyn noudattamiseksi. Tietojenkäsittely tapahtuu Siili ' +
-        'Solutions Oyj:n tietosuojaselosteen mukaisesti.',
-    ],
-  },
-]
-
 export function TermsDialog({
   open,
   onAccept,
   onCancel,
   privacyPolicyUrl,
 }: TermsDialogProps) {
+  const t = useStrings()
   const cardRef = useRef<HTMLDivElement>(null)
   const cancelRef = useRef<HTMLButtonElement>(null)
   const previouslyFocusedRef = useRef<HTMLElement | null>(null)
@@ -247,7 +178,7 @@ export function TermsDialog({
         aria-describedby={bodyId}
       >
         <p id={titleId} className={styles.title}>
-          Käyttöehdot
+          {t.termsTitle}
         </p>
         {/*
           Scrollable region is keyboard-focusable so users who cannot use
@@ -258,7 +189,7 @@ export function TermsDialog({
           {expanded ? (
             <LongForm privacyPolicyUrl={privacyPolicyUrl} />
           ) : (
-            <p>{SHORT_BODY}</p>
+            <p>{t.termsShortBody}</p>
           )}
           <p>
             <button
@@ -267,7 +198,7 @@ export function TermsDialog({
               onClick={() => setExpanded((value) => !value)}
               aria-expanded={expanded}
             >
-              {expanded ? 'Näytä vähemmän' : 'Lue lisää'}
+              {expanded ? t.termsShowLess : t.termsReadMore}
             </button>
           </p>
         </div>
@@ -278,14 +209,14 @@ export function TermsDialog({
             className={styles.cancel}
             onClick={onCancel}
           >
-            Peruuta
+            {t.cancelLabel}
           </button>
           <button
             type="button"
             className={styles.confirm}
             onClick={onAccept}
           >
-            Hyväksyn käyttöehdot
+            {t.termsAccept}
           </button>
         </div>
       </div>
@@ -294,22 +225,23 @@ export function TermsDialog({
 }
 
 function LongForm({ privacyPolicyUrl }: { privacyPolicyUrl?: string }) {
+  const t = useStrings()
   return (
     <>
-      {LONG_FORM_SECTIONS.map((section, sectionIdx) => (
+      {/* The short-form paragraph is the first block of the long form too. */}
+      <p>{t.termsShortBody}</p>
+      {t.termsLongFormSections.map((section, sectionIdx) => (
         <div key={sectionIdx}>
-          {section.heading ? (
-            <p className={styles.heading}>
-              <strong>{section.heading}</strong>
-            </p>
-          ) : null}
+          <p className={styles.heading}>
+            <strong>{section.heading}</strong>
+          </p>
           {section.paragraphs.map((paragraph, paragraphIdx) => (
             <p key={paragraphIdx}>{paragraph}</p>
           ))}
         </div>
       ))}
       <p>
-        Tietosuojaseloste on saatavilla yhtiön verkkosivustolla
+        {t.termsPrivacySentencePrefix}
         {privacyPolicyUrl ? (
           <>
             {' '}(
@@ -319,7 +251,7 @@ function LongForm({ privacyPolicyUrl }: { privacyPolicyUrl?: string }) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              tietosuojaseloste
+              {t.termsPrivacyLinkText}
             </a>
             ).
           </>

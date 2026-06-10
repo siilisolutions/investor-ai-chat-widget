@@ -6,12 +6,11 @@
  * screen so the user can reach content below the hero band.
  */
 
+import { useStrings } from '../i18n/LocaleContext.tsx'
 import styles from '../styles/heroScrollCue.module.css'
 
-const SCROLL_LABEL =
-  'Haluatko tarkastella perinteisempiä Siilin sijoittajasivuja?'
-
 export function HeroScrollCue() {
+  const t = useStrings()
   return (
     <button
       type="button"
@@ -23,7 +22,7 @@ export function HeroScrollCue() {
         })
       }}
     >
-      <span className={styles.label}>{SCROLL_LABEL}</span>
+      <span className={styles.label}>{t.scrollCueLabel}</span>
       <svg
         aria-hidden="true"
         focusable="false"

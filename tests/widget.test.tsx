@@ -93,7 +93,7 @@ describe('SiiliChatbot.init', () => {
     )
 
     const textarea = (await screen.findByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     )) as HTMLTextAreaElement
     fireEvent.input(textarea, { target: { value: 'Q1' } })
     fireEvent.keyDown(textarea, { key: 'Enter' })
@@ -126,7 +126,7 @@ describe('SiiliChatbot.init — back-navigation interceptor', () => {
 
   async function sendFirstMessage(): Promise<HTMLTextAreaElement> {
     const textarea = (await screen.findByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     )) as HTMLTextAreaElement
     fireEvent.input(textarea, { target: { value: 'Hello' } })
     fireEvent.keyDown(textarea, { key: 'Enter' })
@@ -167,7 +167,7 @@ describe('SiiliChatbot.init — back-navigation interceptor', () => {
     // state (it would re-render in expanded mode if the user sent a
     // follow-up); compact mode just does not show the message list.
     expect(
-      screen.getByLabelText('Siili investor chatbot message'),
+      screen.getByLabelText('Siilin sijoittajachatbotin viesti'),
     ).toBeInTheDocument()
   })
 

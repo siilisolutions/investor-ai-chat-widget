@@ -19,6 +19,7 @@
  * `continueAffordance` slot).
  */
 
+import { useStrings } from '../i18n/LocaleContext.tsx'
 import styles from '../styles/continuePill.module.css'
 
 interface ContinuePillProps {
@@ -26,11 +27,12 @@ interface ContinuePillProps {
 }
 
 export function ContinuePill({ onClick }: ContinuePillProps) {
+  const t = useStrings()
   return (
     <div className={styles.container}>
       <div className={styles.divider} aria-hidden="true" />
       <button type="button" className={styles.link} onClick={onClick}>
-        Jatka edellistä keskustelua
+        {t.continueDiscussion}
       </button>
     </div>
   )

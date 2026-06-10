@@ -49,6 +49,7 @@ import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent
 import type { Conversation } from '../types/index.ts'
 import { CloseButton } from './CloseButton.tsx'
 import { PreviousDiscussionList } from './PreviousDiscussionList.tsx'
+import { useStrings } from '../i18n/LocaleContext.tsx'
 import styles from '../styles/mobileMenu.module.css'
 
 interface MobileMenuProps {
@@ -70,6 +71,7 @@ export function MobileMenu({
   onDelete,
   onClose,
 }: MobileMenuProps) {
+  const t = useStrings()
   const closeButtonRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -102,7 +104,7 @@ export function MobileMenu({
         className={styles.card}
         role="dialog"
         aria-modal="true"
-        aria-label="Keskusteluvalikko"
+        aria-label={t.menuDialogAriaLabel}
       >
         <div ref={closeButtonRef} className={styles.closeRow}>
           <CloseButton onClick={onClose} />

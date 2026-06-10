@@ -19,7 +19,7 @@ describe('CompactView', () => {
 
   it('AC-11: textarea placeholder is the exact Finnish copy required by the AC', () => {
     render(<CompactView suggestions={CHIPS} onSend={() => {}} />)
-    const textarea = screen.getByLabelText('Siili investor chatbot message')
+    const textarea = screen.getByLabelText('Siilin sijoittajachatbotin viesti')
     expect(textarea).toHaveAttribute(
       'placeholder',
       'Kysy minulta Siilistä sijoituskohteena.',
@@ -38,7 +38,7 @@ describe('CompactView', () => {
     const onSend = vi.fn()
     render(<CompactView suggestions={CHIPS} onSend={onSend} />)
     const textarea = screen.getByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     ) as HTMLTextAreaElement
     fireEvent.input(textarea, { target: { value: '  what is the dividend?  ' } })
     fireEvent.keyDown(textarea, { key: 'Enter' })
@@ -49,7 +49,7 @@ describe('CompactView', () => {
   it('AC-13: pressing Shift+Enter does NOT submit (multi-line input continues)', () => {
     const onSend = vi.fn()
     render(<CompactView suggestions={CHIPS} onSend={onSend} />)
-    const textarea = screen.getByLabelText('Siili investor chatbot message')
+    const textarea = screen.getByLabelText('Siilin sijoittajachatbotin viesti')
     fireEvent.input(textarea, { target: { value: 'line 1' } })
     fireEvent.keyDown(textarea, { key: 'Enter', shiftKey: true })
     expect(onSend).not.toHaveBeenCalled()
@@ -58,9 +58,9 @@ describe('CompactView', () => {
   it('AC-13: clicking the send button fires onSend with the trimmed value', () => {
     const onSend = vi.fn()
     render(<CompactView suggestions={CHIPS} onSend={onSend} />)
-    const textarea = screen.getByLabelText('Siili investor chatbot message')
+    const textarea = screen.getByLabelText('Siilin sijoittajachatbotin viesti')
     fireEvent.input(textarea, { target: { value: 'hello' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Send message' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Lähetä viesti' }))
     expect(onSend).toHaveBeenCalledExactlyOnceWith('hello')
   })
 
@@ -74,7 +74,7 @@ describe('CompactView', () => {
   it('AC-15: Enter on an empty textarea is a no-op', () => {
     const onSend = vi.fn()
     render(<CompactView suggestions={CHIPS} onSend={onSend} />)
-    const textarea = screen.getByLabelText('Siili investor chatbot message')
+    const textarea = screen.getByLabelText('Siilin sijoittajachatbotin viesti')
     fireEvent.keyDown(textarea, { key: 'Enter' })
     expect(onSend).not.toHaveBeenCalled()
   })
@@ -82,7 +82,7 @@ describe('CompactView', () => {
   it('AC-15: Enter on whitespace-only textarea is a no-op', () => {
     const onSend = vi.fn()
     render(<CompactView suggestions={CHIPS} onSend={onSend} />)
-    const textarea = screen.getByLabelText('Siili investor chatbot message')
+    const textarea = screen.getByLabelText('Siilin sijoittajachatbotin viesti')
     fireEvent.input(textarea, { target: { value: '   \n  \t ' } })
     fireEvent.keyDown(textarea, { key: 'Enter' })
     expect(onSend).not.toHaveBeenCalled()
@@ -91,32 +91,32 @@ describe('CompactView', () => {
   it('AC-15: send-button click with empty textarea is a no-op (button is disabled)', () => {
     const onSend = vi.fn()
     render(<CompactView suggestions={CHIPS} onSend={onSend} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Send message' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Lähetä viesti' }))
     expect(onSend).not.toHaveBeenCalled()
   })
 
   it('AC-16: send button is disabled when the textarea is empty', () => {
     render(<CompactView suggestions={CHIPS} onSend={() => {}} />)
-    expect(screen.getByRole('button', { name: 'Send message' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Lähetä viesti' })).toBeDisabled()
   })
 
   it('AC-16: send button is enabled as soon as a non-whitespace character is entered', () => {
     render(<CompactView suggestions={CHIPS} onSend={() => {}} />)
-    const textarea = screen.getByLabelText('Siili investor chatbot message')
+    const textarea = screen.getByLabelText('Siilin sijoittajachatbotin viesti')
     fireEvent.input(textarea, { target: { value: 'x' } })
-    expect(screen.getByRole('button', { name: 'Send message' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Lähetä viesti' })).toBeEnabled()
   })
 
   it('AC-16: send button stays disabled when the textarea contains only whitespace', () => {
     render(<CompactView suggestions={CHIPS} onSend={() => {}} />)
-    const textarea = screen.getByLabelText('Siili investor chatbot message')
+    const textarea = screen.getByLabelText('Siilin sijoittajachatbotin viesti')
     fireEvent.input(textarea, { target: { value: '    ' } })
-    expect(screen.getByRole('button', { name: 'Send message' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Lähetä viesti' })).toBeDisabled()
   })
 
   it('AC-17: mousedown on the input shell padding focuses the textarea', () => {
     render(<CompactView suggestions={CHIPS} onSend={() => {}} />)
-    const textarea = screen.getByLabelText('Siili investor chatbot message')
+    const textarea = screen.getByLabelText('Siilin sijoittajachatbotin viesti')
     const shell = textarea.parentElement?.parentElement as HTMLElement
     expect(shell).toBeTruthy()
     expect(document.activeElement).not.toBe(textarea)
@@ -126,8 +126,8 @@ describe('CompactView', () => {
 
   it('AC-17: mousedown on the send button does not forward focus to the textarea', () => {
     render(<CompactView suggestions={CHIPS} onSend={() => {}} />)
-    const textarea = screen.getByLabelText('Siili investor chatbot message')
-    const sendButton = screen.getByRole('button', { name: 'Send message' })
+    const textarea = screen.getByLabelText('Siilin sijoittajachatbotin viesti')
+    const sendButton = screen.getByRole('button', { name: 'Lähetä viesti' })
     expect(document.activeElement).not.toBe(textarea)
     fireEvent.mouseDown(sendButton)
     expect(document.activeElement).not.toBe(textarea)

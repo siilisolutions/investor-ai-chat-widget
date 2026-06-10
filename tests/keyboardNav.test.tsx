@@ -71,8 +71,8 @@ describe('AC-80 — keyboard focus contract', () => {
 
     const order = focusOrder(container).map(describeElement)
     expect(order).toEqual([
-      'textarea[Siili investor chatbot message]',
-      'button[Send message]',
+      'textarea[Siilin sijoittajachatbotin viesti]',
+      'button[Lähetä viesti]',
       'button[Kysymys 1]',
       'button[Kysymys 2]',
       'button[Kysymys 3]',
@@ -140,8 +140,8 @@ describe('AC-80 — keyboard focus contract', () => {
     expect(inputWrapper).toBeTruthy()
     const wrapperOrder = focusOrder(inputWrapper!).map(describeElement)
     expect(wrapperOrder).toEqual([
-      'textarea[Siili investor chatbot message]',
-      'button[Send message]',
+      'textarea[Siilin sijoittajachatbotin viesti]',
+      'button[Lähetä viesti]',
     ])
   })
 
@@ -211,8 +211,8 @@ describe('AC-80 — keyboard focus contract', () => {
     // reachable" clause) is intentionally not pinned here.
     const order = focusOrder(container).map(describeElement)
     expect(order).toContain('button[Sulje keskustelu]')
-    expect(order).toContain('textarea[Siili investor chatbot message]')
-    expect(order).toContain('button[Send message]')
+    expect(order).toContain('textarea[Siilin sijoittajachatbotin viesti]')
+    expect(order).toContain('button[Lähetä viesti]')
     // The unlinked badge does NOT enter focus order (no anchor in
     // the tree). This is the assertion the original test was
     // really protecting.

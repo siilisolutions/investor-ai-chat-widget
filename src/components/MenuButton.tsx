@@ -24,6 +24,7 @@
  */
 
 import { forwardRef } from 'react'
+import { useStrings } from '../i18n/LocaleContext.tsx'
 import styles from '../styles/menuButton.module.css'
 
 interface MenuButtonProps {
@@ -35,6 +36,7 @@ interface MenuButtonProps {
 
 export const MenuButton = forwardRef<HTMLButtonElement, MenuButtonProps>(
   function MenuButton({ onClick, expanded, controlsId, className }, ref) {
+    const t = useStrings()
     const composed = className
       ? `${styles.menuButton} ${className}`
       : styles.menuButton
@@ -42,7 +44,7 @@ export const MenuButton = forwardRef<HTMLButtonElement, MenuButtonProps>(
       <button
         ref={ref}
         type="button"
-        aria-label="Avaa keskusteluvalikko"
+        aria-label={t.menuOpenAriaLabel}
         aria-expanded={expanded}
         aria-controls={controlsId}
         className={composed}

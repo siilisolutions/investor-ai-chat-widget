@@ -198,7 +198,7 @@ describe('ExpandedView — AC-20j dismissal', () => {
         onDeleteConversation={NOOP}
       />,
     )
-    const textarea = screen.getByLabelText('Siili investor chatbot message')
+    const textarea = screen.getByLabelText('Siilin sijoittajachatbotin viesti')
     fireEvent.keyDown(textarea, { key: 'Escape' })
     expect(onClose).toHaveBeenCalledTimes(1)
   })
@@ -446,7 +446,7 @@ describe('ExpandedView — AC-33 sidebar visibility', () => {
       />,
     )
     const textarea = screen.getByLabelText(
-      'Siili investor chatbot message',
+      'Siilin sijoittajachatbotin viesti',
     ) as HTMLTextAreaElement
     screen.getByRole('button', { name: 'Sulje keskustelu' }).focus()
     expect(document.activeElement).not.toBe(textarea)

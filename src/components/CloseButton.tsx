@@ -28,6 +28,7 @@
  * Used inside: `ExpandedView`.
  */
 
+import { useStrings } from '../i18n/LocaleContext.tsx'
 import styles from '../styles/closeButton.module.css'
 
 interface CloseButtonProps {
@@ -42,13 +43,14 @@ interface CloseButtonProps {
 }
 
 export function CloseButton({ onClick, className }: CloseButtonProps) {
+  const t = useStrings()
   const composed = className
     ? `${styles.closeButton} ${className}`
     : styles.closeButton
   return (
     <button
       type="button"
-      aria-label="Sulje keskustelu"
+      aria-label={t.closeAriaLabel}
       className={composed}
       onClick={onClick}
     >

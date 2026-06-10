@@ -190,7 +190,13 @@ All tokens live in `src/styles/variables.css` as CSS custom properties. These va
 | `src/services/apiChatService.ts` | Real `ChatService` adapter — posts `{ messages }` to `WidgetOptions.apiUrl`, maps `{ response }` back into a `ChatMessage`, handles timeout + error mapping (AC-43 / AC-44 / AC-52 / AC-53) |
 | `src/services/conversationStore.ts` | localStorage-backed multi-conversation persistence layer (PD-08) — `listConversations` / `loadConversation` / `saveConversation` / `createConversation` / `clearConversation` / `clearAll`. `clearConversation(id)` underpins AC-33e per-row delete (idempotent on a missing id, schema unchanged). Survives reloads, tab close, and browser restart per AC-31e (the earlier sessionStorage / tab-close-clears contract is tombstoned with AC-31c). |
 | `src/services/termsStore.ts` | localStorage-backed boolean acceptance flag for the AC-66 / AC-66c Käyttöehdot terms gate. `getAcceptance()` / `setAcceptance()` / `clearAcceptance()`; schema-versioned key `siili.termsAccepted.v1` mirroring PD-08's keying convention so a future copy change can reprompt by bumping the version. Fail-closed on storage errors — the gate continues to show until acceptance can be persisted. |
-| `src/types/index.ts` | TypeScript interfaces (ChatMessage, Source, ChatService, WidgetOptions, Conversation) |
+| `src/types/index.ts` | TypeScript interfaces (ChatMessage, Source, ChatService, WidgetOptions, WidgetLocale, Conversation) |
+| `src/i18n/strings.ts` | Locale-table contract + aggregator (AC-63): the `WidgetStrings` interface and `STRINGS: Record<WidgetLocale, WidgetStrings>` built from the per-language files. A missing key (or unmatched locale) fails `tsc` |
+| `src/i18n/fi.ts` | Finnish (`fi`) string table — every user-facing FI string incl. the full AC-66 *Käyttöehdot* legal body and the dev mock answer |
+| `src/i18n/en.ts` | English (`en`) string table — counterpart of `fi.ts`; chrome is an engineer translation, the legal body ships pending designer / legal review |
+| `src/i18n/LocaleContext.tsx` | `LocaleContext` + `useStrings()` / `useLocale()` hooks (AC-63). Provider lives in a sibling file to satisfy the react-refresh lint |
+| `src/i18n/LocaleProvider.tsx` | `LocaleProvider` mounted once at the `App` root with the resolved locale; supplies `STRINGS[locale]` to the tree |
+| `src/i18n/resolveLocale.ts` | `resolveLocale(option?)` — PD-09 resolution: explicit `WidgetOptions.locale` → `<html lang>` prefix match → `'fi'` (AC-04b) |
 | `src/styles/variables.css` | CSS custom properties (design tokens) |
 | `src/styles/*.module.css` | Component-scoped CSS modules |
 
@@ -253,10 +259,11 @@ npm run build
 <link rel="stylesheet" href="siili-chatbot.css" />
 <script src="siili-chatbot.iife.js"></script>
 <script>
-  SiiliChatbot.init({
-    container: '#siili-chatbot',
-    apiUrl: 'https://.../api/chat', // optional; omit to use the mock
-  });
+ SiiliChatbot.init({
+ container: '#siili-chatbot',
+ apiUrl: 'https://.../api/chat', // optional; omit to use the mock
+ locale: 'fi', // optional; 'fi' | 'en'. Omit to resolve from <html lang>, then 'fi' (AC-04b / PD-09)
+ });
 </script>
 ```
 

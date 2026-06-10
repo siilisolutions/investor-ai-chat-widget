@@ -21,9 +21,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App.tsx'
-import mockService from './services/chatService.ts'
+import { createMockService } from './services/chatService.ts'
 import { createApiChatService } from './services/apiChatService.ts'
-import type { ChatService, WidgetOptions } from './types/index.ts'
+import { resolveLocale } from './i18n/resolveLocale.ts'
+import type { ChatService, WidgetLocale, WidgetOptions } from './types/index.ts'
 import './styles/variables.css'
 
 type Root = ReturnType<typeof createRoot>
@@ -43,9 +44,12 @@ function resolveContainer(container: string | HTMLElement): HTMLElement {
   return container
 }
 
-function resolveService(apiUrl: string | undefined): ChatService {
+function resolveService(
+  apiUrl: string | undefined,
+  locale: WidgetLocale,
+): ChatService {
   const trimmed = typeof apiUrl === 'string' ? apiUrl.trim() : ''
-  if (trimmed.length === 0) return mockService
+  if (trimmed.length === 0) return createMockService(locale)
   return createApiChatService(trimmed)
 }
 
@@ -55,7 +59,8 @@ export function init(options: WidgetOptions): void {
   if (existing) {
     existing.unmount()
   }
-  const chatService = resolveService(options.apiUrl)
+  const locale = resolveLocale(options.locale)
+  const chatService = resolveService(options.apiUrl, locale)
   const interceptBackNavigation = options.interceptBackNavigation !== false
   const privacyPolicyUrl =
     typeof options.privacyPolicyUrl === 'string' &&
@@ -68,6 +73,7 @@ export function init(options: WidgetOptions): void {
     <StrictMode>
       <App
         chatService={chatService}
+        locale={locale}
         interceptBackNavigation={interceptBackNavigation}
         privacyPolicyUrl={privacyPolicyUrl}
       />

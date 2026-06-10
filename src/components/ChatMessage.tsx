@@ -25,6 +25,7 @@
 import type { ReactNode } from 'react'
 import type { ChatMessage as ChatMessageData } from '../types/index.ts'
 import { SourceBadge } from './SourceBadge.tsx'
+import { useStrings } from '../i18n/LocaleContext.tsx'
 import styles from '../styles/chatMessage.module.css'
 
 interface ChatMessageProps {
@@ -108,6 +109,7 @@ function renderAnswer(answer: string): ReactNode[] {
 }
 
 export function ChatMessage({ message }: ChatMessageProps) {
+  const t = useStrings()
   const { question, answer, sources, loading, error } = message
 
   return (
@@ -119,7 +121,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
         {loading ? (
           <div className={styles.loading} role="status" aria-live="polite">
             <div className={styles.loadingBlob} aria-hidden="true" />
-            <p className={styles.loadingText}>Haetaan tietoa...</p>
+            <p className={styles.loadingText}>{t.loadingText}</p>
           </div>
         ) : error ? (
           <p className={styles.error} role="alert">
@@ -131,7 +133,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
 
         {!loading && !error && sources && sources.length > 0 && (
           <div className={styles.references}>
-            <p className={styles.referencesLabel}>Lähteet:</p>
+            <p className={styles.referencesLabel}>{t.sourcesLabel}</p>
             <div className={styles.referenceList}>
               {sources.map((source, index) => (
                 <SourceBadge key={`${message.id}-source-${index}`} source={source} />

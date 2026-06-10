@@ -41,6 +41,7 @@
 
 import type { Conversation } from '../types/index.ts'
 import { PreviousDiscussionItem } from './PreviousDiscussionItem.tsx'
+import { useStrings } from '../i18n/LocaleContext.tsx'
 import styles from '../styles/previousDiscussionList.module.css'
 
 interface PreviousDiscussionListProps {
@@ -51,16 +52,13 @@ interface PreviousDiscussionListProps {
   onDelete: (id: string, label: string) => void
 }
 
-const NEUTRAL_LABEL = 'Uusi keskustelu'
 const LABEL_MAX = 60
-/** Figma `ds:191:259` — rendered uppercase via `.heading` */
-const HEADING_LABEL = 'Viimeisimmät keskustelut'
 
-function deriveLabel(conversation: Conversation): string {
+function deriveLabel(conversation: Conversation, neutralLabel: string): string {
   const firstUser = conversation.messages.find(
     (m) => m.question.trim().length > 0,
   )
-  if (!firstUser) return NEUTRAL_LABEL
+  if (!firstUser) return neutralLabel
   const trimmed = firstUser.question.trim()
   if (trimmed.length <= LABEL_MAX) return trimmed
   return `${trimmed.slice(0, LABEL_MAX - 1).trimEnd()}…`
@@ -73,12 +71,13 @@ export function PreviousDiscussionList({
   onStartNew,
   onDelete,
 }: PreviousDiscussionListProps) {
+  const t = useStrings()
   // PD-08 stores conversations oldest→newest; the sidebar shows the
   // most recently stored thread at the top for quicker scanning.
   const displayConversations = [...conversations].reverse()
 
   return (
-    <aside className={styles.list} aria-label={HEADING_LABEL}>
+    <aside className={styles.list} aria-label={t.recentConversationsHeading}>
       <button
         type="button"
         className={styles.newButton}
@@ -95,16 +94,16 @@ export function PreviousDiscussionList({
           <rect x="4.895" y="0" width="1.21" height="11" fill="currentColor" />
           <rect x="0" y="4.895" width="11" height="1.21" fill="currentColor" />
         </svg>
-        Luo uusi keskustelu
+        {t.newConversationLabel}
       </button>
       <div className={styles.headingSection}>
-        <h3 className={styles.heading}>{HEADING_LABEL}</h3>
+        <h3 className={styles.heading}>{t.recentConversationsHeading}</h3>
         <ul className={styles.items}>
           {displayConversations.map((c) => (
             <li key={c.id}>
               <PreviousDiscussionItem
                 id={c.id}
-                label={deriveLabel(c)}
+                label={deriveLabel(c, t.neutralConversationLabel)}
                 active={c.id === activeConversationId}
                 onActivate={onActivate}
                 onDelete={onDelete}
